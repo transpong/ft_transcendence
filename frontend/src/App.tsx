@@ -1,6 +1,6 @@
 import { ChakraProvider } from '@chakra-ui/react'
 import LoginView from './scenes/Login/View/LoginView'
-// import './App.css'
+import './App.css'
 
 function App() {
   return (
