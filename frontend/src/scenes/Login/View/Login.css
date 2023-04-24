@@ -1,28 +1,14 @@
-.gif {
-  text-align: center;
-  padding: 15px;
-}
- 
-@media screen and (max-width: 600px){
+ @media screen and (max-width: 600px){
   #root{
     background-size: cover fixed;
   }
 }
-  
-.loginBox{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  width: 350px;
-  min-height: 200px;
-  background: #000000;
-  border-radius: 10px;
-  padding: 40px;box-sizing: border-box
-}
-  
-.school42{
-  margin: 0 auto;
-  display: block;
-  margin-bottom: 20px
+
+@keyframes loginBox {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

@@ -1,8 +1,7 @@
 #root {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  background: url("docs/images/background1.png");
+  background: url("docs/images/background6.png");
   height: 100vh;
   background-size: cover;
   background-repeat: no-repeat;
