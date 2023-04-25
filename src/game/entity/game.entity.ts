@@ -1,13 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('game')
 export class GameEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @OneToOne(() => GameEntity)
   @Column()
   userId1: number;
 
+  @OneToOne(() => GameEntity)
   @Column()
   userId2: number;
 

@@ -1,6 +1,13 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { GameEntity } from '../../game/entity/game.entity';
 
-@Entity()
+@Entity('user')
 export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -8,6 +15,9 @@ export class UserEntity {
   @Column()
   @ManyToMany(() => UserEntity)
   friendId: number;
+
+  @OneToMany(() => GameEntity, (game: GameEntity) => game.userId1)
+  matchHistory: GameEntity[];
 
   @Column()
   nickname: string;
