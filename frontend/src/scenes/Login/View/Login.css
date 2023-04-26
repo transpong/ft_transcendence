@@ -1,4 +1,11 @@
- @media screen and (max-width: 600px){
+.LoginBackground{
+  background: url("../../../../docs/images/background6.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+@media screen and (max-width: 600px){
   #root{
     background-size: cover fixed;
   }

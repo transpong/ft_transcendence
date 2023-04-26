@@ -13,7 +13,7 @@ export default function CreateNickNameLoginView(){
     console.log(auth42Code); //TODO logic implementation
 
     return(
-        <Flex h={"100vh"} align={"center"} justify={"center"}>
+        <Flex className='CreateNickNameLoginBackground' h={"100vh"} align={"center"} justify={"center"}>
             <Flex
                 className={'loginBox'}
                 direction={"column"}

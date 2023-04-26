@@ -17,7 +17,7 @@ export default function LoginView(){
       window.location.replace(API42OAUTHURL);
     };
     return (
-      <Flex h={"100vh"} align={"center"} justify={"center"}>
+      <Flex className='LoginBackground' h={"100vh"} align={"center"} justify={"center"}>
         <Flex
           className="loginBox"
           direction={"column"}
