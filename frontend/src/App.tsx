@@ -3,6 +3,7 @@ import LoginView from './scenes/Login/View/LoginView'
 import CreateNickNameLogin from './scenes/CreateNickNameLogin/View/CreateNickNameLoginView'
 import {BrowserRouter, Routes, Route } from 'react-router-dom'
 import TwoFactorAuthenticationLogin from './scenes/TwoFactorAuthenticationLogin/View/TwoFactorAuthenticationLogin';
+import HomeView from './scenes/Home/View/HomeView';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
             <Route path="/" element={<LoginView />} />
             <Route path="/nickname" element={<CreateNickNameLogin />} />
             <Route path="/2FA" element={<TwoFactorAuthenticationLogin />} />
+            <Route path="/home" element={<HomeView />} />
           </Routes>
         </BrowserRouter>
       </ChakraProvider>

@@ -1,7 +1,7 @@
 import { Button, Flex, Stack, Image, Input } from '@chakra-ui/react'
 import "./CreateNickNameLoginView.css"
 import React from "react"
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 export default function CreateNickNameLoginView(){
     const [value, setValue] = React.useState('')
@@ -11,6 +11,7 @@ export default function CreateNickNameLoginView(){
     const queryParams = new URLSearchParams(location.search);
     const auth42Code = queryParams.get('code');
     console.log(auth42Code); //TODO logic implementation
+    const navigate = useNavigate();
 
     return(
         <Flex className='CreateNickNameLoginBackground' h={"100vh"} align={"center"} justify={"center"}>
@@ -35,7 +36,7 @@ export default function CreateNickNameLoginView(){
                 />
                 <Stack spacing={10} direction={"column"} align={"center"}>
                     <Input onChange={handleChange} placeholder={"Apelido"} size={"md"} textColor={"white"}/>
-                    <Button onClick={() => console.log(`VALUE=${value}`)} colorScheme={"purple"} size={"lg"}>
+                    <Button onClick={() => navigate("/home")} colorScheme={"purple"} size={"lg"}>
                         LOGIN
                     </Button>
                 </Stack>

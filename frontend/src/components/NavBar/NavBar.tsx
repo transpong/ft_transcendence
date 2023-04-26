@@ -1,10 +1,9 @@
 import { ButtonGroup, Button, Avatar, HStack} from "@chakra-ui/react";
 import { SettingsIcon } from "@chakra-ui/icons";
-import './NavBar.css'
 
 export default function NavBar() {
   return (
-    <HStack bgColor="#000" h="65px" align="center" justify="space-between">
+    <HStack  h="65px" align="center" justify="space-between">
       <Button marginLeft="20px" paddingLeft="70px" paddingRight="70px">
         Transpong
       </Button>

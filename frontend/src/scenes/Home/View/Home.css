@@ -1,0 +1,21 @@
+.HomeBackground{
+  background: url("../../../../docs/images/terra1.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+@media screen and (max-width: 600px){
+  #root{
+    background-size: cover fixed;
+  }
+}
+
+@keyframes loginBox {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
