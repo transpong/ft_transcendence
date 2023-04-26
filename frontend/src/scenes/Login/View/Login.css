@@ -1,4 +1,6 @@
 .LoginBackground{
+  display: flex;
+  flex-direction: column;
   background: url("../../../../docs/images/background6.png");
   background-size: cover;
   background-repeat: no-repeat;

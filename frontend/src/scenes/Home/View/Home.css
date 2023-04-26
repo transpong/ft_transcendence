@@ -1,4 +1,6 @@
 .HomeBackground{
+  display: flex;
+  flex-direction: column;
   background: url("../../../../docs/images/terra1.png");
   background-size: cover;
   background-repeat: no-repeat;
