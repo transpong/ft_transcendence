@@ -1,17 +1,20 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { UserEntity } from 'src/user/entity/user.entity';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('game')
 export class GameEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => GameEntity)
-  @Column()
-  userId1: number;
-
-  @OneToOne(() => GameEntity)
-  @Column()
-  userId2: number;
+  @ManyToMany(() => UserEntity, (user) => user.matchHistory, { eager: true })
+  @JoinTable()
+  users: UserEntity[];
 
   @Column()
   winnerId: number;
