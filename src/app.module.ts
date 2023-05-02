@@ -6,15 +6,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user/entity/user.entity';
 import { GameModule } from './game/game.module';
 import { GameEntity } from './game/entity/game.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'better-sqlite3',
-      database: ':memory:',
-      dropSchema: true,
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
       entities: [UserEntity, GameEntity],
       synchronize: true,
+      dropSchema: true,
     }),
     UserModule,
     GameModule,
