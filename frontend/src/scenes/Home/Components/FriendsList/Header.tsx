@@ -8,7 +8,7 @@ type Props = {
 
 const Header = (props: Props) => {
   return (
-    <Flex  h={"10vh"} backgroundColor={"#805AD5"} borderTopRadius={"20px"} justify={"center"}>
+    <Flex minHeight={"60px"} backgroundColor={"#805AD5"} borderTopRadius={"20px"} justify={"center"}>
 
       <Flex flexDirection="column" mx="5" justify="center" >
         <Text color={"white"} fontSize="larger" fontWeight="bold">
