@@ -10,7 +10,7 @@ type Props = {
 
 const Header = (props: Props) => {
   return (
-    <Flex h={"8vh"} backgroundColor={"#805AD5"} padding={"1vh"} borderTopRadius={"20px"}>
+    <Flex paddingBottom={"10px"} paddingTop={"1px"} backgroundColor={"#805AD5"} borderTopRadius={"20px"}>
       <Flex w={"85%"}>
       <Avatar size="md" name={props.name}>
         <AvatarBadge boxSize="1.25em" bg="green.500" />
@@ -22,13 +22,13 @@ const Header = (props: Props) => {
         <Text fontSize={"small"} color="green.500" fontWeight={"extrabold"}>Online</Text>
       </Flex>
       </Flex>
-      <Flex align={"start"}>
+      <Flex align={"center"}>
         {
           (props.getStatusMinimized() ? 
           <MinusIcon  cursor={"pointer"} onClick={() => props.minimized()}/> : 
           <AddIcon cursor={"pointer"} onClick={() => props.minimized()}/> )
         }
-        <CloseIcon marginLeft={"1vw"} cursor={"pointer"} onClick={() => props.deleteChat()}/>
+        <CloseIcon marginLeft={"10px"} marginRight={"10px"}cursor={"pointer"} onClick={() => props.deleteChat()}/>
       </Flex>
     </Flex>
   );
