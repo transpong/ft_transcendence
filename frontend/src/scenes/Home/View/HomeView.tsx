@@ -18,9 +18,12 @@ export default function HomeView(){
     return (
       <Flex className='MainBackground' h={"100vh"}>
           <NavBar></NavBar>
-          <Flex h={"100vh"} align={"end"} flexDirection={"row-reverse"}>
-            <FriendsList addChat={addChatList} deleteChat={deleteChatList}/>
-            {listChats}
+          <Flex h={"100vh"} flexDirection={"row-reverse"}>
+            <Flex position={"fixed"} align={"end"} bottom={"0px"}>
+              {listChats}
+              <FriendsList addChat={addChatList} deleteChat={deleteChatList}/>
+            </Flex>
+            <Flex height={"100%"} width={"100vw"}>{/*inserir aqui os elementos das proximas telas*/}</Flex>
           </Flex>
       </Flex>
     );
