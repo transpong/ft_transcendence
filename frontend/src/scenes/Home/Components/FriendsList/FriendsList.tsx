@@ -39,8 +39,8 @@ const FriendsList = (props: Props) => {
   const getStatusMinimized = () => isMinimized;
 
   return (
-    <Flex  justify="end" backgroundColor={"white"} marginLeft={"2vh"} borderTopRadius={"30px"}>
-      <Flex w={"15vw"} maxH={"80vh"} flexDir="column" borderTopRadius={"30px"}>
+    <Flex justify="end" backgroundColor={"white"} marginLeft={"2vh"} borderTopRadius={"30px"}>
+      <Flex minWidth={"250px"} w={"15vw"} maxH={"80vh"} flexDir="column" borderTopRadius={"30px"}>
         <Header  minimized={minimize} getStatusMinimized={getStatusMinimized}/>
         {isMinimized ? (
           <React.Fragment>
