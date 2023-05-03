@@ -16,7 +16,7 @@ export default function HomeView(){
     setListChats(null);
   }
     return (
-      <Flex className='HomeBackground' h={"100vh"}>
+      <Flex className='MainBackground' h={"100vh"}>
           <NavBar></NavBar>
           <Flex h={"100vh"} align={"end"} flexDirection={"row-reverse"}>
             <FriendsList addChat={addChatList} deleteChat={deleteChatList}/>
