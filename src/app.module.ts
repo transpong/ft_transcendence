@@ -7,10 +7,14 @@ import { UserEntity } from './user/entity/user.entity';
 import { GameModule } from './game/game.module';
 import { GameEntity } from './game/entity/game.entity';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { TempModule } from './temp/temp.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -23,6 +27,8 @@ import { ConfigModule } from '@nestjs/config';
     }),
     UserModule,
     GameModule,
+    AuthModule,
+    TempModule,
   ],
   controllers: [AppController],
   providers: [AppService],
