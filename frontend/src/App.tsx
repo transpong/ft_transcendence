@@ -23,8 +23,8 @@ function App() {
             <Route path="/home/" element={ <HomeView/> } >
               <Route path="ranking" element={<Ranking />} />
               <Route path="profile/:user" element={<Profile />} />
+              <Route path="matches" element={<MachesHistory />} />
             </Route>
-            <Route path="/matches" element={<MachesHistory />} />
             <Route path="/user/me" element={<Me />} />
             <Route path="/user/me/mfa" element={<MFA />} />
           </Routes>

@@ -6,7 +6,7 @@ export default function NavBar() {
   const navigate = useNavigate();
 
   return (
-    <HStack h="65px" align="center" justify="space-between">
+    <HStack h="14%" align="center" justify="space-between">
       <Button
         colorScheme={"purple"}
         marginLeft="20px"
@@ -20,8 +20,8 @@ export default function NavBar() {
         <Button colorScheme={"purple"} onClick={() => navigate("/home")}>
           Jogar
         </Button>
-        <Button colorScheme={"purple"} onClick={() => navigate("/matches")}>
-          Jogos ao vivo
+        <Button colorScheme={"purple"} onClick={() => navigate("/home/matches")}>
+          Lista de Jogos
         </Button>
         <Button colorScheme={"purple"} onClick={() => navigate("/home/ranking")}>
           Ranking

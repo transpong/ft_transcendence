@@ -1,6 +1,19 @@
 import { Box, Text, Badge, Avatar, Flex, HStack } from "@chakra-ui/react";
 
-export default function MatchCard() {
+interface IPlayerMatch {
+  points: number
+  nickname: string;
+  avatar?: string;
+}
+
+interface Props {
+  winner: IPlayerMatch;
+  loser: IPlayerMatch;
+}
+
+export default function MatchCard(props: Props) {
+  const { winner, loser } = props;
+
   return (
     <HStack
       align="center"
@@ -9,11 +22,12 @@ export default function MatchCard() {
       margin="10px"
       border="1px"
       borderRadius="10"
+      backgroundColor="rgba(255,255,255, 0.9)"
     >
       <Flex>
-        <Avatar src="https://bit.ly/dan-abramov" />
+        <Avatar src={winner.avatar || "https://bit.ly/sage-adebayo"} />
         <Box ml="3">
-          <Text fontWeight="bold">Nickname</Text>
+          <Text fontWeight="bold">{winner.nickname}</Text>
           <Badge ml="1" colorScheme="green">
             Vitória
           </Badge>
@@ -21,19 +35,19 @@ export default function MatchCard() {
       </Flex>
       <Flex>
         <Text ml="10" fontWeight="bold" fontSize="20">
-          10
+          {winner.points}
         </Text>
         <Text ml="10" fontWeight="bold" fontSize="20">
           x
         </Text>
         <Text ml="10" fontWeight="bold" fontSize="20">
-          7
+          {loser.points}
         </Text>
       </Flex>
       <Flex>
-        <Avatar ml="10" src="https://bit.ly/sage-adebayo" />
+        <Avatar ml="10" src={loser.avatar || "https://bit.ly/dan-abramov"} />
         <Box ml="3">
-          <Text fontWeight="bold">Nickname</Text>
+          <Text fontWeight="bold">{loser.nickname}</Text>
           <Badge ml="1" colorScheme="red">
             Derrota
           </Badge>

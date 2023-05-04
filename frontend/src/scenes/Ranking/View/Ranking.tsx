@@ -85,7 +85,7 @@ export default function Ranking(){
   );
 
   return (
-    <Box h="90%" w={"100%"} overflowY="scroll">
+    <Box h="98%" w={"100%"} overflowY="scroll">
       <Text
         fontSize={"25px"}
         fontWeight={"bold"}

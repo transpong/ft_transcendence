@@ -20,7 +20,7 @@ export default function PageBase() {
   return (
     <Flex className="MainBackground" h={"100vh"}>
       <NavBar></NavBar>
-      <Flex h={"100vh"} flexDirection={"row-reverse"}>
+      <Flex h={"85%"} flexDirection={"row-reverse"}>
         <Flex position={"fixed"} align={"end"} bottom={"0px"}>
           {listChats}
           <FriendsList addChat={addChatList} deleteChat={deleteChatList} />
