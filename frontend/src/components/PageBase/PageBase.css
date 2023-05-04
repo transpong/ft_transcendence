@@ -1,0 +1,11 @@
+.MainView {
+  height: 95%;
+  width: 80vw;
+  margin-top: 1vh;
+  margin-right: 19vw;
+  border: 6px solid;
+  border-color: white;
+  background-color: rgba(0,0,0, 0.7);
+  border-radius: 20px;
+  padding: 10px;
+}

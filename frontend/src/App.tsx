@@ -10,6 +10,7 @@ import MachesHistory from './scenes/MatchesHistory/View/MachesHistory';
 import Me from './scenes/Users/Me/View/Me';
 import MFA from './scenes/Users/MFA/View/MFA';
 import Profile from './scenes/Users/Profiles/View/Profiles';
+import PageBase from './components/PageBase/PageBase';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
             <Route path="/" element={<LoginView />} />
             <Route path="/nickname" element={<CreateNickNameLogin />} />
             <Route path="/2FA" element={<TwoFactorAuthenticationLogin />} />
-            <Route path="/home" element={<HomeView />} />
+            <Route path="/home" element={ <PageBase PageElement={<HomeView/>} />} />
             <Route path="/ranking" element={<Ranking />} />
             <Route path="/matches" element={<MachesHistory />} />
             <Route path="/users/me" element={<Me />} />
