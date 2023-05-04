@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
 import NavBar from "../NavBar/NavBar";
-import FriendsList from "../../scenes/Home/Components/FriendsList/FriendsList";
+import FriendsList from "..//FriendsList/FriendsList";
 import { useState } from "react";
 import './PageBase.css'
 
