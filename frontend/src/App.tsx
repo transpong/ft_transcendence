@@ -25,8 +25,8 @@ function App() {
               <Route path="profile/:user" element={<Profile />} />
             </Route>
             <Route path="/matches" element={<MachesHistory />} />
-            <Route path="/users/me" element={<Me />} />
-            <Route path="/users/me/mfa" element={<MFA />} />
+            <Route path="/user/me" element={<Me />} />
+            <Route path="/user/me/mfa" element={<MFA />} />
           </Routes>
         </BrowserRouter>
       </ChakraProvider>

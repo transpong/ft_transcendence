@@ -32,7 +32,7 @@ export default function NavBar() {
         leftIcon={<Avatar />}
         rightIcon={<SettingsIcon />}
         size="lg"
-        onClick={() => navigate("/home/profile/42")} //estou usando um param fake aqui, por isso coloque 42
+        onClick={() => navigate("/home/user/me")}
       >
         Nickname
       </Button>
