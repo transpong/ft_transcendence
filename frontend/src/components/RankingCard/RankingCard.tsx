@@ -24,6 +24,7 @@ export default function RankingCard(props: Props) {
       margin="10px"
       border="1px"
       borderRadius="10"
+      backgroundColor="rgba(255,255,255, 0.9)"
     >
       <HStack w="35%">
         <VStack alignItems="center" spacing="0">
