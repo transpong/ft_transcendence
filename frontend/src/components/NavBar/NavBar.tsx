@@ -23,7 +23,7 @@ export default function NavBar() {
         <Button colorScheme={"purple"} onClick={() => navigate("/matches")}>
           Jogos ao vivo
         </Button>
-        <Button colorScheme={"purple"} onClick={() => navigate("/ranking")}>
+        <Button colorScheme={"purple"} onClick={() => navigate("/home/ranking")}>
           Ranking
         </Button>
       </ButtonGroup>
@@ -32,7 +32,7 @@ export default function NavBar() {
         leftIcon={<Avatar />}
         rightIcon={<SettingsIcon />}
         size="lg"
-        onClick={() => navigate("/users/me")}
+        onClick={() => navigate("/home/profile/42")} //estou usando um param fake aqui, por isso coloque 42
       >
         Nickname
       </Button>
