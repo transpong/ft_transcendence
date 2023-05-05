@@ -22,10 +22,10 @@ function App() {
             <Route path="/2FA" element={<TwoFactorAuthenticationLogin />} />
             <Route path="/home/" element={ <HomeView/> } >
               <Route path="ranking" element={<Ranking />} />
-              <Route path="profile/:user" element={<Profile />} />
               <Route path="matches" element={<MachesHistory />} />
+              <Route path="me" element={<Me />} />
             </Route>
-            <Route path="/user/me" element={<Me />} />
+            <Route path="profile/:user" element={<Profile />} />
             <Route path="/user/me/mfa" element={<MFA />} />
           </Routes>
         </BrowserRouter>
