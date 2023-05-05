@@ -1,26 +1,27 @@
-import { Controller, Get, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { FtOauthGuard } from '../guards/ft.guard';
+import { Public } from '../public.decorator';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  @Get('42')
-  @UseGuards(FtOauthGuard)
-  async ftAuth(@Req() req: any, @Res() response: Response): Promise<void> {
-    console.log('Req :', req);
-    console.log('Res :', response);
-    return;
-  }
+  constructor(private readonly jwtService: JwtService) {}
 
+  @Public()
+  @Get('login')
+  @UseGuards(FtOauthGuard)
+  async ftAuth(): Promise<void> {}
+
+  @Public()
   @Get('42/callback')
   @UseGuards(FtOauthGuard)
-  @Redirect('/')
-  async ftAuthCallback(
-    @Req() req: any,
-    @Res() response: Response,
-  ): Promise<void> {
-    console.log('ftAuthCallback called');
-    console.log('Req :', req);
-    console.log('Res :', response);
-    return;
+  async ftAuthCallback(@Req() req: any, @Res() res: Response): Promise<void> {
+    const accessToken = this.jwtService.sign(
+      { req: req.user.username },
+      { secret: `${process.env.JWT_SECRET}` },
+    );
+    console.log(accessToken);
+    return res.redirect('http://localhost:5173/?token=' + accessToken);
   }
 }

@@ -13,11 +13,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: any): any {
-    if (!payload.otp)
+    if (payload === null) {
       throw new HttpException(
-        'Validação de dois fatores necessária',
+        { status: HttpStatus.UNAUTHORIZED, error: 'Unauthorized' },
         HttpStatus.UNAUTHORIZED,
       );
-    return { userId: payload.sub };
+    }
+    return { userId: payload.sub, username: payload.username };
   }
 }
