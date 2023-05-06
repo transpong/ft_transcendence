@@ -8,7 +8,6 @@ import { GameModule } from './game/game.module';
 import { GameEntity } from './game/entity/game.entity';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { TempModule } from './temp/temp.module';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -30,7 +29,6 @@ import { APP_GUARD } from '@nestjs/core';
     UserModule,
     GameModule,
     AuthModule,
-    TempModule,
   ],
   controllers: [AppController],
   providers: [

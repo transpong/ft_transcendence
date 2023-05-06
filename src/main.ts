@@ -4,10 +4,12 @@ import { INestApplication } from '@nestjs/common';
 
 async function bootstrap(): Promise<void> {
   const app: INestApplication = await NestFactory.create(AppModule);
+
   app.enableCors({
     origin: '*',
-    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
+
   await app.listen(process.env.PORT || 3000);
 }
 

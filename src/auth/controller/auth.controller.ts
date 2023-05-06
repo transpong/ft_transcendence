@@ -11,17 +11,20 @@ export class AuthController {
   @Public()
   @Get('login')
   @UseGuards(FtOauthGuard)
-  async ftAuth(): Promise<void> {}
+  async ftAuth(): Promise<void> {
+    return;
+  }
 
   @Public()
   @Get('42/callback')
   @UseGuards(FtOauthGuard)
   async ftAuthCallback(@Req() req: any, @Res() res: Response): Promise<void> {
-    const accessToken = this.jwtService.sign(
+    const accessToken: string = this.jwtService.sign(
       { req: req.user.username },
       { secret: `${process.env.JWT_SECRET}` },
     );
-    console.log(accessToken);
-    return res.redirect('http://localhost:5173/?token=' + accessToken);
+    res.cookie('token', accessToken);
+    res.redirect(`http://localhost:5173/dashboard`);
+    return;
   }
 }
