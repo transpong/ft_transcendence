@@ -1,19 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req, Res } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  async login(userId: number): Promise<string> {
-    return this.generateToken(userId);
+  ftAuthCallback(@Req() req: any, @Res() res: Response): void {
+    const accessToken: string = this.generateJwtToken(req);
+    this.setTokenCookie(res, accessToken);
+    res.redirect(`http://localhost:5173/dashboard`);
+    return;
   }
 
-  generateToken(userId: number): string {
-    return this.jwtService.sign({ userId });
+  private generateJwtToken(req: any): string {
+    return this.jwtService.sign(
+      { req: req.user.username },
+      { secret: `${process.env.JWT_SECRET}` },
+    );
   }
 
-  verifyToken(token: string): any {
-    return this.jwtService.verify(token);
+  private setTokenCookie(res: Response, token: string): void {
+    const cookie = `token=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION_TIME}`;
+    res.cookie('token', cookie);
   }
 }
