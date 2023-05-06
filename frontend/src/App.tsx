@@ -23,10 +23,11 @@ function App() {
             <Route path="/home/" element={ <HomeView/> } >
               <Route path="ranking" element={<Ranking />} />
               <Route path="matches" element={<MachesHistory />} />
-              <Route path="me" element={<Me />} />
+              <Route path="me/" element={<Me />}>
+                <Route path="mfa" element={<MFA />}/>
+              </Route>
             </Route>
             <Route path="profile/:user" element={<Profile />} />
-            <Route path="/user/me/mfa" element={<MFA />} />
           </Routes>
         </BrowserRouter>
       </ChakraProvider>

@@ -3,11 +3,13 @@ import { Text, Avatar, Button, Box } from "@chakra-ui/react";
 import { useState } from "react";
 import RankingCard from "../../../../components/RankingCard/RankingCard";
 import MatchCard from "../../../../components/MatchCard/MatchCard";
+import { useNavigate, useOutlet, Outlet } from "react-router-dom";
 
 export default function Me(){
   const position = 7
   const nickname = "Nickname"
   const [isMFA, setMFA] = useState(false);
+  const navigate = useNavigate();
   const teste = [
     {
       winner: {
@@ -103,7 +105,7 @@ export default function Me(){
       },
     },
   ]
-  return (
+  return useOutlet() ? <Outlet/> : ( 
     <>
       <Flex h='100%' w={"100%"} borderRadius={"20px"} align={"center"}>
         <Flex backgroundColor={"white"} width={"30%"} height={"90%"} marginLeft={"1%"} border={"8px"} borderColor={"#805AD5"} align={"center"} justify={"center"} flexDirection={"column"} borderRadius={"20px"}>
@@ -115,7 +117,10 @@ export default function Me(){
             {nickname}
           </Text>
           { !isMFA ?
-            <Button size={"lg"} colorScheme={"purple"} onClick={() => setMFA(true)}>
+            <Button size={"lg"} colorScheme={"purple"} onClick={() => {
+              navigate("/home/me/mfa");
+              setMFA(true)
+            }}>
               Ativar MFA
             </Button> :
             <Button size={"lg"} colorScheme={"purple"} onClick={() => setMFA(false)}>

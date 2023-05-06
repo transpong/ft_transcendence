@@ -17,6 +17,7 @@ export default function PageBase() {
   const deleteChatList = () => {
     setListChats(null);
   };
+  
   return (
     <Flex className="MainBackground" h={"100vh"}>
       <NavBar></NavBar>
