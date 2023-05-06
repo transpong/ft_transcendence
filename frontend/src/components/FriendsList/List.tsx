@@ -25,14 +25,6 @@ type Props = {
 }
 
 const List = (props: Props) => {
-  const AlwaysScrollToBottom = () => {
-    const elementRef = useRef<HTMLInputElement>(null);
-        useEffect(() => {
-            if( elementRef.current)
-            elementRef.current.scrollIntoView()
-        });
-        return <div ref={elementRef} />;
-  };
 
   return (
     <Flex w="100%" h="100%" overflowY="scroll" flexDirection="column" p="3">
@@ -121,7 +113,6 @@ const List = (props: Props) => {
         </Flex>
       )}
       <Divider/>
-      <AlwaysScrollToBottom />
     </Flex>
   );
 };
