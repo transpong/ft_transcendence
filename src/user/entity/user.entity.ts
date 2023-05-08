@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
-import { ChannelEntity } from '../../chat/entity/channel.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { UsersChannelsEntity } from '../../chat/entity/user-channels.entity';
 import { DirectMessagesEntity } from '../../chat/entity/direct-messages.entity';
 import { MatchHistoryEntity } from '../../game/entity/game.entity';
@@ -9,6 +8,15 @@ import { MatchHistoryEntity } from '../../game/entity/game.entity';
 export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @CreateDateColumn()
+  created_at: Date
+
+  @UpdateDateColumn()
+  updated_at: Date
+
+  @Column()
+  ft_id: number;
 
   @Column({ length: 50 })
   nickname: string;
@@ -25,13 +33,9 @@ export class UserEntity {
   @Column()
   status: number;
 
-  @ManyToMany(() => ChannelEntity, channel => channel.users, { cascade: true })
-  @JoinTable({
-    name: 'users_channels',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'channel_id', referencedColumnName: 'id' },
-  })
-  channels: ChannelEntity[];
+  @ManyToMany(() => UserEntity)
+  @JoinTable()
+  friends: UserEntity[];
 
   @OneToMany(() => UsersChannelsEntity, usersChannels => usersChannels.user)
   usersChannels: UsersChannelsEntity[];

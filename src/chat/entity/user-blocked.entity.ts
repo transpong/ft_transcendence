@@ -1,8 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 
 @Entity()
-export class DirectMessagesEntity {
+export class BlockUserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -12,12 +12,9 @@ export class DirectMessagesEntity {
   @UpdateDateColumn()
   updated_at: Date
 
-  @Column()
-  message_text: string;
+  @ManyToOne(() => UserEntity, user => user.id)
+  user_id_1: UserEntity;
 
   @ManyToOne(() => UserEntity, user => user.id)
-  from_user: UserEntity;
-
-  @ManyToOne(() => UserEntity, user => user.id)
-  to_user: UserEntity;
+  user_id_2: UserEntity;
 }

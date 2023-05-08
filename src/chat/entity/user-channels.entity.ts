@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { ChannelEntity } from './channel.entity';
 
@@ -6,6 +6,12 @@ import { ChannelEntity } from './channel.entity';
 export class UsersChannelsEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @CreateDateColumn()
+  created_at: Date
+
+  @UpdateDateColumn()
+  updated_at: Date
 
   @Column()
   user_access_type: number;
@@ -22,6 +28,6 @@ export class UsersChannelsEntity {
   @ManyToOne(() => UserEntity, (user) => user.usersChannels)
   user: UserEntity;
 
-  @ManyToOne(() => ChannelEntity, (channel) => channel.usersChannels)
+  @ManyToOne(() => ChannelEntity, (channel) => channel.users_channels)
   channel: ChannelEntity;
 }
