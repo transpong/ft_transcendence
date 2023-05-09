@@ -5,10 +5,13 @@ import { INestApplication } from '@nestjs/common';
 async function bootstrap(): Promise<void> {
   const app: INestApplication = await NestFactory.create(AppModule);
 
-  app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  });
+  const corsOptions = {
+    origin: ['http://localhost:5173', 'http://api.intra.42.fr'],
+    credentials: true,
+    optionSuccessStatus: 200,
+  };
+
+  app.enableCors(corsOptions);
 
   await app.listen(process.env.PORT || 3000);
 }

@@ -4,5 +4,6 @@ interface Photo {
 
 export interface FortyTwoUser {
   id: number;
+  nickname: string;
   photos: Photo[];
 }

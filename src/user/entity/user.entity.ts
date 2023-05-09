@@ -1,9 +1,9 @@
 import {
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
-  JoinTable,
 } from 'typeorm';
 import { GameEntity } from '../../game/entity/game.entity';
 
@@ -19,19 +19,19 @@ export class UserEntity {
   @ManyToMany(() => GameEntity, (game: GameEntity) => game.users)
   matchHistory: GameEntity[];
 
-  @Column()
+  @Column({ nullable: true })
   nickname: string;
 
   @Column()
   avatar: string;
 
-  @Column()
+  @Column({ nullable: true })
   mfatoken: string;
 
-  @Column()
+  @Column({ nullable: true })
   mfaValidateAt: Date;
 
-  @Column()
+  @Column({ nullable: true })
   status: number;
 
   @Column()

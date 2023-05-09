@@ -15,7 +15,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   validate(payload: any): any {
     if (payload === null) {
       throw new HttpException(
-        { status: HttpStatus.UNAUTHORIZED, error: 'Unauthorized' },
+        {
+          status: HttpStatus.UNAUTHORIZED,
+          error: 'Unauthorized',
+        },
         HttpStatus.UNAUTHORIZED,
       );
     }

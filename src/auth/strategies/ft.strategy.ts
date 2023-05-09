@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-42';
-import { FortyTwoUser } from '../user.interface';
-import { AuthService } from '../service/auth.service';
+import { AuthDto } from '../dto/auth.dto';
+import { UserService } from '../../user/service/user.service';
 
 @Injectable()
 export class FtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
+  constructor(private readonly userService: UserService) {
     super({
       clientID: process.env.FORTYTWO_CLIENT_ID,
       clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
@@ -14,11 +14,18 @@ export class FtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(
-    accessToken: string,
-    refreshToken: string,
-    profile: FortyTwoUser,
-  ): FortyTwoUser {
-    return profile;
+  async validate(accessToken: string, refreshToken: string, profile) {
+    const { login, image } = profile._json;
+    const authDto: AuthDto = AuthDto.fromJSON(profile._json);
+
+    if (!(await this.userService.userExists(authDto.username))) {
+      this.userService.createUser(authDto).then((r) => console.log(r));
+    }
+
+    return {
+      username: login,
+      image: image.link,
+      accessToken,
+    };
   }
 }

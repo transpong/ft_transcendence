@@ -14,4 +14,10 @@ export class AuthController {
   async ftAuthCallback(@Req() req: any, @Res() res: Response): Promise<void> {
     this.authService.ftAuthCallback(req, res);
   }
+
+  // temp route to test auth
+  @Get('me')
+  async me(@Req() req: any): Promise<any> {
+    return this.authService.me(req);
+  }
 }
