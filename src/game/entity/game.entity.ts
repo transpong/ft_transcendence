@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 
 @Entity()
@@ -7,10 +14,10 @@ export class MatchHistoryEntity {
   id: number;
 
   @CreateDateColumn()
-  created_at: Date
+  created_at: Date;
 
   @UpdateDateColumn()
-  updated_at: Date
+  updated_at: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   user1: UserEntity;
@@ -31,5 +38,5 @@ export class MatchHistoryEntity {
   status: number;
 
   @Column()
-  map: number;
+  custom: number;
 }

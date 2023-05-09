@@ -1,8 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { UsersChannelsEntity } from '../../chat/entity/user-channels.entity';
 import { DirectMessagesEntity } from '../../chat/entity/direct-messages.entity';
 import { MatchHistoryEntity } from '../../game/entity/game.entity';
-
 
 @Entity('users')
 export class UserEntity {
@@ -10,13 +18,13 @@ export class UserEntity {
   id: number;
 
   @CreateDateColumn()
-  created_at: Date
+  created_at: Date;
 
   @UpdateDateColumn()
-  updated_at: Date
+  updated_at: Date;
 
   @Column()
-  ft_id: number;
+  ft_id: string;
 
   @Column({ length: 50 })
   nickname: string;
@@ -37,21 +45,42 @@ export class UserEntity {
   @JoinTable()
   friends: UserEntity[];
 
-  @OneToMany(() => UsersChannelsEntity, usersChannels => usersChannels.user)
+  @ManyToMany(() => UserEntity, (user) => user.blockedBy)
+  @JoinTable({
+    name: 'user_blocks',
+    joinColumn: {
+      name: 'user_blocker',
+    },
+    inverseJoinColumn: {
+      name: 'user_blocked',
+    },
+  })
+  blocks: UserEntity[];
+
+  @ManyToMany(() => UserEntity, (user) => user.blocks)
+  blockedBy: UserEntity[];
+
+  @OneToMany(() => UsersChannelsEntity, (usersChannels) => usersChannels.user)
   usersChannels: UsersChannelsEntity[];
 
-  @OneToMany(() => DirectMessagesEntity, directMessage => directMessage.from_user)
+  @OneToMany(
+    () => DirectMessagesEntity,
+    (directMessage) => directMessage.from_user,
+  )
   directMessagesFrom: DirectMessagesEntity[];
 
-  @OneToMany(() => DirectMessagesEntity, directMessage => directMessage.to_user)
+  @OneToMany(
+    () => DirectMessagesEntity,
+    (directMessage) => directMessage.to_user,
+  )
   directMessagesTo: DirectMessagesEntity[];
 
-  @OneToMany(() => MatchHistoryEntity, matchHistory => matchHistory.user1)
+  @OneToMany(() => MatchHistoryEntity, (matchHistory) => matchHistory.user1)
   matchHistory1: MatchHistoryEntity[];
 
-  @OneToMany(() => MatchHistoryEntity, matchHistory => matchHistory.user2)
+  @OneToMany(() => MatchHistoryEntity, (matchHistory) => matchHistory.user2)
   matchHistory2: MatchHistoryEntity[];
 
-  @OneToMany(() => MatchHistoryEntity, matchHistory => matchHistory.winner)
+  @OneToMany(() => MatchHistoryEntity, (matchHistory) => matchHistory.winner)
   matchHistoryWinner: MatchHistoryEntity[];
 }
