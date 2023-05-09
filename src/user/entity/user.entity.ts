@@ -1,39 +1,86 @@
 import {
-  Column,
   Entity,
-  ManyToMany,
   PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
   JoinTable,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { GameEntity } from '../../game/entity/game.entity';
+import { UsersChannelsEntity } from '../../chat/entity/user-channels.entity';
+import { DirectMessagesEntity } from '../../chat/entity/direct-messages.entity';
+import { MatchHistoryEntity } from '../../game/entity/game.entity';
 
-@Entity('user')
+@Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @Column()
+  ft_id: string;
+
+  @Column({ length: 50 })
+  nickname: string;
+
+  @Column({ nullable: true })
+  avatar: string;
+
+  @Column({ nullable: true })
+  mfa_token: string;
+
+  @Column({ nullable: true })
+  mfa_validated_at: Date;
+
+  @Column()
+  status: number;
 
   @ManyToMany(() => UserEntity)
   @JoinTable()
   friends: UserEntity[];
 
-  @ManyToMany(() => GameEntity, (game: GameEntity) => game.users)
-  matchHistory: GameEntity[];
+  @ManyToMany(() => UserEntity, (user) => user.blockedBy)
+  @JoinTable({
+    name: 'user_blocks',
+    joinColumn: {
+      name: 'user_blocker',
+    },
+    inverseJoinColumn: {
+      name: 'user_blocked',
+    },
+  })
+  blocks: UserEntity[];
 
-  @Column()
-  nickname: string;
+  @ManyToMany(() => UserEntity, (user) => user.blocks)
+  blockedBy: UserEntity[];
 
-  @Column()
-  avatar: string;
+  @OneToMany(() => UsersChannelsEntity, (usersChannels) => usersChannels.user)
+  usersChannels: UsersChannelsEntity[];
 
-  @Column()
-  mfatoken: string;
+  @OneToMany(
+    () => DirectMessagesEntity,
+    (directMessage) => directMessage.from_user,
+  )
+  directMessagesFrom: DirectMessagesEntity[];
 
-  @Column()
-  mfaValidateAt: Date;
+  @OneToMany(
+    () => DirectMessagesEntity,
+    (directMessage) => directMessage.to_user,
+  )
+  directMessagesTo: DirectMessagesEntity[];
 
-  @Column()
-  status: number;
+  @OneToMany(() => MatchHistoryEntity, (matchHistory) => matchHistory.user1)
+  matchHistory1: MatchHistoryEntity[];
 
-  @Column()
-  ftId: string;
+  @OneToMany(() => MatchHistoryEntity, (matchHistory) => matchHistory.user2)
+  matchHistory2: MatchHistoryEntity[];
+
+  @OneToMany(() => MatchHistoryEntity, (matchHistory) => matchHistory.winner)
+  matchHistoryWinner: MatchHistoryEntity[];
 }
