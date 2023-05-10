@@ -14,7 +14,9 @@ export class UserService {
   ) {}
 
   async createUser(authDto: AuthDto): Promise<void> {
+    console.log('authDto ' + authDto.username); // TODO: remove this debug log
     const user: UserEntity = AuthDto.toUserEntity(authDto);
+    console.log('createUser ' + user.ftId); // TODO: remove this debug log
     const imageUrl: string = await this.imageService.downloadImageFromUrl(
       authDto.image,
     );
@@ -23,15 +25,17 @@ export class UserService {
 
     // console.log(imageUrl); // TODO: remove this debug log
     // console.log(user); // TODO: remove this debug log
-    this.userRepository.create(user);
     await this.userRepository.save(user);
     console.log(`User ${user.ftId} created!`); // TODO: remove this debug log
   }
 
   async userExists(ftId: string): Promise<boolean> {
-    const user: UserEntity = await this.userRepository.findOne({
-      where: { ftId: ftId },
-    });
+    // get all
+    const users = await this.userRepository.find();
+    console.log('users ' + users); // TODO: remove this debug log
+    console.log('ftId ' + ftId); // TODO: remove this debug log
+    const user = await this.userRepository.findOneBy({ ftId: ftId });
+    console.log('userExists ' + user); // TODO: remove this debug log
     return !!user;
   }
 
@@ -40,7 +44,6 @@ export class UserService {
       where: { ftId },
     });
     if (!user) return false;
-    console.log('busca ' + user); // TODO: remove this debug log
     return user.nickname === '';
   }
 }

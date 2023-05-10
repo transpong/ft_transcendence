@@ -11,20 +11,21 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  ftAuthCallback(@Req() req: any, @Res() res: Response): void {
+  async ftAuthCallback(@Req() req: any, @Res() res: Response): Promise<void> {
     const tempUser: AuthDto = AuthDto.fromJSON(req.user);
     const accessToken: string = this.generateJwtToken(req);
 
     res.cookie('token', accessToken);
-    if (this.userService.userEmptyNickname(tempUser.username)) {
+    if (await this.userService.userEmptyNickname(tempUser.username)) {
       res.redirect('http://localhost:5173/dashboard');
     } else {
-      res.redirect('http://google.com');
+      console.log('NOT EMPTY');
+      res.redirect('http://localhost:5173/dashboard');
     }
     return;
   }
 
-  me(@Req() req: any): any {
+  async me(@Req() req: any) {
     const token = this.deserializeJwtToken(this.getBearerToken(req));
     return token.req;
   }

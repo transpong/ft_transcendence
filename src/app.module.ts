@@ -24,7 +24,7 @@ import { APP_GUARD } from '@nestjs/core';
       password: process.env.POSTGRES_PASSWORD,
       entities: [UserEntity, GameEntity],
       synchronize: true,
-      dropSchema: true,
+      // dropSchema: true,
     }),
     UserModule,
     GameModule,

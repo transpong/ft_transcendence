@@ -12,7 +12,7 @@ export class AuthController {
   @Get('42/callback')
   @UseGuards(FtOauthGuard)
   async ftAuthCallback(@Req() req: any, @Res() res: Response): Promise<void> {
-    this.authService.ftAuthCallback(req, res);
+    await this.authService.ftAuthCallback(req, res);
   }
 
   // temp route to test auth this route return user info from jwt token
