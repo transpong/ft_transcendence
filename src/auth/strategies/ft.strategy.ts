@@ -23,10 +23,10 @@ export class FtStrategy extends PassportStrategy(Strategy) {
     const authDto: AuthDto = AuthDto.fromJSON(profile._json);
 
     if (!(await this.userService.userExists(login))) {
+      console.log(image.link);
       authDto.image = await this.avatarService.downloadImageFromUrl(image.link);
       await this.userService.createUser(authDto);
     }
-
     return {
       username: login,
       image: image.link,
