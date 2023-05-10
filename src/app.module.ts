@@ -5,7 +5,11 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user/entity/user.entity';
 import { GameModule } from './game/game.module';
-import { GameEntity } from './game/entity/game.entity';
+import { MatchHistoryEntity } from './game/entity/game.entity';
+import { ChannelEntity } from './chat/entity/channel.entity';
+import { UsersChannelsEntity } from './chat/entity/user-channels.entity';
+import { DirectMessagesEntity } from './chat/entity/direct-messages.entity';
+import { ChannelMessagesEntity } from './chat/entity/channelmessages.entity';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/guards/jwt.guard';
@@ -23,7 +27,7 @@ import { AvatarModule } from './avatar/avatar.module';
       port: 5432,
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
-      entities: [UserEntity, GameEntity],
+      entities: [UserEntity, MatchHistoryEntity, ChannelEntity, UsersChannelsEntity, DirectMessagesEntity, ChannelMessagesEntity],
       synchronize: true,
       // dropSchema: true,
     }),

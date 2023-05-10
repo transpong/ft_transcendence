@@ -1,33 +1,42 @@
-import { UserEntity } from 'src/user/entity/user.entity';
 import {
-  Column,
   Entity,
-  JoinTable,
-  ManyToMany,
+  Column,
   PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { UserEntity } from '../../user/entity/user.entity';
 
-@Entity('game')
-export class GameEntity {
+@Entity()
+export class MatchHistoryEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => UserEntity, (user) => user.matchHistory, { eager: true })
-  @JoinTable()
-  users: UserEntity[];
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @ManyToOne(() => UserEntity, (user) => user.id)
+  user1: UserEntity;
+
+  @ManyToOne(() => UserEntity, (user) => user.id)
+  user2: UserEntity;
+
+  @ManyToOne(() => UserEntity, (user) => user.id)
+  winner: UserEntity;
 
   @Column()
-  winnerId: number;
+  user_1_score: number;
 
   @Column()
-  user1Score: number;
-
-  @Column()
-  user2Score: number;
+  user_2_score: number;
 
   @Column()
   status: number;
 
   @Column()
-  mapId: number;
+  custom: number;
 }
