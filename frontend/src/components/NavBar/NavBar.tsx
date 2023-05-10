@@ -1,4 +1,4 @@
-import { ButtonGroup, Button, Avatar, HStack, Text} from "@chakra-ui/react";
+import { ButtonGroup, Button, Avatar, HStack, Text, Flex} from "@chakra-ui/react";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { IoExit } from "react-icons/io5";
 import { useNavigate } from "react-router";
@@ -34,12 +34,14 @@ export default function NavBar() {
         backgroundColor={"#805AD5"}
         minWidth={"2.5rem"}
       >
-        <HStack marginRight={"1rem"} marginLeft={"1rem"}>
+        <Flex marginRight={"1rem"} marginLeft={"1rem"} align={"center"} justify={"center"}>
           <Avatar/>
-          <Text fontSize={"1rem"} fontWeight={"bold"} color={"white"}>Nickname</Text>
-          <SettingsIcon cursor={"pointer"} fontSize={"2rem"} fontWeight={"bold"} color={"white"} onClick={() => navigate("/home/me")}/>
+          <HStack marginRight={"2rem"} marginLeft={"2rem"} cursor={"pointer"} onClick={() => navigate("/home/me")}>
+            <Text fontSize={"1rem"} fontWeight={"bold"} color={"white"}>Nickname</Text>
+            <SettingsIcon fontSize={"2rem"} fontWeight={"bold"} color={"white"}/>
+          </HStack>
           <IoExit cursor={"pointer"} fontSize={"2rem"} fontWeight={"bold"} color={"white"} onClick={() => logoff()}/>
-        </HStack>
+        </Flex>
       </HStack>
     </HStack>
   );
