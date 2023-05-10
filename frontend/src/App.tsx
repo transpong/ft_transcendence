@@ -26,8 +26,8 @@ function App() {
               <Route path="me/" element={<Me />}>
                 <Route path="mfa" element={<MFA />}/>
               </Route>
+              <Route path="profile/:user" element={<Profile />} />
             </Route>
-            <Route path="profile/:user" element={<Profile />} />
           </Routes>
         </BrowserRouter>
       </ChakraProvider>
