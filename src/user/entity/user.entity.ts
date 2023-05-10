@@ -1,16 +1,16 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  JoinTable,
-  OneToMany,.
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
 import { UsersChannelsEntity } from '../../chat/entity/user-channels.entity';
 import { DirectMessagesEntity } from '../../chat/entity/direct-messages.entity';
 import { MatchHistoryEntity } from '../../game/entity/game.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -38,7 +38,6 @@ export class UserEntity {
 
   @Column({ nullable: true })
   mfa_validated_at: Date;
-
 
   @Column({ nullable: true })
   status: number;

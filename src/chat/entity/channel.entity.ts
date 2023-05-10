@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { UsersChannelsEntity } from './user-channels.entity';
 import { ChannelMessagesEntity } from './channelmessages.entity';
 
@@ -8,10 +15,10 @@ export class ChannelEntity {
   id: number;
 
   @CreateDateColumn()
-  created_at: Date
+  created_at: Date;
 
   @UpdateDateColumn()
-  updated_at: Date
+  updated_at: Date;
 
   @Column()
   name: string;
@@ -25,9 +32,15 @@ export class ChannelEntity {
   @Column()
   type: number;
 
-  @OneToMany(() => UsersChannelsEntity, usersChannels => usersChannels.channel)
+  @OneToMany(
+    () => UsersChannelsEntity,
+    (usersChannels) => usersChannels.channel,
+  )
   users_channels: UsersChannelsEntity[];
 
-  @OneToMany(() => ChannelMessagesEntity, channelMessage => channelMessage.channel)
+  @OneToMany(
+    () => ChannelMessagesEntity,
+    (channelMessage) => channelMessage.channel,
+  )
   channel_messages: ChannelMessagesEntity[];
 }
