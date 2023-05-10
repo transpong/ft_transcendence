@@ -3,10 +3,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-42';
 import { AuthDto } from '../dto/auth.dto';
 import { UserService } from '../../user/service/user.service';
+import { AvatarService } from '../../avatar/service/avatar.service';
 
 @Injectable()
 export class FtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly userService: UserService) {
+  constructor(
+    private readonly userService: UserService,
+    private readonly avatarService: AvatarService,
+  ) {
     super({
       clientID: process.env.FORTYTWO_CLIENT_ID,
       clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
@@ -19,6 +23,7 @@ export class FtStrategy extends PassportStrategy(Strategy) {
     const authDto: AuthDto = AuthDto.fromJSON(profile._json);
 
     if (!(await this.userService.userExists(login))) {
+      authDto.image = await this.avatarService.downloadImageFromUrl(image.link);
       await this.userService.createUser(authDto);
     }
 
