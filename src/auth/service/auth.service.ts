@@ -17,10 +17,10 @@ export class AuthService {
 
     res.cookie('token', accessToken);
     if (await this.userService.userEmptyNickname(tempUser.username)) {
-      res.redirect('http://localhost:5173/dashboard');
+      res.redirect(process.env.FRONTEND_REDIRECT_NICKNAME);
     } else {
       console.log('NOT EMPTY');
-      res.redirect('http://localhost:5173/dashboard');
+      res.redirect(process.env.FRONTEND_REDIRECT_NICKNAME);
     }
     return;
   }
