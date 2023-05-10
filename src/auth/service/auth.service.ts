@@ -25,25 +25,10 @@ export class AuthService {
     return;
   }
 
-  async me(@Req() req: any) {
-    const token = this.deserializeJwtToken(this.getBearerToken(req));
-    return token.req;
-  }
-
-  generateJwtToken(req: any): string {
+  private generateJwtToken(req: any): string {
     return this.jwtService.sign(
       { req: req.user.username },
       { secret: `${process.env.JWT_SECRET}` },
     );
-  }
-
-  deserializeJwtToken(token: string): any {
-    return this.jwtService.verify(token, {
-      secret: `${process.env.JWT_SECRET}`,
-    });
-  }
-
-  private getBearerToken(req: any): string {
-    return req.headers.authorization.split(' ')[1];
   }
 }

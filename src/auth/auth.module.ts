@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { FtStrategy } from './strategies/ft.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from '../user/user.module';
+import { AvatarModule } from '../avatar/avatar.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UserModule } from '../user/user.module';
     }),
     PassportModule,
     UserModule,
+    AvatarModule,
   ],
   providers: [FtStrategy, JwtStrategy, AuthService],
   controllers: [AuthController],

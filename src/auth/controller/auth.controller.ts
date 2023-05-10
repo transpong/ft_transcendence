@@ -15,9 +15,8 @@ export class AuthController {
     await this.authService.ftAuthCallback(req, res);
   }
 
-  // temp route to test auth this route return user info from jwt token
   @Get('me')
   async me(@Req() req: any): Promise<any> {
-    return this.authService.me(req);
+    return req.user.ftLogin;
   }
 }

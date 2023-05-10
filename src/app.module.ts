@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { AvatarModule } from './avatar/avatar.module';
 
 @Module({
   imports: [
@@ -24,11 +25,12 @@ import { APP_GUARD } from '@nestjs/core';
       password: process.env.POSTGRES_PASSWORD,
       entities: [UserEntity, GameEntity],
       synchronize: true,
-      // dropSchema: true,
+      dropSchema: true,
     }),
     UserModule,
     GameModule,
     AuthModule,
+    AvatarModule,
   ],
   controllers: [AppController],
   providers: [
