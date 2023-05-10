@@ -50,13 +50,12 @@ export class AvatarService {
     }
   }
 
-  async getImageFromUser(user: string) {
+  async getImageFromUser(user: string): Promise<string> {
     const userEntity: UserEntity = await this.userService.getUserByFtId(user);
 
     if (!userEntity) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    console.log(userEntity.avatar);
     return userEntity.avatar;
   }
 
