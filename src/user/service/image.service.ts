@@ -25,24 +25,15 @@ export class ImageService {
   }
 
   getImage(name: string, res: Response): void {
-    const imagePath: string = path.join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'upload',
-      name,
-    );
-    res.sendFile(imagePath, {}, (err: Error): void => {
+    res.sendFile(name, { root: 'upload' }, (err: Error): void => {
       if (err) {
-        console.error(`Erro ao enviar arquivo: ${err.message}`);
+        console.error(`Erro ao enviar arquivo: ${err.message}`); // TODO: remove this debug log
         res.sendFile('default.jpeg', { root: 'upload' });
       }
     });
   }
 
   private generateImageName(url: string): string {
-    console.log('url ' + url); // TODO: remove this debug log
     const timestamp: number = new Date().getTime();
     const extension: string = path.extname(url);
 

@@ -16,7 +16,7 @@ export class AuthService {
     const accessToken: string = this.generateJwtToken(req);
 
     res.cookie('token', accessToken);
-    if (this.userService.userHasNickname(tempUser.username)) {
+    if (this.userService.userEmptyNickname(tempUser.username)) {
       res.redirect('http://localhost:5173/dashboard');
     } else {
       res.redirect('http://google.com');

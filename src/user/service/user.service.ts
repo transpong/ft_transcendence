@@ -14,36 +14,33 @@ export class UserService {
   ) {}
 
   async createUser(authDto: AuthDto): Promise<void> {
-    // download image from 42 api
+    const user: UserEntity = AuthDto.toUserEntity(authDto);
     const imageUrl: string = await this.imageService.downloadImageFromUrl(
       authDto.image,
     );
 
-    console.log(imageUrl); // TODO: remove this debug log
-
-    const user: UserEntity = new UserEntity();
-    user.ftId = authDto.username;
     user.avatar = imageUrl;
 
-    user.status = 0;
-    console.log(user); // TODO: remove this debug log
-
+    // console.log(imageUrl); // TODO: remove this debug log
+    // console.log(user); // TODO: remove this debug log
+    this.userRepository.create(user);
     await this.userRepository.save(user);
     console.log(`User ${user.ftId} created!`); // TODO: remove this debug log
   }
 
   async userExists(ftId: string): Promise<boolean> {
     const user: UserEntity = await this.userRepository.findOne({
-      where: { ftId },
+      where: { ftId: ftId },
     });
     return !!user;
   }
 
-  async userHasNickname(ftId: string): Promise<boolean> {
+  async userEmptyNickname(ftId: string): Promise<boolean> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { ftId },
     });
-
-    return user !== null && user.nickname !== null;
+    if (!user) return false;
+    console.log('busca ' + user); // TODO: remove this debug log
+    return user.nickname === '';
   }
 }

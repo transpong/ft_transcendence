@@ -18,7 +18,7 @@ export class FtStrategy extends PassportStrategy(Strategy) {
     const { login, image } = profile._json;
     const authDto: AuthDto = AuthDto.fromJSON(profile._json);
 
-    if (!(await this.userService.userExists(authDto.username))) {
+    if (!(await this.userService.userExists(login))) {
       this.userService.createUser(authDto).then((r) => console.log(r));
     }
 
