@@ -25,10 +25,7 @@ export class AuthService {
   }
 
   me(@Req() req: any): any {
-    // console.log(req.headers);
-    // console.log(this.getBearerToken(req));
     const token = this.deserializeJwtToken(this.getBearerToken(req));
-    // console.log('token', token);
     return token.req;
   }
 
@@ -46,7 +43,6 @@ export class AuthService {
   }
 
   private getBearerToken(req: any): string {
-    const bearerToken: string = req.headers.authorization.split(' ')[1];
-    return bearerToken;
+    return req.headers.authorization.split(' ')[1];
   }
 }

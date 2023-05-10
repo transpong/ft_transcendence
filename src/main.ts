@@ -6,7 +6,7 @@ async function bootstrap(): Promise<void> {
   const app: INestApplication = await NestFactory.create(AppModule);
 
   const corsOptions = {
-    origin: ['http://localhost:5173', 'http://api.intra.42.fr'],
+    origin: [process.env.FRONTEND_URL, 'http://api.intra.42.fr'],
     credentials: true,
     optionSuccessStatus: 200,
   };
