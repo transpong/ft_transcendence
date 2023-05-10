@@ -4,7 +4,7 @@ import {
   Column,
   ManyToMany,
   JoinTable,
-  OneToMany,
+  OneToMany,.
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -23,22 +23,24 @@ export class UserEntity {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @Column()
-  ft_id: string;
-
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
   nickname: string;
 
   @Column({ nullable: true })
   avatar: string;
 
   @Column({ nullable: true })
+  mfatoken: string;
+
+  @Column({ nullable: true })
+  mfaValidateAt: Date;
   mfa_token: string;
 
   @Column({ nullable: true })
   mfa_validated_at: Date;
 
-  @Column()
+
+  @Column({ nullable: true })
   status: number;
 
   @ManyToMany(() => UserEntity)
