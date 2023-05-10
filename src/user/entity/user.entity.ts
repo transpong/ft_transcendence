@@ -20,8 +20,11 @@ export class UserEntity {
   @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ nullable: true })
   updated_at: Date;
+
+  @Column()
+  ft_id: string;
 
   @Column({ length: 50, nullable: true })
   nickname: string;
@@ -34,6 +37,8 @@ export class UserEntity {
 
   @Column({ nullable: true })
   mfaValidateAt: Date;
+
+  @Column({ nullable: true })
   mfa_token: string;
 
   @Column({ nullable: true })

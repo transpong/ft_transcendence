@@ -16,7 +16,7 @@ export class AuthDto {
 
   static toUserEntity(authDto: AuthDto): UserEntity {
     const user: UserEntity = new UserEntity();
-    user.ftId = authDto.username;
+    user.ft_id = authDto.username;
     user.avatar = authDto.image;
     user.status = 0;
     user.nickname = '';
