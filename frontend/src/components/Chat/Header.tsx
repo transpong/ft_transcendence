@@ -1,14 +1,19 @@
-import {MinusIcon, AddIcon, CloseIcon, SettingsIcon } from "@chakra-ui/icons";
-import { Flex, Avatar, AvatarBadge, Text, Button } from "@chakra-ui/react";
+import {MinusIcon, AddIcon, CloseIcon } from "@chakra-ui/icons";
+import { Flex, Avatar, AvatarBadge, Text } from "@chakra-ui/react";
+import { ScreensObject } from "./Chat";
 import HeaderNavgation from "./HeaderNavigation";
 
 type Props = {
   minimized: () => void;
   getStatusMinimized: () => boolean;
   name: string;
-  type: 'group' | 'individual'
+  type: "group" | "individual";
   deleteChat: () => void;
-}
+  screenNavigation: number;
+  setScreenNavigation: React.Dispatch<
+    React.SetStateAction<keyof ScreensObject>
+  >;
+};
 
 const Header = (props: Props) => {
   return (
@@ -25,7 +30,7 @@ const Header = (props: Props) => {
       </Flex>
       </Flex>
       <Flex align={"center"} >
-        <HeaderNavgation type={props.type} />
+        <HeaderNavgation type={props.type} screenNavigation={props.screenNavigation} setScreenNavigation={props.setScreenNavigation} />
         {
           (props.getStatusMinimized() ?
           <MinusIcon  cursor={"pointer"} onClick={() => props.minimized()}/> :

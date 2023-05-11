@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Fragment, useState } from "react";
 import Divider from "./Divider";
 import Header from "./Header";
 import List from "./List";
@@ -21,7 +21,7 @@ type ListFriendsType = {
 
 type Props = {
   addChat: (chat : React.ReactElement) => void;
-  deleteChat: () => void; 
+  deleteChat: () => void;
 }
 
 
@@ -43,10 +43,10 @@ const FriendsList = (props: Props) => {
       <Flex minWidth={"250px"} w={"15vw"} maxH={"80vh"} flexDir="column" borderTopRadius={"30px"}>
         <Header  minimized={minimize} getStatusMinimized={getStatusMinimized}/>
         {isMinimized ? (
-          <React.Fragment>
+          <Fragment>
           <List list={contacts} addChat={props.addChat} deleteChat={props.deleteChat}/>
           <Divider />
-          </React.Fragment>
+          </Fragment>
         ): null}
       </Flex>
     </Flex>
