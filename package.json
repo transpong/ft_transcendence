@@ -28,6 +28,7 @@
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/typeorm": "^9.0.1",
+    "2fa-util": "^1.1.1",
     "better-sqlite3": "^8.3.0",
     "http-proxy-middleware": "^2.0.6",
     "passport-42": "^1.2.6",
