@@ -12,6 +12,6 @@ export class UserController {
 
   @Post('me/mfa/validate')
   async validateMfaSecret(@Req() req, @Body() body) {
-    return this.userService.validateMfaSecret(req.user.ft_id, body.mfa_token);
+    return this.userService.validateMfaSecret(req.user.ft_id, body.code);
   }
 }
