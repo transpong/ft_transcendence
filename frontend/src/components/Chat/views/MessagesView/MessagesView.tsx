@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { Fragment, useState } from "react";
 import Divider from "../../Divider";
 import Footer from "./Footer";
 import Messages from "./Messages";
@@ -33,7 +33,7 @@ const MessagesView = () => {
   };
 
   return (
-          <React.Fragment>
+          <Fragment>
             <Messages messages={messages} />
             <Divider />
             <Footer
@@ -41,7 +41,7 @@ const MessagesView = () => {
               setInputMessage={setInputMessage}
               handleSendMessage={handleSendMessage}
             />
-          </React.Fragment>
+          </Fragment>
         )
 };
 
