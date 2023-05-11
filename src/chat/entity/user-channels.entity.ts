@@ -14,23 +14,23 @@ export class UsersChannelsEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn()
-  created_at: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-  @UpdateDateColumn()
-  updated_at: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
-  @Column()
-  user_access_type: number;
+  @Column({ name: 'user_access_type' })
+  userAccessType: number;
 
-  @Column({ nullable: true })
-  muted_until: Date;
+  @Column({ name: 'muted_until', nullable: true })
+  mutedUntil: Date;
 
-  @Column({ nullable: true })
-  kicked_at: Date;
+  @Column({ name: 'kicked_at', nullable: true })
+  kickedAt: Date;
 
-  @Column({ nullable: true })
-  banned_at: Date;
+  @Column({ name: 'banned_at', nullable: true })
+  bannedAt: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.usersChannels)
   user: UserEntity;
