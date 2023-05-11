@@ -12,7 +12,7 @@ export class AuthService {
   ) {}
 
   async ftAuthCallback(@Req() req: any, @Res() res: Response): Promise<void> {
-    const tempUser: AuthDto = AuthDto.fromJSON(req.user);
+    const tempUser: AuthDto = AuthDto.fromJSON(req.user); // TODO: simplify this
     const accessToken: string = this.generateJwtToken(req);
 
     res.cookie('token', accessToken);
