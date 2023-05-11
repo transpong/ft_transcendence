@@ -53,6 +53,7 @@ export class UserService {
     const mfaSecret = await generateSecret(userEntity.ftId, 'Transpong');
 
     userEntity.tokenMFA = mfaSecret.secret;
+    userEntity.validatedAtMFA = null;
     await this.userRepository.update(userEntity.id, userEntity);
     return {
       secret: mfaSecret.secret,
@@ -60,10 +61,10 @@ export class UserService {
     };
   }
 
-  async validateMfaSecret(ftId: string, token: string): Promise<void> {
+  async validateMfaSecret(ftId: string, code: string): Promise<void> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
 
-    if (await verify(userEntity.tokenMFA, token)) {
+    if (!(await verify(code, userEntity.tokenMFA))) {
       throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
     }
 
