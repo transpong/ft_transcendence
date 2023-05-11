@@ -27,16 +27,16 @@ export class UserEntity {
   ftId: string;
 
   @Column({ name: 'nickname', length: 50, nullable: true })
-  nickname: string;
+  nickname?: string;
 
   @Column({ name: 'avatar', nullable: true })
-  avatar: string;
+  avatar?: string;
 
   @Column({ name: 'mfa_token', nullable: true })
-  tokenMFA: string;
+  tokenMFA?: string;
 
   @Column({ name: 'mfa_validated_at', nullable: true })
-  validatedAtMFA: Date;
+  validatedAtMFA?: Date;
 
   @Column({ name: 'status' })
   status: number;

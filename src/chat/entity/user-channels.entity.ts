@@ -24,13 +24,13 @@ export class UsersChannelsEntity {
   userAccessType: number;
 
   @Column({ name: 'muted_until', nullable: true })
-  mutedUntil: Date;
+  mutedUntil?: Date;
 
   @Column({ name: 'kicked_at', nullable: true })
-  kickedAt: Date;
+  kickedAt?: Date;
 
   @Column({ name: 'banned_at', nullable: true })
-  bannedAt: Date;
+  bannedAt?: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.usersChannels)
   user: UserEntity;
