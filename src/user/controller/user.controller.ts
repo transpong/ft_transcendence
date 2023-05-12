@@ -15,12 +15,12 @@ export class UserController {
   @Public()
   @UseGuards(TFAGuard)
   @Post('me/mfa/validate')
-  async validateMfaSecret(@Req() req, @Body() body) {
+  async validateMfaSecret(@Req() req, @Body() body): Promise<void> {
     return this.userService.validateMfaSecret(req.user.ft_id, body.code);
   }
 
   @Patch('me/mfa/invalidate')
-  async invalidateMfaSecret(@Req() req) {
+  async invalidateMfaSecret(@Req() req): Promise<void> {
     return this.userService.invalidateMfaSecret(req.user.ft_id);
   }
 }
