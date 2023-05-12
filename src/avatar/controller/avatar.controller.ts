@@ -11,10 +11,4 @@ export class AvatarController {
   async getUserImage(@Param('name') name: string) {
     return this.avatarService.getImage(name);
   }
-
-  // rota para retornar a imagem do usuário logado utilizando o ftLogin do jwt
-  @Get('download')
-  async getImageNameFromUser(@Req() req: any): Promise<string> {
-    return this.avatarService.getImageFromUser(req.user.ftLogin);
-  }
 }

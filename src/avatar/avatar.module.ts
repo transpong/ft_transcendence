@@ -10,7 +10,6 @@ import { UserModule } from '../user/user.module';
     MulterModule.registerAsync({
       useClass: MulterConfigService,
     }),
-    UserModule,
   ],
 
   controllers: [AvatarController],
