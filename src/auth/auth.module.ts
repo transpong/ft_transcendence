@@ -7,6 +7,7 @@ import { FtStrategy } from './strategies/ft.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from '../user/user.module';
 import { AvatarModule } from '../avatar/avatar.module';
+import { TFAStrategy } from './strategies/tfa.strategy';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { AvatarModule } from '../avatar/avatar.module';
     UserModule,
     AvatarModule,
   ],
-  providers: [FtStrategy, JwtStrategy, AuthService],
+  providers: [FtStrategy, JwtStrategy, TFAStrategy, AuthService],
   controllers: [AuthController],
   exports: [AuthService],
 })

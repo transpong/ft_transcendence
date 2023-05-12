@@ -14,14 +14,17 @@ export class AuthService {
   async ftAuthCallback(@Req() req: any, @Res() res: Response): Promise<void> {
     const tempUser: AuthDto = AuthDto.fromJSON(req.user); // TODO: simplify this
     const accessToken: string = this.generateJwtToken(req);
-    console.log('token: ', accessToken);
 
     res.cookie('token', accessToken);
-    if (await this.userService.userEmptyNickname(tempUser.username)) {
+    if (tempUser.hasTwoFactor) {
+      res.redirect(process.env.FRONTEND_REDIRECT_MFA);
+      return;
+    }
+
+    if (await this.userService.userHasEmptyNickname(tempUser.username)) {
       res.redirect(process.env.FRONTEND_REDIRECT_NICKNAME);
     } else {
-      console.log('NOT EMPTY');
-      res.redirect(process.env.FRONTEND_REDIRECT_NICKNAME);
+      res.redirect(process.env.FRONTEND_REDIRECT_HOME);
     }
     return;
   }
