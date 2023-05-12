@@ -72,6 +72,14 @@ export class UserService {
     await this.userRepository.update(userEntity.id, userEntity);
   }
 
+  async invalidateMfaSecret(ftId: string): Promise<void> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+
+    userEntity.tokenMFA = null;
+    userEntity.validatedAtMFA = null;
+    await this.userRepository.update(userEntity.id, userEntity);
+  }
+
   async userHasMfa(ftId: string): Promise<boolean> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
     return userEntity.tokenMFA !== null;
