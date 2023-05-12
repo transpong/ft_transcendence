@@ -16,6 +16,7 @@ export class AuthService {
     const accessToken: string = this.generateJwtToken(req);
 
     res.cookie('token', accessToken);
+    console.log(accessToken);
     if (tempUser.hasTwoFactor) {
       res.redirect(process.env.FRONTEND_REDIRECT_MFA);
       return;

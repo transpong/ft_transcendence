@@ -117,9 +117,9 @@ export class UserService {
   private async validNickname(nickname: string): Promise<boolean> {
     if (nickname === '' || nickname === null) return false;
     const userEntity: UserEntity = await this.userRepository.findOneBy({
-      nickname,
+      nickname: nickname,
     });
 
-    return !!userEntity;
+    return !userEntity;
   }
 }
