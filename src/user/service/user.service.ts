@@ -5,6 +5,7 @@ import { UserEntity } from '../entity/user.entity';
 import { AuthDto } from '../../auth/dto/auth.dto';
 import { generateSecret, verify } from '2fa-util';
 import { AvatarService } from '../../avatar/service/avatar.service';
+import { UserDto } from '../dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -103,6 +104,11 @@ export class UserService {
     this.avatarService.deleteImage(userEntity.avatar);
     userEntity.avatar = await this.avatarService.upload(file);
     await this.userRepository.update(userEntity.id, userEntity);
+  }
+
+  async getUserInfo(ftId: string): Promise<UserDto> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+    return UserDto.fromEntity(userEntity);
   }
 
   private async validNickname(nickname: string): Promise<boolean> {

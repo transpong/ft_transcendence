@@ -14,10 +14,16 @@ import { TFAGuard } from '../../auth/guards/tfa.guard';
 import { Public } from '../../auth/decorator/public.decorator';
 import { AvatarPipe } from '../pipe/avatar.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UserDto } from '../dto/user.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('me')
+  async getUserInfo(@Req() req): Promise<UserDto> {
+    return this.userService.getUserInfo(req.user.ft_id);
+  }
   @Post('me/mfa')
   async generateMfaSecret(@Req() req) {
     return this.userService.generateMfaSecret(req.user.ft_id);
