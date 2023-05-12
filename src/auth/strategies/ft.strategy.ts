@@ -19,12 +19,17 @@ export class FtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(accessToken: string, refreshToken: string, profile) {
-    const { login, image }: { login: string; image: { link?: string } } = profile._json;
+    const { login, image }: { login: string; image: { link?: string } } =
+      profile._json;
     const authDto: AuthDto = AuthDto.fromJSON(profile._json);
 
     if (!(await this.userService.userExists(login))) {
       if (authDto.image) {
-        authDto.image = await this.avatarService.downloadImageFromUrl(image.link);
+        authDto.image = await this.avatarService.downloadImageFromUrl(
+          image.link,
+        );
+      } else {
+        authDto.image = 'default.jpeg';
       }
       await this.userService.createUser(authDto);
     }
