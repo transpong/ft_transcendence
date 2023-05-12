@@ -1,11 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToMany,
-  JoinTable,
-  OneToMany,
   CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UsersChannelsEntity } from '../../chat/entity/user-channels.entity';
@@ -83,4 +83,8 @@ export class UserEntity {
 
   @OneToMany(() => MatchHistoryEntity, (matchHistory) => matchHistory.winner)
   matchHistoryWinner: MatchHistoryEntity[];
+
+  twoFactorValid(): boolean {
+    return !(this.tokenMFA !== null && this.validatedAtMFA === null);
+  }
 }

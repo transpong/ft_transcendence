@@ -1,5 +1,7 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from '../service/user.service';
+import { TFAGuard } from '../../auth/guards/tfa.guard';
+import { Public } from '../../auth/decorator/public.decorator';
 
 @Controller('user')
 export class UserController {
@@ -10,6 +12,8 @@ export class UserController {
     return this.userService.generateMfaSecret(req.user.ft_id);
   }
 
+  @Public()
+  @UseGuards(TFAGuard)
   @Post('me/mfa/validate')
   async validateMfaSecret(@Req() req, @Body() body) {
     return this.userService.validateMfaSecret(req.user.ft_id, body.code);

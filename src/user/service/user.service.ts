@@ -29,7 +29,7 @@ export class UserService {
     return !!user;
   }
 
-  async userEmptyNickname(ftId: string): Promise<boolean> {
+  async userHasEmptyNickname(ftId: string): Promise<boolean> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { ftId },
     });
@@ -41,10 +41,10 @@ export class UserService {
     const userEntity: UserEntity = await this.userRepository.findOneBy({
       ftId,
     });
+
     if (!userEntity) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-
     return userEntity;
   }
 
@@ -70,5 +70,10 @@ export class UserService {
 
     userEntity.validatedAtMFA = new Date();
     await this.userRepository.update(userEntity.id, userEntity);
+  }
+
+  async userHasMfa(ftId: string): Promise<boolean> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+    return userEntity.tokenMFA !== null;
   }
 }
