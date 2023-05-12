@@ -17,9 +17,9 @@ export class UserService {
 
   async createUser(authDto: AuthDto): Promise<void> {
     const user: UserEntity = AuthDto.toUserEntity(authDto);
+
     user.createdAt = new Date();
     user.updatedAt = new Date();
-
     await this.userRepository.save(user);
     console.log(`User ${user.ftId} created!`); // TODO: remove this debug log
   }
@@ -36,6 +36,7 @@ export class UserService {
     const user: UserEntity = await this.userRepository.findOne({
       where: { ftId },
     });
+
     if (!user) return false;
     return user.nickname === '';
   }
@@ -85,6 +86,7 @@ export class UserService {
 
   async userHasMfa(ftId: string): Promise<boolean> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
+
     return userEntity.tokenMFA !== null;
   }
 
@@ -108,6 +110,7 @@ export class UserService {
 
   async getUserInfo(ftId: string): Promise<UserDto> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
+
     return UserDto.fromEntity(userEntity);
   }
 
@@ -116,6 +119,7 @@ export class UserService {
     const userEntity: UserEntity = await this.userRepository.findOneBy({
       nickname,
     });
+
     return !!userEntity;
   }
 }
