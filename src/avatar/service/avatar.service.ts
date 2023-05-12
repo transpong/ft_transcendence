@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  StreamableFile,
-} from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { createReadStream, createWriteStream, existsSync } from 'fs';
 import fetch from 'node-fetch';
 import * as path from 'path';
@@ -53,9 +48,6 @@ export class AvatarService {
   async getImageFromUser(user: string): Promise<string> {
     const userEntity: UserEntity = await this.userService.getUserByFtId(user);
 
-    if (!userEntity) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
     return userEntity.avatar;
   }
 
