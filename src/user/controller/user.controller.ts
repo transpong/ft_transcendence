@@ -1,12 +1,23 @@
-import { Body, Controller, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { TFAGuard } from '../../auth/guards/tfa.guard';
 import { Public } from '../../auth/decorator/public.decorator';
+import { AvatarPipe } from '../pipe/avatar.pipe';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
   @Post('me/mfa')
   async generateMfaSecret(@Req() req) {
     return this.userService.generateMfaSecret(req.user.ft_id);
@@ -22,5 +33,20 @@ export class UserController {
   @Patch('me/mfa/invalidate')
   async invalidateMfaSecret(@Req() req): Promise<void> {
     return this.userService.invalidateMfaSecret(req.user.ft_id);
+  }
+
+  @Patch('me/nickname')
+  async updateNickname(@Req() req, @Body() body): Promise<void> {
+    return this.userService.updateNickname(req.user.ft_id, body.nickname);
+  }
+
+  @Patch('me/avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateAvatar(
+    @Req() req,
+    @UploadedFile(AvatarPipe)
+    file: Express.Multer.File,
+  ): Promise<void> {
+    return this.userService.updateAvatar(req.user.ft_id, file);
   }
 }

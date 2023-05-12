@@ -1,15 +1,16 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
-import { createReadStream, createWriteStream, existsSync } from 'fs';
+import {
+  createReadStream,
+  createWriteStream,
+  existsSync,
+  unlinkSync,
+} from 'fs';
 import fetch from 'node-fetch';
 import * as path from 'path';
 import { join } from 'path';
-import { UserService } from '../../user/service/user.service';
-import { UserEntity } from '../../user/entity/user.entity';
 
 @Injectable()
 export class AvatarService {
-  constructor(private readonly userService: UserService) {}
-
   async downloadImageFromUrl(url: string): Promise<string> {
     const imageName: string = this.generateImageName(url);
     const imagePath: string = path.join('upload', imageName);
@@ -45,10 +46,27 @@ export class AvatarService {
     }
   }
 
-  async getImageFromUser(user: string): Promise<string> {
-    const userEntity: UserEntity = await this.userService.getUserByFtId(user);
+  async upload(file: Express.Multer.File): Promise<string> {
+    const imageName: string = this.generateImageName(file.originalname);
+    const imagePath: string = path.join('upload', imageName);
 
-    return userEntity.avatar;
+    const writeStream = createWriteStream(imagePath);
+
+    await new Promise<void>((resolve, reject): void => {
+      writeStream.on('finish', resolve);
+      writeStream.on('error', reject);
+      writeStream.write(file.buffer);
+      writeStream.end();
+    });
+
+    return imageName;
+  }
+  deleteImage(imageName: string): void {
+    const imagePath: string = path.join('upload', imageName);
+
+    if (existsSync(imagePath)) {
+      unlinkSync(imagePath);
+    }
   }
 
   private generateImageName(url: string): string {

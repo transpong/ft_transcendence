@@ -4,12 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entity/user.entity';
 import { AuthDto } from '../../auth/dto/auth.dto';
 import { generateSecret, verify } from '2fa-util';
+import { AvatarService } from '../../avatar/service/avatar.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly avatarService: AvatarService,
   ) {}
 
   async createUser(authDto: AuthDto): Promise<void> {
@@ -83,5 +85,31 @@ export class UserService {
   async userHasMfa(ftId: string): Promise<boolean> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
     return userEntity.tokenMFA !== null;
+  }
+
+  async updateNickname(ftId: string, nickname: string): Promise<void> {
+    if (!(await this.validNickname(nickname))) {
+      throw new HttpException('Invalid nickname', HttpStatus.BAD_REQUEST);
+    }
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+
+    userEntity.nickname = nickname;
+    await this.userRepository.update(userEntity.id, userEntity);
+  }
+
+  async updateAvatar(ftId: string, file: Express.Multer.File): Promise<void> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+
+    this.avatarService.deleteImage(userEntity.avatar);
+    userEntity.avatar = await this.avatarService.upload(file);
+    await this.userRepository.update(userEntity.id, userEntity);
+  }
+
+  private async validNickname(nickname: string): Promise<boolean> {
+    if (nickname === '' || nickname === null) return false;
+    const userEntity: UserEntity = await this.userRepository.findOneBy({
+      nickname,
+    });
+    return !!userEntity;
   }
 }
