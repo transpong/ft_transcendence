@@ -1,15 +1,23 @@
 import { Flex } from "@chakra-ui/layout";
 import { Text, Avatar, Button, Box } from "@chakra-ui/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import RankingCard from "../../../../components/RankingCard/RankingCard";
 import MatchCard from "../../../../components/MatchCard/MatchCard";
 import { useNavigate, useOutlet, Outlet } from "react-router-dom";
+import { IApiUserMe, userService } from "../../../../services/users-service";
 
 export default function Me(){
   const position = 7
-  const nickname = "Nickname"
   const [isMFA, setMFA] = useState(false);
+  const [me, setMe] = useState<IApiUserMe>();
   const navigate = useNavigate();
+
+  useMemo(async () => {
+    const myData = await userService.getMe();
+
+    setMe(myData);
+  }, [])
+
   const teste = [
     {
       winner: {
@@ -105,7 +113,7 @@ export default function Me(){
       },
     },
   ]
-  return useOutlet() ? <Outlet/> : ( 
+  return useOutlet() ? <Outlet/> : (
     <>
       <Flex h='100%' w={"100%"} borderRadius={"20px"} align={"center"}>
         <Flex backgroundColor={"white"} width={"30%"} height={"90%"} marginLeft={"1%"} border={"8px"} borderColor={"#805AD5"} align={"center"} justify={"center"} flexDirection={"column"} borderRadius={"20px"}>
@@ -114,7 +122,7 @@ export default function Me(){
             Upload Avatar
           </Button>
           <Text fontSize={"35px"} fontWeight={"bold"} marginBottom={"15px"}>
-            {nickname}
+            {me?.nickname}
           </Text>
           { !isMFA ?
             <Button size={"lg"} colorScheme={"purple"} onClick={() => {
@@ -137,7 +145,7 @@ export default function Me(){
           >
             Status
           </Text>
-          <RankingCard position={position} nickname={nickname} matches={10} wins={7} losses={3}/>
+          <RankingCard position={position} nickname={me?.nickname || ''} matches={10} wins={7} losses={3}/>
 
           <Text
             fontSize={"25px"}

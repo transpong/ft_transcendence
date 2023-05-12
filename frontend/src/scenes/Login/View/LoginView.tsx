@@ -7,7 +7,7 @@ const API42OAUTHURL = `${
 }/oauth/authorize?client_id=${
   import.meta.env.VITE_API_42_CLIENT_ID
 }&redirect_uri=${encodeURIComponent(
-  window.location.origin + "/nickname"
+  import.meta.env.VITE_API_42_REDIRECT_URL
 )}&response_type=code`;
 
 export default function LoginView(){
