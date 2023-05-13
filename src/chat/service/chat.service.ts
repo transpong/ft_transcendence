@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ChannelEntity } from '../entity/channel.entity';
 import { Repository } from 'typeorm';
 import { UsersChannelsEntity } from '../entity/user-channels.entity';
@@ -26,17 +26,63 @@ export class ChatService {
     private readonly userService: UserService,
   ) {}
 
-  async createChat(ft_id: string, inputDto: ChannelInputDto): Promise<void> {
-    const user: UserEntity = await this.userService.getUserByFtId(ft_id);
+  async createChat(ftId: string, inputDto: ChannelInputDto): Promise<void> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
     const channel: ChannelEntity = await this.makeNewChannel(inputDto);
     const userChannel: UsersChannelsEntity = await this.createUserChannel(
       user,
       channel,
-      UserAccessType.ADMIN,
+      UserAccessType.OWNER,
     );
 
     channel.users_channels.push(userChannel);
     await this.channelRepository.save(channel);
+  }
+
+  async addUserToChannel(
+    ftId: string,
+    channelId: number,
+    nickname: string,
+  ): Promise<void> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+    const friend: UserEntity = await this.userService.getUserByNickname(
+      nickname,
+    );
+    const userChannel: UsersChannelsEntity = await this.createUserChannel(
+      friend,
+      channel,
+      UserAccessType.MEMBER,
+    );
+
+    await this.permissionCheck(user, channel);
+    channel.update();
+    channel.users_channels.push(userChannel);
+    await this.channelRepository.save(channel);
+  }
+
+  private async permissionCheck(
+    user: UserEntity,
+    channel: ChannelEntity,
+  ): Promise<void> {
+    if (!channel.userHasAdminAccess(user.nickname)) {
+      throw new HttpException(
+        'User does not have the required permissions',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  private async getChannelById(id: number): Promise<ChannelEntity> {
+    const channel: ChannelEntity = await this.channelRepository.findOne({
+      where: { id: id },
+      relations: ['users_channels', 'users_channels.user'],
+    });
+
+    if (!channel) {
+      throw new HttpException('Channel not found', HttpStatus.NOT_FOUND);
+    }
+    return channel;
   }
 
   private async makeNewChannel(
@@ -65,6 +111,9 @@ export class ChatService {
   ): Promise<UsersChannelsEntity> {
     const userChannel: UsersChannelsEntity = new UsersChannelsEntity();
 
+    if (channel.hasUser(user.nickname)) {
+      throw new HttpException('User already in channel', HttpStatus.CONFLICT);
+    }
     userChannel.createdAt = new Date();
     userChannel.update();
     userChannel.userAccessType = accessType;

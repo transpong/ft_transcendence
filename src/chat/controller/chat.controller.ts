@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put, Req } from '@nestjs/common';
 import { ChatService } from '../service/chat.service';
 import { ChannelInputDto } from '../dto/channel-input.dto';
 
@@ -9,5 +9,14 @@ export class ChatController {
   @Post()
   async createChat(@Req() req, @Body() body: ChannelInputDto): Promise<void> {
     return this.chatService.createChat(req.user.ftLogin, body);
+  }
+
+  @Put('channel/:id/user/:nickname')
+  async addUserToChannel(
+    @Req() req,
+    @Param('id') id: number,
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    await this.chatService.addUserToChannel(req.user.ftLogin, id, nickname);
   }
 }

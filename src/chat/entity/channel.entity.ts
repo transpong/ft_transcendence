@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { UsersChannelsEntity } from './user-channels.entity';
 import { ChannelMessagesEntity } from './channelmessages.entity';
+import { UserAccessType } from '../enum/access-type.enum';
 
 @Entity()
 export class ChannelEntity {
@@ -46,5 +47,34 @@ export class ChannelEntity {
 
   update(): void {
     this.updatedAt = new Date();
+  }
+
+  hasUser(nickname: string): boolean {
+    if (!this.users_channels) return false;
+    console.log(this.users_channels);
+    for (const userChannel of this.users_channels) {
+      if (userChannel.user.nickname === nickname) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  userHasAdminAccess(nickname: string): boolean {
+    const UserAccessValids: UserAccessType[] = [
+      UserAccessType.ADMIN,
+      UserAccessType.OWNER,
+    ];
+
+    if (!this.users_channels) return false;
+    for (const userChannel of this.users_channels) {
+      if (
+        userChannel.user.nickname === nickname &&
+        UserAccessValids.includes(userChannel.userAccessType)
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 }
