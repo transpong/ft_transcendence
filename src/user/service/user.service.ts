@@ -18,8 +18,6 @@ export class UserService {
   async createUser(authDto: AuthDto): Promise<void> {
     const user: UserEntity = AuthDto.toUserEntity(authDto);
 
-    user.createdAt = new Date();
-    user.updatedAt = new Date();
     await this.userRepository.save(user);
     console.log(`User ${user.ftId} created!`); // TODO: remove this debug log
   }
