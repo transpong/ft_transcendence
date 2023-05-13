@@ -127,6 +127,21 @@ export class UserService {
     await this.userRepository.update(userEntity.id, userEntity);
   }
 
+  async getUserByNickname(nickname: string): Promise<UserEntity> {
+    const userEntity: UserEntity = await this.userRepository.findOne({
+      where: { nickname: nickname },
+      relations: ['friends'],
+    });
+
+    if (!userEntity) {
+      throw new HttpException(
+        "User with nickname '" + nickname + "' not found",
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return userEntity;
+  }
+
   private async validNickname(nickname: string): Promise<boolean> {
     if (nickname === '' || nickname === null) return false;
     const userEntity: UserEntity = await this.userRepository.findOneBy({
