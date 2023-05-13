@@ -9,6 +9,8 @@ import { UserEntity } from '../../user/entity/user.entity';
 import { UserAccessType } from '../enum/access-type.enum';
 import * as bcrypt from 'bcrypt';
 import { ChannelInputDto } from '../dto/channel-input.dto';
+import { ChannelMessagesEntity } from '../entity/channelmessages.entity';
+import { MessageInputDto } from '../dto/message-input.dto';
 
 @Injectable()
 export class ChatService {
@@ -21,8 +23,8 @@ export class ChatService {
     private readonly usersChannelsRepository: Repository<UsersChannelsEntity>,
     @InjectRepository(DirectMessagesEntity)
     private readonly directMessagesRepository: Repository<DirectMessagesEntity>,
-    @InjectRepository(UsersChannelsEntity)
-    private readonly usersChannelsEntityRepository: Repository<UsersChannelsEntity>,
+    @InjectRepository(ChannelMessagesEntity)
+    private readonly channelMessagesRepository: Repository<ChannelMessagesEntity>,
     private readonly userService: UserService,
   ) {}
 
@@ -56,8 +58,55 @@ export class ChatService {
     );
 
     await this.permissionCheck(user, channel);
-    channel.update();
     channel.users_channels.push(userChannel);
+    await this.channelRepository.save(channel);
+  }
+
+  async sendMessageToChannel(
+    ftId: string,
+    channelId: number,
+    dto: MessageInputDto,
+  ): Promise<void> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+    const messageChannel: ChannelMessagesEntity =
+      MessageInputDto.toMessageChannelEntity(dto, channel, user);
+
+    if (!channel.userHasWriteAccess(user.nickname)) {
+      throw new HttpException(
+        'User does not have the required permissions',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    channel.addChannelMessages(messageChannel);
+    await this.channelMessagesRepository.save(messageChannel);
+  }
+
+  async sendDirectMessage(
+    ftId: string,
+    nickname: string,
+    dto: MessageInputDto,
+  ): Promise<void> {
+    const fromUser: UserEntity = await this.userService.getUserByFtId(ftId);
+    const toUser: UserEntity = await this.userService.getUserByNickname(
+      nickname,
+    );
+    const message: DirectMessagesEntity =
+      MessageInputDto.toDirectMessagesEntity(dto, fromUser, toUser);
+
+    await this.directMessagesRepository.save(message);
+  }
+
+  async changeChannelType(
+    ftId: string,
+    channelId: number,
+    type: number,
+  ): Promise<void> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+
+    await this.permissionCheck(user, channel);
+    channel.type = type;
     await this.channelRepository.save(channel);
   }
 
@@ -76,7 +125,7 @@ export class ChatService {
   private async getChannelById(id: number): Promise<ChannelEntity> {
     const channel: ChannelEntity = await this.channelRepository.findOne({
       where: { id: id },
-      relations: ['users_channels', 'users_channels.user'],
+      relations: ['users_channels', 'users_channels.user', 'channel_messages'],
     });
 
     if (!channel) {
@@ -114,8 +163,6 @@ export class ChatService {
     if (channel.hasUser(user.nickname)) {
       throw new HttpException('User already in channel', HttpStatus.CONFLICT);
     }
-    userChannel.createdAt = new Date();
-    userChannel.update();
     userChannel.userAccessType = accessType;
     userChannel.mutedUntil = null;
     userChannel.kickedAt = null;

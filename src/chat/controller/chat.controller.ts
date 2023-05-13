@@ -1,6 +1,8 @@
-import { Body, Controller, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post, Put, Req } from '@nestjs/common';
 import { ChatService } from '../service/chat.service';
 import { ChannelInputDto } from '../dto/channel-input.dto';
+import { MessageInputDto } from '../dto/message-input.dto';
+import { NumberInputDto } from '../dto/number-input.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -11,12 +13,51 @@ export class ChatController {
     return this.chatService.createChat(req.user.ftLogin, body);
   }
 
-  @Put('channel/:id/user/:nickname')
+  @Put('channel/:channelId/user/:nickname')
   async addUserToChannel(
     @Req() req,
-    @Param('id') id: number,
+    @Param('channelId') id: number,
     @Param('nickname') nickname: string,
   ): Promise<void> {
     await this.chatService.addUserToChannel(req.user.ftLogin, id, nickname);
+  }
+
+  @Post('channel/:channelId/messages')
+  async sendMessageToChannel(
+    @Req() req,
+    @Param('channelId') channelId: number,
+    @Body() messageDto: MessageInputDto,
+  ): Promise<void> {
+    await this.chatService.sendMessageToChannel(
+      req.user.ftLogin,
+      channelId,
+      messageDto,
+    );
+  }
+
+  @Post('channel/direct/:nickname/messages')
+  async sendDirectMessage(
+    @Req() req,
+    @Param('nickname') nickname: string,
+    @Body() messageDto: MessageInputDto,
+  ): Promise<void> {
+    await this.chatService.sendDirectMessage(
+      req.user.ftLogin,
+      nickname,
+      messageDto,
+    );
+  }
+
+  @Patch('channels/:channelId/type')
+  async changeChannelType(
+    @Req() req,
+    @Param('channelId') channelId: number,
+    @Body() numberDto: NumberInputDto,
+  ): Promise<void> {
+    await this.chatService.changeChannelType(
+      req.user.ftLogin,
+      channelId,
+      numberDto.type,
+    );
   }
 }
