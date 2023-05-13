@@ -22,28 +22,29 @@ export class UserController {
 
   @Get('me')
   async getUserInfo(@Req() req): Promise<UserDto> {
-    return this.userService.getUserInfo(req.user.ft_id);
+    return this.userService.getUserInfo(req.user.ftLogin);
   }
+
   @Post('me/mfa')
   async generateMfaSecret(@Req() req) {
-    return this.userService.generateMfaSecret(req.user.ft_id);
+    return this.userService.generateMfaSecret(req.user.ftLogin);
   }
 
   @Public()
   @UseGuards(TFAGuard)
   @Post('me/mfa/validate')
   async validateMfaSecret(@Req() req, @Body() body): Promise<void> {
-    return this.userService.validateMfaSecret(req.user.ft_id, body.code);
+    return this.userService.validateMfaSecret(req.user.ftLogin, body.code);
   }
 
   @Patch('me/mfa/invalidate')
   async invalidateMfaSecret(@Req() req): Promise<void> {
-    return this.userService.invalidateMfaSecret(req.user.ft_id);
+    return this.userService.invalidateMfaSecret(req.user.ftLogin);
   }
 
   @Patch('me/nickname')
   async updateNickname(@Req() req, @Body() body): Promise<void> {
-    return this.userService.updateNickname(req.user.ft_id, body.nickname);
+    return this.userService.updateNickname(req.user.ftLogin, body.nickname);
   }
 
   @Patch('me/avatar')
@@ -53,6 +54,6 @@ export class UserController {
     @UploadedFile(AvatarPipe)
     file: Express.Multer.File,
   ): Promise<void> {
-    return this.userService.updateAvatar(req.user.ft_id, file);
+    return this.userService.updateAvatar(req.user.ftLogin, file);
   }
 }
