@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user/entity/user.entity';
@@ -37,7 +35,7 @@ import { ChatModule } from './chat/chat.module';
         ChannelMessagesEntity,
       ],
       synchronize: true,
-      // dropSchema: true,
+      //dropSchema: true,
     }),
     UserModule,
     GameModule,
@@ -45,9 +43,8 @@ import { ChatModule } from './chat/chat.module';
     AvatarModule,
     ChatModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,
