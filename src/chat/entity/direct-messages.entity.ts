@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 
-@Entity()
+@Entity({ name: 'direct_messages' })
 export class DirectMessagesEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -27,8 +27,4 @@ export class DirectMessagesEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   toUser: UserEntity;
-
-  update(): void {
-    this.updatedAt = new Date();
-  }
 }
