@@ -1,4 +1,13 @@
-import { Body, Controller, Param, Patch, Post, Put, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Req,
+} from '@nestjs/common';
 import { ChatService } from '../service/chat.service';
 import { ChannelInputDto } from '../dto/channel-input.dto';
 import { MessageInputDto } from '../dto/message-input.dto';
@@ -75,7 +84,7 @@ export class ChatController {
     );
   }
 
-  @Post('chats/channels/:channelId/login')
+  @Post('channels/:channelId/login')
   async validateChannelPassword(
     @Req() req,
     @Param('channelId') channelId: number,
@@ -86,5 +95,10 @@ export class ChatController {
       channelId,
       passwordDto.password,
     );
+  }
+
+  @Get('channels/:channelId/users')
+  async getChannelUsers(@Req() req, @Param('channelId') channelId: number) {
+    return await this.chatService.getChannelUsers(req.user.ftLogin, channelId);
   }
 }

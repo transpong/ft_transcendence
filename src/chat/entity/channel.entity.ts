@@ -47,7 +47,7 @@ export class ChannelEntity {
 
   hasUser(nickname: string): boolean {
     if (!this.users_channels) return false;
-    console.log(this.users_channels);
+
     for (const userChannel of this.users_channels) {
       if (userChannel.user.nickname === nickname) {
         return true;

@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { ChannelInputDto } from '../dto/channel-input.dto';
 import { ChannelMessagesEntity } from '../entity/channelmessages.entity';
 import { MessageInputDto } from '../dto/message-input.dto';
+import { UserChannelOutputDto } from '../dto/user-channel-output.dto';
 
 @Injectable()
 export class ChatService {
@@ -149,6 +150,19 @@ export class ChatService {
     if (!isPasswordValid) {
       throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
     }
+  }
+
+  async getChannelUsers(ftId: string, channelId: number) {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+
+    if (!channel.userHasWriteAccess(user.nickname)) {
+      throw new HttpException(
+        'User does not have the required permissions',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    return UserChannelOutputDto.toDtoList(channel.users_channels);
   }
 
   private async permissionCheck(
