@@ -17,7 +17,7 @@ export class AuthController {
 
   @Patch('logout')
   async logout(@Req() req: any): Promise<void> {
-    this.authService.logout(req.user.ftLogin);
+    await this.authService.logout(req.user.ftLogin);
   }
 
   @Get('me')
