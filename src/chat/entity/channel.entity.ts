@@ -99,4 +99,13 @@ export class ChannelEntity {
     }
     this.channel_messages.push(message);
   }
+
+  isPublic(): boolean {
+    return this.type === 0;
+  }
+
+  deletePassword(): void {
+    this.passwordHash = null;
+    this.passwordSalt = null;
+  }
 }

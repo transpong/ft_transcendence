@@ -3,6 +3,7 @@ import { ChatService } from '../service/chat.service';
 import { ChannelInputDto } from '../dto/channel-input.dto';
 import { MessageInputDto } from '../dto/message-input.dto';
 import { NumberInputDto } from '../dto/number-input.dto';
+import { PasswordInputDto } from '../dto/password-input.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -58,6 +59,32 @@ export class ChatController {
       req.user.ftLogin,
       channelId,
       numberDto.type,
+    );
+  }
+
+  @Put('channels/:channelId/password')
+  async changeChannelPassword(
+    @Req() req,
+    @Param('channelId') channelId: number,
+    @Body() passwordDto: PasswordInputDto,
+  ): Promise<void> {
+    await this.chatService.changeChannelPassword(
+      req.user.ftLogin,
+      channelId,
+      passwordDto.password,
+    );
+  }
+
+  @Post('chats/channels/:channelId/login')
+  async validateChannelPassword(
+    @Req() req,
+    @Param('channelId') channelId: number,
+    @Body() passwordDto: PasswordInputDto,
+  ): Promise<void> {
+    await this.chatService.validateChannelPassword(
+      req.user.ftLogin,
+      channelId,
+      passwordDto.password,
     );
   }
 }

@@ -107,7 +107,48 @@ export class ChatService {
 
     await this.permissionCheck(user, channel);
     channel.type = type;
+    if (channel.isPublic()) {
+      channel.deletePassword();
+    }
     await this.channelRepository.save(channel);
+  }
+
+  async changeChannelPassword(
+    ftId: string,
+    channelId: number,
+    password: string,
+  ): Promise<void> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+
+    await this.permissionCheck(user, channel);
+    channel.passwordSalt = await bcrypt.genSalt();
+    channel.passwordHash = await bcrypt.hash(password, channel.passwordSalt);
+    await this.channelRepository.save(channel);
+  }
+
+  async validateChannelPassword(
+    ftId: string,
+    channelId: number,
+    password: string,
+  ): Promise<void> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+
+    if (!channel.userHasWriteAccess(user.nickname)) {
+      throw new HttpException(
+        'User does not have the required permissions',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    const isPasswordValid: boolean = await bcrypt.compare(
+      password,
+      channel.passwordHash,
+    );
+
+    if (!isPasswordValid) {
+      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
+    }
   }
 
   private async permissionCheck(
