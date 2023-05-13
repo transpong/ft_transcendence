@@ -10,7 +10,7 @@ import { UsersChannelsEntity } from './user-channels.entity';
 import { ChannelMessagesEntity } from './channelmessages.entity';
 import { UserAccessType } from '../enum/access-type.enum';
 
-@Entity()
+@Entity({ name: 'channels' })
 export class ChannelEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -45,10 +45,6 @@ export class ChannelEntity {
   )
   channel_messages: ChannelMessagesEntity[];
 
-  update(): void {
-    this.updatedAt = new Date();
-  }
-
   hasUser(nickname: string): boolean {
     if (!this.users_channels) return false;
     console.log(this.users_channels);
@@ -76,5 +72,31 @@ export class ChannelEntity {
       }
     }
     return false;
+  }
+
+  userHasWriteAccess(nickname: string): boolean {
+    const UserAccessValids: UserAccessType[] = [
+      UserAccessType.ADMIN,
+      UserAccessType.OWNER,
+      UserAccessType.MEMBER,
+    ];
+
+    if (!this.users_channels) return false;
+    for (const userChannel of this.users_channels) {
+      if (
+        userChannel.user.nickname === nickname &&
+        UserAccessValids.includes(userChannel.userAccessType)
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  addChannelMessages(message: ChannelMessagesEntity): void {
+    if (!this.channel_messages) {
+      this.channel_messages = [];
+    }
+    this.channel_messages.push(message);
   }
 }

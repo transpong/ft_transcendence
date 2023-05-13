@@ -9,7 +9,7 @@ import {
 import { UserEntity } from '../../user/entity/user.entity';
 import { ChannelEntity } from './channel.entity';
 
-@Entity()
+@Entity({ name: 'user_channels' })
 export class UsersChannelsEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -37,8 +37,4 @@ export class UsersChannelsEntity {
 
   @ManyToOne(() => ChannelEntity, (channel) => channel.users_channels)
   channel: ChannelEntity;
-
-  update(): void {
-    this.updatedAt = new Date();
-  }
 }
