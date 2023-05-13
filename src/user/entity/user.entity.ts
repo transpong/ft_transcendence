@@ -87,4 +87,8 @@ export class UserEntity {
   twoFactorValid(): boolean {
     return !(this.tokenMFA !== null && this.validatedAtMFA === null);
   }
+
+  update(): void {
+    this.updatedAt = new Date();
+  }
 }
