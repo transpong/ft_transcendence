@@ -58,6 +58,7 @@ export class UserService {
 
     userEntity.tokenMFA = mfaSecret.secret;
     userEntity.validatedAtMFA = null;
+    userEntity.update();
     await this.userRepository.update(userEntity.id, userEntity);
     return {
       secret: mfaSecret.secret,
@@ -73,6 +74,7 @@ export class UserService {
     }
 
     userEntity.validatedAtMFA = new Date();
+    userEntity.update();
     await this.userRepository.update(userEntity.id, userEntity);
   }
 
@@ -81,6 +83,7 @@ export class UserService {
 
     userEntity.tokenMFA = null;
     userEntity.validatedAtMFA = null;
+    userEntity.update();
     await this.userRepository.update(userEntity.id, userEntity);
   }
 
@@ -97,6 +100,7 @@ export class UserService {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
 
     userEntity.nickname = nickname;
+    userEntity.update();
     await this.userRepository.update(userEntity.id, userEntity);
   }
 
@@ -105,6 +109,7 @@ export class UserService {
 
     this.avatarService.deleteImage(userEntity.avatar);
     userEntity.avatar = await this.avatarService.upload(file);
+    userEntity.update();
     await this.userRepository.update(userEntity.id, userEntity);
   }
 
@@ -118,6 +123,7 @@ export class UserService {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
 
     userEntity.validatedAtMFA = null;
+    userEntity.update();
     await this.userRepository.update(userEntity.id, userEntity);
   }
 
