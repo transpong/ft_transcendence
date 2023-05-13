@@ -28,4 +28,8 @@ export class ChannelMessagesEntity {
 
   @ManyToOne(() => ChannelEntity, (channel) => channel.channel_messages)
   channel: ChannelEntity;
+
+  update(): void {
+    this.updatedAt = new Date();
+  }
 }

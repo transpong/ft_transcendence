@@ -37,4 +37,8 @@ export class UsersChannelsEntity {
 
   @ManyToOne(() => ChannelEntity, (channel) => channel.users_channels)
   channel: ChannelEntity;
+
+  update(): void {
+    this.updatedAt = new Date();
+  }
 }

@@ -27,4 +27,8 @@ export class DirectMessagesEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   toUser: UserEntity;
+
+  update(): void {
+    this.updatedAt = new Date();
+  }
 }

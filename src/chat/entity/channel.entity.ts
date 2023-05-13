@@ -43,4 +43,8 @@ export class ChannelEntity {
     (channelMessage) => channelMessage.channel,
   )
   channel_messages: ChannelMessagesEntity[];
+
+  update(): void {
+    this.updatedAt = new Date();
+  }
 }
