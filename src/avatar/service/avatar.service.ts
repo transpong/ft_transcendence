@@ -61,6 +61,7 @@ export class AvatarService {
 
     return imageName;
   }
+
   deleteImage(imageName: string): void {
     const imagePath: string = path.join('upload', imageName);
 

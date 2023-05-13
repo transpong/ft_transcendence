@@ -3,7 +3,6 @@ import { AvatarService } from './service/avatar.service';
 import { AvatarController } from './controller/avatar.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { MulterConfigService } from './0-config/multer.config';
-import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
