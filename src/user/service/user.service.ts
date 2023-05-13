@@ -114,6 +114,13 @@ export class UserService {
     return UserDto.fromEntity(userEntity);
   }
 
+  async logout(ftId: string): Promise<void> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+
+    userEntity.validatedAtMFA = null;
+    await this.userRepository.update(userEntity.id, userEntity);
+  }
+
   private async validNickname(nickname: string): Promise<boolean> {
     if (nickname === '' || nickname === null) return false;
     const userEntity: UserEntity = await this.userRepository.findOneBy({

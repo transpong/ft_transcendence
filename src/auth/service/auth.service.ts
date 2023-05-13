@@ -30,6 +30,10 @@ export class AuthService {
     return;
   }
 
+  async logout(ftLogin: string): Promise<void> {
+    await this.userService.logout(ftLogin);
+  }
+
   private generateJwtToken(req: any): string {
     return this.jwtService.sign(
       { req: req.user.username },
