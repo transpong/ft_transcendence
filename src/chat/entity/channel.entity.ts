@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { UsersChannelsEntity } from './user-channels.entity';
 import { ChannelMessagesEntity } from './channelmessages.entity';
 
@@ -7,27 +14,33 @@ export class ChannelEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn()
-  created_at: Date
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-  @UpdateDateColumn()
-  updated_at: Date
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
-  @Column()
+  @Column({ name: 'name' })
   name: string;
 
-  @Column()
-  password_hash: string;
+  @Column({ name: 'password_hash' })
+  passwordHash: string;
 
-  @Column()
-  password_salt: string;
+  @Column({ name: 'password_salt' })
+  passwordSalt: string;
 
-  @Column()
+  @Column({ name: 'type' })
   type: number;
 
-  @OneToMany(() => UsersChannelsEntity, usersChannels => usersChannels.channel)
+  @OneToMany(
+    () => UsersChannelsEntity,
+    (usersChannels) => usersChannels.channel,
+  )
   users_channels: UsersChannelsEntity[];
 
-  @OneToMany(() => ChannelMessagesEntity, channelMessage => channelMessage.channel)
+  @OneToMany(
+    () => ChannelMessagesEntity,
+    (channelMessage) => channelMessage.channel,
+  )
   channel_messages: ChannelMessagesEntity[];
 }

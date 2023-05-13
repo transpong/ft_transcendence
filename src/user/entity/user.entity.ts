@@ -1,11 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToMany,
-  JoinTable,
-  OneToMany,
   CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UsersChannelsEntity } from '../../chat/entity/user-channels.entity';
@@ -17,32 +17,32 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn()
-  created_at: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-  @UpdateDateColumn()
-  updated_at: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
-  @Column()
-  ft_id: string;
+  @Column({ name: 'ft_id', length: 50, unique: true })
+  ftId: string;
 
-  @Column({ length: 50 })
-  nickname: string;
+  @Column({ name: 'nickname', length: 50, nullable: true })
+  nickname?: string;
 
-  @Column({ nullable: true })
-  avatar: string;
+  @Column({ name: 'avatar', nullable: true })
+  avatar?: string;
 
-  @Column({ nullable: true })
-  mfa_token: string;
+  @Column({ name: 'mfa_token', nullable: true })
+  tokenMFA?: string;
 
-  @Column({ nullable: true })
-  mfa_validated_at: Date;
+  @Column({ name: 'mfa_validated_at', nullable: true })
+  validatedAtMFA?: Date;
 
-  @Column()
+  @Column({ name: 'status' })
   status: number;
 
   @ManyToMany(() => UserEntity)
-  @JoinTable()
+  @JoinTable({ name: 'friends' })
   friends: UserEntity[];
 
   @ManyToMany(() => UserEntity, (user) => user.blockedBy)
@@ -65,13 +65,13 @@ export class UserEntity {
 
   @OneToMany(
     () => DirectMessagesEntity,
-    (directMessage) => directMessage.from_user,
+    (directMessage) => directMessage.fromUser,
   )
   directMessagesFrom: DirectMessagesEntity[];
 
   @OneToMany(
     () => DirectMessagesEntity,
-    (directMessage) => directMessage.to_user,
+    (directMessage) => directMessage.toUser,
   )
   directMessagesTo: DirectMessagesEntity[];
 
@@ -83,4 +83,8 @@ export class UserEntity {
 
   @OneToMany(() => MatchHistoryEntity, (matchHistory) => matchHistory.winner)
   matchHistoryWinner: MatchHistoryEntity[];
+
+  twoFactorValid(): boolean {
+    return !(this.tokenMFA !== null && this.validatedAtMFA === null);
+  }
 }
