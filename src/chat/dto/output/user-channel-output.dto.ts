@@ -1,5 +1,5 @@
 import { classToPlain, Expose } from '@nestjs/class-transformer';
-import { UsersChannelsEntity } from '../entity/user-channels.entity';
+import { UsersChannelsEntity } from '../../entity/user-channels.entity';
 
 export class UserChannelOutputDto {
   @Expose({ name: 'ft_id' })

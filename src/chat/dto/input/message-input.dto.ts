@@ -1,8 +1,8 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { ChannelEntity } from '../entity/channel.entity';
-import { UserEntity } from '../../user/entity/user.entity';
-import { ChannelMessagesEntity } from '../entity/channelmessages.entity';
-import { DirectMessagesEntity } from '../entity/direct-messages.entity';
+import { ChannelEntity } from '../../entity/channel.entity';
+import { UserEntity } from '../../../user/entity/user.entity';
+import { ChannelMessagesEntity } from '../../entity/channelmessages.entity';
+import { DirectMessagesEntity } from '../../entity/direct-messages.entity';
 
 export class MessageInputDto {
   @IsNotEmpty()
