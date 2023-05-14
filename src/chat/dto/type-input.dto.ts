@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 
-export class NumberInputDto {
+export class TypeInputDto {
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
