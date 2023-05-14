@@ -8,10 +8,11 @@ import { UserService } from '../../user/service/user.service';
 import { UserEntity } from '../../user/entity/user.entity';
 import { UserAccessType } from '../enum/access-type.enum';
 import * as bcrypt from 'bcrypt';
-import { ChannelInputDto } from '../dto/channel-input.dto';
+import { ChannelInputDto } from '../dto/input/channel-input.dto';
 import { ChannelMessagesEntity } from '../entity/channelmessages.entity';
-import { MessageInputDto } from '../dto/message-input.dto';
-import { UserChannelOutputDto } from '../dto/user-channel-output.dto';
+import { MessageInputDto } from '../dto/input/message-input.dto';
+import { UserChannelOutputDto } from '../dto/output/user-channel-output.dto';
+import { MessageOutputDto } from '../dto/output/message-output.dto';
 
 @Injectable()
 export class ChatService {
@@ -269,6 +270,23 @@ export class ChatService {
     await this.usersChannelsRepository.save(userChannel);
   }
 
+  async getChannelMessages(
+    ftId: string,
+    channelId: number,
+  ): Promise<MessageOutputDto[]> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+
+    if (!channel.userHasWriteAccess(user.nickname)) {
+      throw new HttpException(
+        'User does not have the required permissions',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    return MessageOutputDto.toMessageDtoList(channel.getSortedMessages(), user);
+  }
+
   private async permissionCheck(
     user: UserEntity,
     channel: ChannelEntity,
@@ -299,7 +317,12 @@ export class ChatService {
   private async getChannelById(id: number): Promise<ChannelEntity> {
     const channel: ChannelEntity = await this.channelRepository.findOne({
       where: { id: id },
-      relations: ['users_channels', 'users_channels.user', 'channel_messages'],
+      relations: [
+        'users_channels',
+        'users_channels.user',
+        'channel_messages',
+        'channel_messages.user',
+      ],
     });
 
     if (!channel) {

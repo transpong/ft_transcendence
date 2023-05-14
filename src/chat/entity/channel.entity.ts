@@ -124,4 +124,11 @@ export class ChannelEntity {
       }
     }
   }
+
+  getSortedMessages(): ChannelMessagesEntity[] {
+    if (!this.channel_messages) return [];
+    return this.channel_messages.sort((a, b) => {
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    });
+  }
 }

@@ -10,11 +10,11 @@ import {
   Req,
 } from '@nestjs/common';
 import { ChatService } from '../service/chat.service';
-import { ChannelInputDto } from '../dto/channel-input.dto';
-import { MessageInputDto } from '../dto/message-input.dto';
-import { TypeInputDto } from '../dto/type-input.dto';
-import { PasswordInputDto } from '../dto/password-input.dto';
-import { RestrictionInputDto } from '../dto/restriction-input.dto';
+import { ChannelInputDto } from '../dto/input/channel-input.dto';
+import { MessageInputDto } from '../dto/input/message-input.dto';
+import { TypeInputDto } from '../dto/input/type-input.dto';
+import { PasswordInputDto } from '../dto/input/password-input.dto';
+import { RestrictionInputDto } from '../dto/input/restriction-input.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -144,6 +144,14 @@ export class ChatController {
       channelId,
       nickname,
       restrictionDto.restriction,
+    );
+  }
+
+  @Get('channels/:channelId/messages')
+  async getChannelMessages(@Req() req, @Param('channelId') channelId: number) {
+    return await this.chatService.getChannelMessages(
+      req.user.ftLogin,
+      channelId,
     );
   }
 }
