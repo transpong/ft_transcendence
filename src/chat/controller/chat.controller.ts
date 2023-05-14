@@ -14,6 +14,7 @@ import { ChannelInputDto } from '../dto/channel-input.dto';
 import { MessageInputDto } from '../dto/message-input.dto';
 import { TypeInputDto } from '../dto/type-input.dto';
 import { PasswordInputDto } from '../dto/password-input.dto';
+import { RestrictionInputDto } from '../dto/restriction-input.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -63,12 +64,12 @@ export class ChatController {
   async changeChannelType(
     @Req() req,
     @Param('channelId') channelId: number,
-    @Body() numberDto: TypeInputDto,
+    @Body() typeDto: TypeInputDto,
   ): Promise<void> {
     await this.chatService.changeChannelType(
       req.user.ftLogin,
       channelId,
-      numberDto.type,
+      typeDto.type,
     );
   }
 
@@ -121,13 +122,28 @@ export class ChatController {
     @Req() req,
     @Param('channelId') channelId: number,
     @Param('nickname') nickname: string,
-    @Body() numberDto: TypeInputDto,
+    @Body() typeDto: TypeInputDto,
   ): Promise<void> {
     await this.chatService.changeUserAccessType(
       req.user.ftLogin,
       channelId,
       nickname,
-      numberDto.type,
+      typeDto.type,
+    );
+  }
+
+  @Patch('channels/:channelId/users/:nickname/restrictions')
+  async changeUserRestrictions(
+    @Req() req,
+    @Param('channelId') channelId: number,
+    @Param('nickname') nickname: string,
+    @Body() restrictionDto: RestrictionInputDto,
+  ): Promise<void> {
+    await this.chatService.changeUserRestrictions(
+      req.user.ftLogin,
+      channelId,
+      nickname,
+      restrictionDto.restriction,
     );
   }
 }
