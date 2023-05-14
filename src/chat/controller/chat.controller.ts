@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -100,5 +101,18 @@ export class ChatController {
   @Get('channels/:channelId/users')
   async getChannelUsers(@Req() req, @Param('channelId') channelId: number) {
     return await this.chatService.getChannelUsers(req.user.ftLogin, channelId);
+  }
+
+  @Delete('channels/:channelId/users/:nickname')
+  async removeUserFromChannel(
+    @Req() req,
+    @Param('channelId') channelId: number,
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    await this.chatService.removeUserFromChannel(
+      req.user.ftLogin,
+      channelId,
+      nickname,
+    );
   }
 }

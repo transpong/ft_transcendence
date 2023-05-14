@@ -4,6 +4,6 @@ export class NumberInputDto {
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
-  @Max(1)
+  @Max(2)
   type: number;
 }

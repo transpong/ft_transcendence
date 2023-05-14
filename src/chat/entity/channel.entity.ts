@@ -108,4 +108,20 @@ export class ChannelEntity {
     this.passwordHash = null;
     this.passwordSalt = null;
   }
+
+  userIsOwner(nickname: string): boolean {
+    for (const userChannel of this.users_channels) {
+      if (userChannel.user.nickname === nickname) {
+        return userChannel.userAccessType === UserAccessType.OWNER;
+      }
+    }
+  }
+
+  getUserChannel(nickname: string): UsersChannelsEntity {
+    for (const userChannel of this.users_channels) {
+      if (userChannel.user.nickname === nickname) {
+        return userChannel;
+      }
+    }
+  }
 }
