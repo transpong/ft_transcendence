@@ -288,7 +288,10 @@ export class ChatService {
     return MessageOutputDto.toMessageDtoList(channel.getSortedMessages(), user);
   }
 
-  async getDirectMessages(ftId: string, nickname: string): Promise<any> {
+  async getDirectMessages(
+    ftId: string,
+    nickname: string,
+  ): Promise<MessageDirectOutputDto> {
     const user: UserEntity = await this.userService.getUserByFtId(ftId);
     const friend: UserEntity = await this.userService.getUserByNickname(
       nickname,

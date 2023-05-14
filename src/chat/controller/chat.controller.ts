@@ -15,6 +15,8 @@ import { MessageInputDto } from '../dto/input/message-input.dto';
 import { TypeInputDto } from '../dto/input/type-input.dto';
 import { PasswordInputDto } from '../dto/input/password-input.dto';
 import { RestrictionInputDto } from '../dto/input/restriction-input.dto';
+import { MessageDirectOutputDto } from '../dto/output/message-direct-output.dto';
+import { MessageOutputDto } from '../dto/output/message-output.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -148,7 +150,10 @@ export class ChatController {
   }
 
   @Get('channels/:channelId/messages')
-  async getChannelMessages(@Req() req, @Param('channelId') channelId: number) {
+  async getChannelMessages(
+    @Req() req,
+    @Param('channelId') channelId: number,
+  ): Promise<MessageOutputDto[]> {
     return await this.chatService.getChannelMessages(
       req.user.ftLogin,
       channelId,
@@ -156,7 +161,10 @@ export class ChatController {
   }
 
   @Get('channels/direct/:nickname/messages')
-  async getDirectMessages(@Req() req, @Param('nickname') nickname: string) {
+  async getDirectMessages(
+    @Req() req,
+    @Param('nickname') nickname: string,
+  ): Promise<MessageDirectOutputDto> {
     return await this.chatService.getDirectMessages(req.user.ftLogin, nickname);
   }
 }
