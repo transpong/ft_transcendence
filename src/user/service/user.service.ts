@@ -42,8 +42,9 @@ export class UserService {
   }
 
   async getUserByFtId(ftId: string): Promise<UserEntity> {
-    const userEntity: UserEntity = await this.userRepository.findOneBy({
-      ftId,
+    const userEntity: UserEntity = await this.userRepository.findOne({
+      where: { ftId: ftId },
+      relations: ['directMessagesFrom'],
     });
 
     if (!userEntity) {

@@ -13,6 +13,7 @@ import { ChannelMessagesEntity } from '../entity/channelmessages.entity';
 import { MessageInputDto } from '../dto/input/message-input.dto';
 import { UserChannelOutputDto } from '../dto/output/user-channel-output.dto';
 import { MessageOutputDto } from '../dto/output/message-output.dto';
+import { MessageDirectOutputDto } from '../dto/output/message-direct-output.dto';
 
 @Injectable()
 export class ChatService {
@@ -285,6 +286,43 @@ export class ChatService {
     }
 
     return MessageOutputDto.toMessageDtoList(channel.getSortedMessages(), user);
+  }
+
+  async getDirectMessages(ftId: string, nickname: string): Promise<any> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const friend: UserEntity = await this.userService.getUserByNickname(
+      nickname,
+    );
+    const directMessages: DirectMessagesEntity[] =
+      await this.findDirectMessages(user, friend);
+
+    return MessageDirectOutputDto.fromDirectMessageEntityList(
+      user,
+      friend,
+      directMessages,
+    );
+  }
+
+  async findDirectMessages(
+    fromUser: UserEntity,
+    toUser: UserEntity,
+  ): Promise<DirectMessagesEntity[]> {
+    return await this.directMessagesRepository.find({
+      where: [
+        {
+          fromUser: { id: fromUser.id },
+          toUser: { id: toUser.id },
+        },
+        {
+          fromUser: { id: toUser.id },
+          toUser: { id: fromUser.id },
+        },
+      ],
+      relations: ['fromUser', 'toUser'],
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 
   private async permissionCheck(

@@ -154,4 +154,9 @@ export class ChatController {
       channelId,
     );
   }
+
+  @Get('channels/direct/:nickname/messages')
+  async getDirectMessages(@Req() req, @Param('nickname') nickname: string) {
+    return await this.chatService.getDirectMessages(req.user.ftLogin, nickname);
+  }
 }

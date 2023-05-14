@@ -87,4 +87,14 @@ export class UserEntity {
   twoFactorValid(): boolean {
     return !(this.tokenMFA !== null && this.validatedAtMFA === null);
   }
+
+  getSortedMessagesFrom(friend: UserEntity): DirectMessagesEntity[] {
+    const messages = this.directMessagesFrom.filter(
+      (message) => message.toUser.id === friend.id,
+    );
+
+    return messages.sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    );
+  }
 }

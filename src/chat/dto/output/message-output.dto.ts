@@ -2,6 +2,7 @@ import { UserEntity } from '../../../user/entity/user.entity';
 import { classToPlain, Expose } from '@nestjs/class-transformer';
 import { ChannelMessagesEntity } from '../../entity/channelmessages.entity';
 import { SenderDto } from './message-sender-output.dto';
+import { DirectMessagesEntity } from '../../entity/direct-messages.entity';
 
 export class MessageOutputDto {
   @Expose({ name: 'id' })
@@ -41,6 +42,27 @@ export class MessageOutputDto {
 
     for (const channelMessagesEntity of channelMessagesEntityList) {
       messageDtoList.push(this.toMessageDto(channelMessagesEntity, user));
+    }
+    return messageDtoList;
+  }
+
+  static fromDirectMessageEntityList(
+    user: UserEntity,
+    directMessagesEntityList: DirectMessagesEntity[],
+  ): MessageOutputDto[] {
+    const messageDtoList: MessageOutputDto[] = [];
+    const sortedMessages = directMessagesEntityList.sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    );
+
+    for (const directMessagesEntity of sortedMessages) {
+      const messageDto: MessageOutputDto = new MessageOutputDto();
+
+      messageDto.id = directMessagesEntity.id;
+      messageDto.createdAt = directMessagesEntity.createdAt;
+      messageDto.messageText = directMessagesEntity.messageText;
+      messageDto.isSender = directMessagesEntity.fromUser.id === user.id;
+      messageDtoList.push(messageDto);
     }
     return messageDtoList;
   }
