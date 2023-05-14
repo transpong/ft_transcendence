@@ -37,6 +37,5 @@ lerna-debug.log*
 # ENV
 .env
 
-!./upload/default.jpeg
-./upload/*
+/upload
 
