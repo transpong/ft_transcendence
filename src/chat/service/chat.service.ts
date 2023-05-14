@@ -198,6 +198,41 @@ export class ChatService {
     await this.usersChannelsRepository.remove(userChannel);
   }
 
+  async changeUserAccessType(
+    ftId: string,
+    channelId: number,
+    nickname: string,
+    type: number,
+  ): Promise<void> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+    const friend: UserEntity = await this.userService.getUserByNickname(
+      nickname,
+    );
+
+    if (!channel.hasUser(friend.nickname)) {
+      throw new HttpException(
+        'User is not in the channel',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (channel.userIsOwner(friend.nickname)) {
+      throw new HttpException(
+        'Cannot change owner access type',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.permissionCheck(user, channel);
+    const userChannel: UsersChannelsEntity = channel.getUserChannel(
+      friend.nickname,
+    );
+
+    userChannel.userAccessType = type;
+    await this.usersChannelsRepository.save(userChannel);
+  }
+
   private async permissionCheck(
     user: UserEntity,
     channel: ChannelEntity,

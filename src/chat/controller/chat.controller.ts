@@ -12,7 +12,7 @@ import {
 import { ChatService } from '../service/chat.service';
 import { ChannelInputDto } from '../dto/channel-input.dto';
 import { MessageInputDto } from '../dto/message-input.dto';
-import { NumberInputDto } from '../dto/number-input.dto';
+import { TypeInputDto } from '../dto/type-input.dto';
 import { PasswordInputDto } from '../dto/password-input.dto';
 
 @Controller('chat')
@@ -63,7 +63,7 @@ export class ChatController {
   async changeChannelType(
     @Req() req,
     @Param('channelId') channelId: number,
-    @Body() numberDto: NumberInputDto,
+    @Body() numberDto: TypeInputDto,
   ): Promise<void> {
     await this.chatService.changeChannelType(
       req.user.ftLogin,
@@ -113,6 +113,21 @@ export class ChatController {
       req.user.ftLogin,
       channelId,
       nickname,
+    );
+  }
+
+  @Patch('channels/:channelId/users/:nickname/type')
+  async changeUserAccessType(
+    @Req() req,
+    @Param('channelId') channelId: number,
+    @Param('nickname') nickname: string,
+    @Body() numberDto: TypeInputDto,
+  ): Promise<void> {
+    await this.chatService.changeUserAccessType(
+      req.user.ftLogin,
+      channelId,
+      nickname,
+      numberDto.type,
     );
   }
 }
