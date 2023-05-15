@@ -2,6 +2,9 @@ import { classToPlain, Expose } from '@nestjs/class-transformer';
 import { UsersChannelsEntity } from '../../entity/user-channels.entity';
 
 export class UserChannelOutputDto {
+  @Expose({ name: 'id' })
+  id: number;
+
   @Expose({ name: 'ft_id' })
   ftLogin: string;
 
@@ -29,6 +32,7 @@ export class UserChannelOutputDto {
   static toDto(usersChannel: UsersChannelsEntity): UserChannelOutputDto {
     const userDto: UserChannelOutputDto = new UserChannelOutputDto();
 
+    userDto.id = usersChannel.id;
     userDto.ftLogin = usersChannel.user.ftId;
     userDto.nickname = usersChannel.user.nickname;
     userDto.avatar = usersChannel.user.avatar;
