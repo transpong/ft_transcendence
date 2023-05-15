@@ -1,4 +1,4 @@
-import { Expose } from '@nestjs/class-transformer';
+import { classToPlain, Expose } from '@nestjs/class-transformer';
 import { MatchHistoryEntity } from '../entity/game.entity';
 import { UserEntity } from '../../user/entity/user.entity';
 
@@ -41,5 +41,9 @@ export class MatchesUserDto {
     matchHistoryDto.avatar = user.avatar;
     matchHistoryDto.custom = matchHistory.custom;
     return matchHistoryDto;
+  }
+
+  toJSON() {
+    return classToPlain(this);
   }
 }

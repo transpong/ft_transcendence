@@ -1,4 +1,4 @@
-import { Expose } from '@nestjs/class-transformer';
+import { classToPlain, Expose } from '@nestjs/class-transformer';
 import { MatchHistoryEntity } from '../entity/game.entity';
 import { MatchesUserDto } from './matches-user.dto';
 
@@ -40,5 +40,9 @@ export class MatchesHistoryDto {
       matchHistoryDtoList.push(MatchesHistoryDto.toDto(matchHistoryEntity));
     });
     return matchHistoryDtoList;
+  }
+
+  toJSON() {
+    return classToPlain(this);
   }
 }

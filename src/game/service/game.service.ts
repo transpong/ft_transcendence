@@ -52,8 +52,9 @@ export class GameService {
       await this.findMatchesHistoryFromUser(nickname);
     const wins: number = this.getWins(matchesHistoryList, nickname);
     const losses: number = this.getLosses(matchesHistoryList, nickname);
+    const score: number = this.getScore(matchesHistoryList, nickname);
 
-    return MatchesRakingDto.toDto(user, wins, losses);
+    return MatchesRakingDto.toDto(user, wins, losses, score);
   }
 
   private getRankingList(
@@ -66,10 +67,12 @@ export class GameService {
       const user: UserEntity = users[i];
       const wins: number = this.getWins(matchesHistoryList, user.nickname);
       const losses: number = this.getLosses(matchesHistoryList, user.nickname);
+      const score: number = this.getScore(matchesHistoryList, user.nickname);
       const matchesRakingDto: MatchesRakingDto = MatchesRakingDto.toDto(
         user,
         wins,
         losses,
+        score,
       );
 
       matchesRakingDtoList.push(matchesRakingDto);
@@ -78,15 +81,35 @@ export class GameService {
   }
 
   private sortRankingList(matchesRakingDtoList: MatchesRakingDto[]) {
-    matchesRakingDtoList.sort((a, b) => {
-      if (a.wins > b.wins) {
-        return -1;
-      }
-      if (a.wins < b.wins) {
-        return 1;
-      }
-      return 0;
-    });
+    matchesRakingDtoList
+      .sort((a, b) => {
+        if (a.wins > b.wins) {
+          return -1;
+        }
+        if (a.wins < b.wins) {
+          return 1;
+        }
+        if (a.wins === b.wins) {
+          if (a.score > b.score) {
+            return -1;
+          }
+          if (a.score < b.score) {
+            return 1;
+          }
+        }
+        if (a.wins === b.wins && a.score === b.score) {
+          if (a.loses < b.loses) {
+            return -1;
+          }
+          if (a.loses > b.loses) {
+            return 1;
+          }
+        }
+        return 0;
+      })
+      .forEach((matchRakingDto, index) => {
+        matchRakingDto.position = index + 1;
+      });
   }
 
   private getWins(matchesHistoryList: MatchHistoryEntity[], nickname: string) {
@@ -112,6 +135,20 @@ export class GameService {
       }
     });
     return losses;
+  }
+
+  private getScore(matchesHistoryList: MatchHistoryEntity[], nickname: string) {
+    let score = 0;
+
+    matchesHistoryList.forEach((matchHistory) => {
+      if (matchHistory.user1.nickname === nickname) {
+        score += matchHistory.user1Score;
+      }
+      if (matchHistory.user2.nickname === nickname) {
+        score += matchHistory.user2Score;
+      }
+    });
+    return score;
   }
 
   private async findAllMatchesHistory() {
