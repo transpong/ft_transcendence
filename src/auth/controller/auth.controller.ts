@@ -19,9 +19,4 @@ export class AuthController {
   async logout(@Req() req: any): Promise<void> {
     await this.authService.logout(req.user.ftLogin);
   }
-
-  @Get('me')
-  async me(@Req() req: any): Promise<any> {
-    return req.user.ftLogin;
-  }
 }
