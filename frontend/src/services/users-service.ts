@@ -3,15 +3,15 @@ import { apiService } from "./api";
 
 export interface IApiUserMe {
   id: number;
-  ftId: string;
+  ft_id: string;
   nickname: string;
   avatar: string;
-  isMfaEnabled: boolean;
+  is_mfa_enabled: boolean;
 }
 
 export class UsersService {
-  private api: AxiosInstance
-  constructor () {
+  private api: AxiosInstance;
+  constructor() {
     this.api = apiService.getAxios();
   }
 
@@ -22,6 +22,21 @@ export class UsersService {
 
   async uploadAvatar(avatar: FormData): Promise<void> {
     return this.api.patch("/user/me/avatar", avatar);
+  }
+
+  async activateMfa(): Promise<{qr_code_url: string, secrt: string}> {
+    const { data } = await this.api.post("/user/me/mfa");
+    return data;
+  }
+
+  async validateMfa(code: string): Promise<void> {
+    return this.api.post("/user/me/mfa/validate", {
+      code,
+    });
+  }
+
+  async disableMfa(): Promise<void> {
+    return this.api.patch("/user/me/mfa/invalidate");
   }
 }
 

@@ -15,7 +15,6 @@ import { avatarUrl } from "../../../../helpers/avatar-url";
 
 export default function Me(){
   const position = 7;
-  const [isMFA, setMFA] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [me, setMe] = useState<IApiUserMe>();
   const navigate = useNavigate();
@@ -137,6 +136,20 @@ export default function Me(){
     setIsUploading(false);
   }
 
+  async function handleMfaActivation() {
+    const data = await userService.activateMfa();
+
+    navigate(`/home/me/mfa`, {
+      state: {
+        qr_code: data.qr_code_url,
+      }
+    });
+  }
+
+  async function handleMfadeactivation() {
+    await userService.disableMfa();
+  }
+
   return useOutlet() ? (
     <Outlet />
   ) : (
@@ -163,7 +176,9 @@ export default function Me(){
             hidden
             type="file"
             ref={(el) => (hiddenInput = el)}
-            onChange={(e) => handlePhotoSelect(e.target.files && e.target.files[0])}
+            onChange={(e) =>
+              handlePhotoSelect(e.target.files && e.target.files[0])
+            }
           />
           <Button
             colorScheme={"purple"}
@@ -176,14 +191,11 @@ export default function Me(){
           <Text fontSize={"35px"} fontWeight={"bold"} marginBottom={"15px"}>
             {me?.nickname}
           </Text>
-          {!isMFA ? (
+          {!me?.is_mfa_enabled ? (
             <Button
               size={"lg"}
               colorScheme={"purple"}
-              onClick={() => {
-                navigate("/home/me/mfa");
-                setMFA(true);
-              }}
+              onClick={handleMfaActivation}
             >
               Ativar MFA
             </Button>
@@ -191,7 +203,7 @@ export default function Me(){
             <Button
               size={"lg"}
               colorScheme={"purple"}
-              onClick={() => setMFA(false)}
+              onClick={handleMfadeactivation}
             >
               Desativar MFA
             </Button>

@@ -1,10 +1,25 @@
 import { Button, Flex, Stack, Image, Input } from '@chakra-ui/react'
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { userService } from '../../../services/users-service';
 import "./TwoFactorAuthenticationLogin.css"
-import React from "react"
 
 export default function TwoFactorAuthenticationLogin(){
-    const [value, setValue] = React.useState('')
+    const [value, setValue] = useState('')
+    const [isUploading, setIsUploading] = useState(false);
     const handleChange : React.ChangeEventHandler<HTMLInputElement>  = (event) => setValue(event.target.value)
+    const navigate = useNavigate();
+
+    async function handleMfaValidation() {
+      setIsUploading(true);
+
+      await userService.validateMfa(value);
+
+      setTimeout(() => {
+        setIsUploading(false);
+        navigate("/home");
+      }, 1000);
+    }
     return(
         <Flex h={"100vh"} align={"center"} justify={"center"}>
             <Flex
@@ -28,7 +43,7 @@ export default function TwoFactorAuthenticationLogin(){
                 />
                 <Stack spacing={10} direction={"column"} align={"center"}>
                     <Input onChange={handleChange} placeholder={"2FA Code"} size={"md"} textColor={"white"}/>
-                    <Button onClick={() => console.log(`VALUE=${value}`)} colorScheme={"purple"} size={"lg"}>
+                    <Button onClick={handleMfaValidation} colorScheme={"purple"} size={"lg"} isLoading={isUploading}>
                         LOGIN
                     </Button>
                 </Stack>
