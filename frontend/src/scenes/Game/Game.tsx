@@ -1,0 +1,230 @@
+import React from "react";
+import Sketch from "react-p5";
+import p5Types from "p5"; //Import this for typechecking and intellisense
+
+interface ComponentProps {
+  // Your component props
+}
+
+let ball: Ball;
+let player1: Player;
+let player2: Player;
+let game: Game;
+let windowWidth = 1500
+let windowHeight = 700
+let canvasParent: Element
+
+
+class Game {
+    isRunning;
+    scoreP1;
+    scoreP2
+    ballGame;
+    constructor(ballGame: Ball){
+        this.isRunning = false
+        this.scoreP1 = 0
+        this.scoreP2 = 0
+        this.ballGame = ballGame
+    }
+
+    stop(){
+        this.isRunning = false
+    }
+
+    start(){
+        this.ballGame.centralize();
+        this.isRunning = true;
+    }
+
+    scorePlayer(player: number = 0){
+        if(player == 1)
+            this.scoreP1 += 1
+        else if(player == 2)
+            this.scoreP2 += 1
+        console.log("Player1 ", this.scoreP1, " X ", this.scoreP2, " PlayerP2" )
+    }
+
+    resetScore(){
+        this.scoreP1 = this.scoreP2 = 0;
+    }
+}
+
+class Player{
+    id = 0
+    positionX = 0;
+    positionY = 0;
+    heightPlayer = 0;
+    widthPlayer = 0;
+    speedY = 2;
+    p5;
+    constructor(p5Origin: p5Types, idPlayer: number) {
+        this.widthPlayer = 20;
+        this.heightPlayer = windowHeight * 0.1;
+        this.id = idPlayer;
+        if(idPlayer == 1){
+            this.positionX = 0;
+        }else if (idPlayer == 2){
+            this.positionX = windowWidth - this.widthPlayer;
+        }
+        this.positionY = (windowHeight / 2) - (this.heightPlayer / 2);
+        this.speedY = 2;
+        this.p5 = p5Origin
+    }
+
+    responsivePlayer(newHeight: number, oldHeight: number){
+        this.heightPlayer = newHeight * 0.1
+        this.positionY = newHeight * (this.positionY / oldHeight)
+    }
+
+    printPlayer() {
+        this.p5.rect( this.positionX, this.positionY, this.widthPlayer, this.heightPlayer);
+    }
+
+    movePlayer(){
+        if(this.id == 1){
+            if(this.p5.keyIsDown(this.p5.SHIFT)){
+                this.positionY -= this.speedY
+                if(this.positionY < 0) this.positionY = 0
+            }
+            if(this.p5.keyIsDown(this.p5.CONTROL)){
+                this.positionY += this.speedY
+                if(this.positionY + this.heightPlayer > windowHeight)this.positionY = windowHeight - this.heightPlayer
+            }
+        }
+
+        if(this.id == 2){
+            if(this.p5.keyIsDown(this.p5.UP_ARROW)){
+                this.positionY -= this.speedY
+                if(this.positionY < 0) this.positionY = 0
+            }
+            if(this.p5.keyIsDown(this.p5.DOWN_ARROW)){
+                this.positionY += this.speedY
+                if(this.positionY + this.heightPlayer > windowHeight) this.positionY = windowHeight - this.heightPlayer
+            }
+        }
+    }
+}
+
+class Ball{
+    positionX = windowWidth / 2;
+    positionY = windowHeight / 2;
+    speedX = 2;
+    speedY = 2;
+    diameterBall = ((windowWidth + windowHeight) / 2) * 0.023;
+    p5 ;
+
+    constructor(teste: p5Types) {
+        this.positionX;
+        this.positionY;
+        this.speedX;
+        this.speedY;
+        this.diameterBall;
+        this.p5 = teste
+    }
+
+    responsiveBall(newHeight: number, oldHeight: number, newWidth: number, oldWidth: number){
+        this.positionY = newHeight * (this.positionY / oldHeight)
+        this.positionX = newWidth * (this.positionX / oldWidth)
+        this.diameterBall = ((newHeight + newWidth) / 2) * 0.015;;
+        
+    }
+
+    centralize(){
+        this.positionX = windowWidth / 2;
+        this.positionY = windowHeight / 2;
+    }
+
+    printBall() {
+        this.p5.circle( this.positionX, this.positionY, this.diameterBall);
+        this.positionX += this.speedX;
+        this.positionY += this.speedY;
+        return this.checkBorder();
+    }
+
+    checkBorder() {
+        if(this.positionY - (this.diameterBall / 2) < 0) this.speedY *= -1;
+        if(this.positionY + (this.diameterBall / 2) > windowHeight) this.speedY *= -1;
+        return 0;
+    }
+
+    isGoal(){
+        if(this.positionX - (this.diameterBall / 2) < 0) return true;
+        if(this.positionX + (this.diameterBall / 2) > windowWidth) return true;
+        return false
+    }
+
+    whoScoredGoal(){
+        if(this.positionX - (this.diameterBall / 2) < 0) return 1;
+        if(this.positionX + (this.diameterBall / 2) > windowWidth) return 2;
+        return 0;
+    }
+
+    checkPlayerCollision(player: Player){
+        const yMenor = player.positionY
+        const yMaior = player.positionY + player.heightPlayer
+        if(player.id == 1){
+            const xReferencia = player.positionX + player.widthPlayer
+            if(this.positionX - (this.diameterBall / 2) <= xReferencia && this.positionX - (this.diameterBall / 2) > 0){
+                if(this.positionY >= yMenor && this.positionY <= yMaior)
+                    this.speedX *= -1;
+            }
+        }else if(player.id == 2){
+            const xReferencia = player.positionX
+            if(this.positionX + (this.diameterBall / 2) >= xReferencia && this.positionX  < windowWidth){
+                if(this.positionY >= yMenor && this.positionY <= yMaior)
+                    this.speedX *= -1;
+            }
+        }
+    }
+}
+
+const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
+    const setup = (p5: p5Types, canvasParentRef: Element) => {
+        p5.createCanvas(windowWidth , windowHeight).parent(canvasParentRef);
+        canvasParent = canvasParentRef
+        ball = new Ball(p5)
+        player1 = new Player(p5, 1)
+        player2 = new Player(p5, 2)
+        game = new Game(ball)
+    };
+
+    const draw = (p5: p5Types) => {
+        if(windowWidth != canvasParent.clientWidth || windowHeight != canvasParent.clientHeight){
+            p5.createCanvas(canvasParent.clientWidth , canvasParent.clientHeight).parent(canvasParent)
+            windowWidth = canvasParent.clientWidth
+            windowHeight = canvasParent.clientHeight
+        }
+        p5.background(0);
+        player1.printPlayer();
+        player2.printPlayer();
+        if(game.isRunning){
+            ball.printBall();
+            if(ball.isGoal()){
+                game.scorePlayer(ball.whoScoredGoal());
+                game.stop();
+            }
+            player1.movePlayer();
+            player2.movePlayer();
+            ball.checkPlayerCollision(player1)
+            ball.checkPlayerCollision(player2)
+        }else{
+            if(p5.keyIsDown(p5.ENTER))
+                game.start()
+        }
+    };
+
+    const windowResized = (p5: p5Types) => {
+        player1.responsivePlayer(canvasParent.clientHeight, windowHeight)
+        player2.responsivePlayer(canvasParent.clientHeight, windowHeight)
+        ball.responsiveBall(canvasParent.clientHeight, windowHeight, canvasParent.clientWidth, windowWidth)
+        p5.createCanvas(canvasParent.clientWidth , canvasParent.clientHeight).parent(canvasParent)
+        windowWidth = canvasParent.clientWidth
+        windowHeight = canvasParent.clientHeight
+    }
+
+  return <Sketch setup={setup} draw={draw}  windowResized={windowResized}/>
+}
+
+
+
+export default Pong

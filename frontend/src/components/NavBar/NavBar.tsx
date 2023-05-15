@@ -19,7 +19,7 @@ export default function NavBar() {
         Transpong
       </Button>
       <ButtonGroup>
-        <Button colorScheme={"purple"} onClick={() => navigate("/home")}>
+        <Button colorScheme={"purple"} onClick={() => navigate("/home/game")}>
           Jogar
         </Button>
         <Button colorScheme={"purple"} onClick={() => navigate("/home/matches")}>

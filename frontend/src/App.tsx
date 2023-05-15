@@ -10,6 +10,7 @@ import MachesHistory from './scenes/MatchesHistory/View/MachesHistory';
 import Me from './scenes/Users/Me/View/Me';
 import MFA from './scenes/Users/MFA/View/MFA';
 import Profile from './scenes/Users/Profiles/View/Profiles';
+import Game from './scenes/Game/Game';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                 <Route path="mfa" element={<MFA />}/>
               </Route>
               <Route path="profile/:user" element={<Profile />} />
+              <Route path="game" element={<Game />} />
             </Route>
           </Routes>
         </BrowserRouter>
