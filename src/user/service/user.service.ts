@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entity/user.entity';
 import { AuthDto } from '../../auth/dto/auth.dto';
@@ -44,7 +44,7 @@ export class UserService {
   async getUserByFtId(ftId: string): Promise<UserEntity> {
     const userEntity: UserEntity = await this.userRepository.findOne({
       where: { ftId: ftId },
-      relations: ['directMessagesFrom'],
+      relations: ['directMessagesFrom', 'friends'],
     });
 
     if (!userEntity) {
@@ -135,6 +135,18 @@ export class UserService {
       );
     }
     return userEntity;
+  }
+
+  async getNotFriendsByFtId(userEntity: UserEntity): Promise<UserEntity[]> {
+    const friendsIds: number[] = userEntity.friends.map((f) => f.id);
+
+    return await this.userRepository.find({
+      where: {
+        id: Not(In(friendsIds)),
+        ftId: Not(userEntity.ftId),
+      },
+      relations: ['friends', 'blocks'],
+    });
   }
 
   private async validNickname(nickname: string): Promise<boolean> {

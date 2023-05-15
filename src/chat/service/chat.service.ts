@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ChannelEntity } from '../entity/channel.entity';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { UsersChannelsEntity } from '../entity/user-channels.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DirectMessagesEntity } from '../entity/direct-messages.entity';
@@ -14,6 +14,8 @@ import { MessageInputDto } from '../dto/input/message-input.dto';
 import { UserChannelOutputDto } from '../dto/output/user-channel-output.dto';
 import { MessageOutputDto } from '../dto/output/message-output.dto';
 import { MessageDirectOutputDto } from '../dto/output/message-direct-output.dto';
+import { AccessType } from '../enum/cannel-type.enum';
+import { ChannelOutputDto } from '../dto/output/channel-output.dto';
 
 @Injectable()
 export class ChatService {
@@ -306,7 +308,50 @@ export class ChatService {
     );
   }
 
-  async findDirectMessages(
+  async getChats(ftId: string) {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const userChannels: UsersChannelsEntity[] =
+      await this.findUnbannedChannelsByUserFtId(user.ftId);
+    const unrelatedPublicChannels: UsersChannelsEntity[] =
+      await this.findUnrelatedPublicChannelsByUserFtId(userChannels);
+    const usersNotFriends: UserEntity[] =
+      await this.userService.getNotFriendsByFtId(user);
+
+    return ChannelOutputDto.getChats(
+      user,
+      usersNotFriends,
+      userChannels,
+      unrelatedPublicChannels,
+    );
+  }
+
+  private async findUnrelatedPublicChannelsByUserFtId(
+    userChannels: UsersChannelsEntity[],
+  ): Promise<UsersChannelsEntity[]> {
+    const userChannelIds: number[] = userChannels.map(
+      (userChannel) => userChannel.channel.id,
+    );
+
+    return await this.usersChannelsRepository.find({
+      where: [
+        {
+          channel: { type: AccessType.PUBLIC, id: Not(In(userChannelIds)) },
+        },
+      ],
+      relations: ['user', 'channel'],
+    });
+  }
+
+  private async findUnbannedChannelsByUserFtId(
+    ftId: string,
+  ): Promise<UsersChannelsEntity[]> {
+    return await this.usersChannelsRepository.find({
+      where: { user: { ftId: ftId }, bannedAt: null },
+      relations: ['user', 'channel'],
+    });
+  }
+
+  private async findDirectMessages(
     fromUser: UserEntity,
     toUser: UserEntity,
   ): Promise<DirectMessagesEntity[]> {
@@ -378,8 +423,6 @@ export class ChatService {
     const channel: ChannelEntity = new ChannelEntity();
 
     channel.name = inputDto.name;
-    channel.createdAt = new Date();
-    channel.updatedAt = new Date();
     channel.type = inputDto.type;
     channel.passwordSalt = await bcrypt.genSalt();
     channel.passwordHash = await bcrypt.hash(

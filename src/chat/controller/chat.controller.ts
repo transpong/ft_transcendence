@@ -27,6 +27,11 @@ export class ChatController {
     return this.chatService.createChat(req.user.ftLogin, body);
   }
 
+  @Get()
+  async getChats(@Req() req) {
+    return await this.chatService.getChats(req.user.ftLogin);
+  }
+
   @Put('channel/:channelId/user/:nickname')
   async addUserToChannel(
     @Req() req,
