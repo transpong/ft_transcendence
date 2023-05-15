@@ -151,6 +151,15 @@ export class UserService {
     });
   }
 
+  async getAllUsersThatHaveMatches(): Promise<UserEntity[]> {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.matchHistory1', 'match1')
+      .leftJoinAndSelect('user.matchHistory2', 'match2')
+      .where('(match1.id IS NOT NULL OR match2.id IS NOT NULL)')
+      .getMany();
+  }
+
   private async validNickname(nickname: string): Promise<boolean> {
     if (nickname === '' || nickname === null) return false;
     const userEntity: UserEntity = await this.userRepository.findOneBy({

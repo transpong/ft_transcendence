@@ -1,6 +1,6 @@
 import { Expose } from '@nestjs/class-transformer';
 import { MatchHistoryEntity } from '../entity/game.entity';
-import { MatchesUserDto } from './matchers-user.dto';
+import { MatchesUserDto } from './matches-user.dto';
 
 export class MatchesHistoryDto {
   @Expose({ name: 'id' })

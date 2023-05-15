@@ -4,23 +4,130 @@ import { MatchHistoryEntity } from '../entity/game.entity';
 import { Repository } from 'typeorm';
 import { UserService } from '../../user/service/user.service';
 import { MatchesHistoryDto } from '../dto/matches-history.dto';
+import { MatchesRakingDto } from '../dto/matches-raking.dto';
+import { UserEntity } from '../../user/entity/user.entity';
 
 @Injectable()
 export class GameService {
-  @InjectRepository(MatchHistoryEntity)
-  private readonly matchHistoryRepository: Repository<MatchHistoryEntity>;
-  private readonly userService: UserService;
+  constructor(
+    @InjectRepository(MatchHistoryEntity)
+    private readonly matchHistoryRepository: Repository<MatchHistoryEntity>,
+    private readonly userService: UserService,
+  ) {}
 
   async getMatchesHistory(): Promise<MatchesHistoryDto[]> {
-    const matchesHistory: MatchHistoryEntity[] =
-      await this.getAllMatchesHistory();
+    const matchesHistoryList: MatchHistoryEntity[] =
+      await this.findAllMatchesHistory();
 
-    return MatchesHistoryDto.toDtoList(matchesHistory);
+    return MatchesHistoryDto.toDtoList(matchesHistoryList);
   }
 
-  private async getAllMatchesHistory() {
+  async getMatchesHistoryFromUser(
+    nickname: string,
+  ): Promise<MatchesHistoryDto[]> {
+    const matchesHistoryList: MatchHistoryEntity[] =
+      await this.findMatchesHistoryFromUser(nickname);
+
+    return MatchesHistoryDto.toDtoList(matchesHistoryList);
+  }
+
+  async getRanking(): Promise<MatchesRakingDto[]> {
+    const users: UserEntity[] =
+      await this.userService.getAllUsersThatHaveMatches();
+    const matchesHistoryList: MatchHistoryEntity[] =
+      await this.findAllMatchesHistory();
+    const matchesRakingDtoList: MatchesRakingDto[] = this.getRankingList(
+      users,
+      matchesHistoryList,
+    );
+
+    this.sortRankingList(matchesRakingDtoList);
+
+    return matchesRakingDtoList;
+  }
+
+  async getRankingFromUser(nickname: string): Promise<MatchesRakingDto> {
+    const user: UserEntity = await this.userService.getUserByNickname(nickname);
+    const matchesHistoryList: MatchHistoryEntity[] =
+      await this.findMatchesHistoryFromUser(nickname);
+    const wins: number = this.getWins(matchesHistoryList, nickname);
+    const losses: number = this.getLosses(matchesHistoryList, nickname);
+
+    return MatchesRakingDto.toDto(user, wins, losses);
+  }
+
+  private getRankingList(
+    users: UserEntity[],
+    matchesHistoryList: MatchHistoryEntity[],
+  ): MatchesRakingDto[] {
+    const matchesRakingDtoList: MatchesRakingDto[] = [];
+
+    for (let i = 0; i < users.length; i++) {
+      const user: UserEntity = users[i];
+      const wins: number = this.getWins(matchesHistoryList, user.nickname);
+      const losses: number = this.getLosses(matchesHistoryList, user.nickname);
+      const matchesRakingDto: MatchesRakingDto = MatchesRakingDto.toDto(
+        user,
+        wins,
+        losses,
+      );
+
+      matchesRakingDtoList.push(matchesRakingDto);
+    }
+    return matchesRakingDtoList;
+  }
+
+  private sortRankingList(matchesRakingDtoList: MatchesRakingDto[]) {
+    matchesRakingDtoList.sort((a, b) => {
+      if (a.wins > b.wins) {
+        return -1;
+      }
+      if (a.wins < b.wins) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+
+  private getWins(matchesHistoryList: MatchHistoryEntity[], nickname: string) {
+    let wins = 0;
+
+    matchesHistoryList.forEach((matchHistory) => {
+      if (matchHistory.winner.nickname === nickname) {
+        wins++;
+      }
+    });
+    return wins;
+  }
+
+  private getLosses(
+    matchesHistoryList: MatchHistoryEntity[],
+    nickname: string,
+  ) {
+    let losses = 0;
+
+    matchesHistoryList.forEach((matchHistory) => {
+      if (matchHistory.winner.nickname !== nickname) {
+        losses++;
+      }
+    });
+    return losses;
+  }
+
+  private async findAllMatchesHistory() {
     return this.matchHistoryRepository.find({
       relations: ['user1', 'user2', 'winner'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  private async findMatchesHistoryFromUser(nickname: string) {
+    return this.matchHistoryRepository.find({
+      relations: ['user1', 'user2', 'winner'],
+      where: [
+        { user1: { nickname: nickname } },
+        { user2: { nickname: nickname } },
+      ],
       order: { createdAt: 'DESC' },
     });
   }
