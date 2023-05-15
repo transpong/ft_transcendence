@@ -6,6 +6,7 @@ import { AuthDto } from '../../auth/dto/auth.dto';
 import { generateSecret, verify } from '2fa-util';
 import { AvatarService } from '../../avatar/service/avatar.service';
 import { UserDto } from '../dto/user.dto';
+import { UserEnum } from '../enum/user.enum';
 
 @Injectable()
 export class UserService {
@@ -119,6 +120,7 @@ export class UserService {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
 
     userEntity.validatedAtMFA = null;
+    userEntity.status = UserEnum.OFFLINE;
     await this.userRepository.update(userEntity.id, userEntity);
   }
 

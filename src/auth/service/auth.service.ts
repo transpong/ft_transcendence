@@ -1,8 +1,9 @@
 import { Injectable, Req, Res } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-import { AuthDto } from '../dto/auth.dto';
 import { UserService } from '../../user/service/user.service';
+import { UserEntity } from '../../user/entity/user.entity';
+import { UserEnum } from '../../user/enum/user.enum';
 
 @Injectable()
 export class AuthService {
@@ -12,17 +13,19 @@ export class AuthService {
   ) {}
 
   async ftAuthCallback(@Req() req: any, @Res() res: Response): Promise<void> {
-    const tempUser: AuthDto = AuthDto.fromJSON(req.user); // TODO: simplify this
+    const user: UserEntity = await this.userService.getUserByFtId(
+      req.user.username,
+    );
     const accessToken: string = this.generateJwtToken(req);
 
     res.cookie('token', accessToken);
-    console.log(accessToken);
-    if (tempUser.hasTwoFactor) {
+    user.status = UserEnum.ONLINE;
+    console.log(accessToken); // TODO: REMOVE THIS DEBUG LOG
+    if (req.user.mfa) {
       res.redirect(process.env.FRONTEND_REDIRECT_MFA);
       return;
     }
-
-    if (await this.userService.userHasEmptyNickname(tempUser.username)) {
+    if (!user.nickname) {
       res.redirect(process.env.FRONTEND_REDIRECT_NICKNAME);
     } else {
       res.redirect(process.env.FRONTEND_REDIRECT_HOME);
