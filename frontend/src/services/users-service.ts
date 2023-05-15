@@ -19,6 +19,10 @@ export class UsersService {
     const { data } = await this.api.get<IApiUserMe>("/user/me");
     return data;
   }
+
+  async uploadAvatar(avatar: FormData): Promise<void> {
+    return this.api.patch("/user/me/avatar", avatar);
+  }
 }
 
 export const userService = new UsersService();
