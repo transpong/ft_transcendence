@@ -2,10 +2,25 @@ import { ButtonGroup, Button, Avatar, HStack, Text, Flex} from "@chakra-ui/react
 import { SettingsIcon } from "@chakra-ui/icons";
 import { IoExit } from "react-icons/io5";
 import { useNavigate } from "react-router";
+import { IApiUserMe, userService } from "../../services/users-service";
+import { useMemo, useState } from "react";
+import { avatarUrl } from "../../helpers/avatar-url";
+import { clearCookies } from "../../helpers/clear-cookies";
 
 export default function NavBar() {
   const navigate = useNavigate();
-  const logoff = () => navigate("/");
+
+  const [me, setMe] = useState<IApiUserMe>();
+  useMemo(async () => {
+    const myData = await userService.getMe();
+
+    setMe(myData);
+  }, []);
+
+  function handleLogoff () {
+    clearCookies();
+    navigate("/")
+  }
 
   return (
     <HStack h="14%" align="center" justify="space-between">
@@ -35,12 +50,12 @@ export default function NavBar() {
         minWidth={"2.5rem"}
       >
         <Flex marginRight={"1rem"} marginLeft={"1rem"} align={"center"} justify={"center"}>
-          <Avatar/>
+          <Avatar src={avatarUrl(me?.avatar)} />
           <HStack marginRight={"2rem"} marginLeft={"2rem"} cursor={"pointer"} onClick={() => navigate("/home/me")}>
-            <Text fontSize={"1rem"} fontWeight={"bold"} color={"white"}>Nickname</Text>
+            <Text fontSize={"1rem"} fontWeight={"bold"} color={"white"}>{me?.nickname}</Text>
             <SettingsIcon fontSize={"2rem"} fontWeight={"bold"} color={"white"}/>
           </HStack>
-          <IoExit cursor={"pointer"} fontSize={"2rem"} fontWeight={"bold"} color={"white"} onClick={() => logoff()}/>
+          <IoExit cursor={"pointer"} fontSize={"2rem"} fontWeight={"bold"} color={"white"} onClick={handleLogoff}/>
         </Flex>
       </HStack>
     </HStack>
