@@ -3,4 +3,5 @@ export enum UserEnum {
   OFFLINE = 1,
   ONGAME = 2,
   INLOBBY = 3,
+  INCUSTOMLOBBY = 4,
 }
