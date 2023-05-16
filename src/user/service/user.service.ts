@@ -19,8 +19,6 @@ export class UserService {
   async createUser(authDto: AuthDto): Promise<void> {
     const user: UserEntity = AuthDto.toUserEntity(authDto);
 
-    user.createdAt = new Date();
-    user.updatedAt = new Date();
     await this.userRepository.save(user);
     console.log(`User ${user.ftId} created!`); // TODO: remove this debug log
   }
@@ -60,7 +58,7 @@ export class UserService {
 
     userEntity.tokenMFA = mfaSecret.secret;
     userEntity.validatedAtMFA = null;
-    await this.userRepository.update(userEntity.id, userEntity);
+    await this.userRepository.save(userEntity);
     return {
       secret: mfaSecret.secret,
       qr_code_url: mfaSecret.qrcode,
@@ -75,7 +73,7 @@ export class UserService {
     }
 
     userEntity.validatedAtMFA = new Date();
-    await this.userRepository.update(userEntity.id, userEntity);
+    await this.userRepository.save(userEntity);
   }
 
   async invalidateMfaSecret(ftId: string): Promise<void> {
@@ -83,7 +81,7 @@ export class UserService {
 
     userEntity.tokenMFA = null;
     userEntity.validatedAtMFA = null;
-    await this.userRepository.update(userEntity.id, userEntity);
+    await this.userRepository.save(userEntity);
   }
 
   async userHasMfa(ftId: string): Promise<boolean> {
@@ -99,7 +97,7 @@ export class UserService {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
 
     userEntity.nickname = nickname;
-    await this.userRepository.update(userEntity.id, userEntity);
+    await this.userRepository.save(userEntity);
   }
 
   async updateAvatar(ftId: string, file: Express.Multer.File): Promise<void> {
@@ -121,7 +119,7 @@ export class UserService {
 
     userEntity.validatedAtMFA = null;
     userEntity.status = UserEnum.OFFLINE;
-    await this.userRepository.update(userEntity.id, userEntity);
+    await this.userRepository.save(userEntity);
   }
 
   async getUserByNickname(nickname: string): Promise<UserEntity> {
