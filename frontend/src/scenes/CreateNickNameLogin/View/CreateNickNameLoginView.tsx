@@ -1,17 +1,30 @@
 import { Button, Flex, Stack, Image, Input } from '@chakra-ui/react'
 import "./CreateNickNameLoginView.css"
-import React from "react"
 import { useLocation, useNavigate } from "react-router";
+import { useState } from 'react';
+import { userService } from '../../../services/users-service';
 
 export default function CreateNickNameLoginView(){
-    const [value, setValue] = React.useState('')
-    const handleChange : React.ChangeEventHandler<HTMLInputElement>  = (event) => setValue(event.target.value)
+  const [value, setValue] = useState('')
+  const [isUploading, setIsUploading] = useState(false);
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) =>
+    setValue(event.target.value);
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const auth42Code = queryParams.get('code');
     console.log(auth42Code); //TODO logic implementation
     const navigate = useNavigate();
+
+    async function handleNicknameUpdate() {
+      setIsUploading(true);
+      await userService.updateNickname(value)
+
+      setTimeout(()=> {
+        setIsUploading(false);
+        navigate("/home");
+      })
+    }
 
     return(
         <Flex className='CreateNickNameLoginBackground' h={"100vh"} align={"center"} justify={"center"}>
@@ -36,7 +49,7 @@ export default function CreateNickNameLoginView(){
                 />
                 <Stack spacing={10} direction={"column"} align={"center"}>
                     <Input onChange={handleChange} placeholder={"Apelido"} size={"md"} textColor={"white"}/>
-                    <Button onClick={() => navigate("/home")} colorScheme={"purple"} size={"lg"}>
+                    <Button onClick={handleNicknameUpdate} colorScheme={"purple"} size={"lg"} isLoading={isUploading}>
                         LOGIN
                     </Button>
                 </Stack>

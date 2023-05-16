@@ -24,7 +24,7 @@ export class UsersService {
     return this.api.patch("/user/me/avatar", avatar);
   }
 
-  async activateMfa(): Promise<{qr_code_url: string, secrt: string}> {
+  async activateMfa(): Promise<{ qr_code_url: string; secrt: string }> {
     const { data } = await this.api.post("/user/me/mfa");
     return data;
   }
@@ -37,6 +37,12 @@ export class UsersService {
 
   async disableMfa(): Promise<void> {
     return this.api.patch("/user/me/mfa/invalidate");
+  }
+
+  async updateNickname(nickname: string): Promise<void> {
+    return this.api.patch("/user/me/nickname", {
+      nickname,
+    });
   }
 }
 
