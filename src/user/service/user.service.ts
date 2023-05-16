@@ -107,7 +107,7 @@ export class UserService {
 
     this.avatarService.deleteImage(userEntity.avatar);
     userEntity.avatar = await this.avatarService.upload(file);
-    await this.userRepository.update(userEntity.id, userEntity);
+    await this.userRepository.save(userEntity);
   }
 
   async getUserInfo(ftId: string): Promise<UserDto> {
