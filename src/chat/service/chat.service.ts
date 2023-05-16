@@ -77,12 +77,17 @@ export class ChatService {
     const messageChannel: ChannelMessagesEntity =
       MessageInputDto.toMessageChannelEntity(dto, channel, user);
 
-    if (!channel.userHasWriteAccess(user.nickname)) {
+    if (!channel.userHasWriteAccess(user.nickname) && !channel.isPublic()) {
       throw new HttpException(
         'User does not have the required permissions',
         HttpStatus.FORBIDDEN,
       );
     }
+
+    if (channel.isPublic() && !channel.hasUser(user.nickname)) {
+      await this.enterPublicChannel(user, channel);
+    }
+
     channel.addChannelMessages(messageChannel);
     await this.channelMessagesRepository.save(messageChannel);
   }
@@ -129,6 +134,7 @@ export class ChatService {
     await this.permissionCheck(user, channel);
     channel.passwordSalt = await bcrypt.genSalt();
     channel.passwordHash = await bcrypt.hash(password, channel.passwordSalt);
+    channel.type = AccessType.PROTECTED;
     await this.channelRepository.save(channel);
   }
 
@@ -140,12 +146,13 @@ export class ChatService {
     const user: UserEntity = await this.userService.getUserByFtId(ftId);
     const channel: ChannelEntity = await this.getChannelById(channelId);
 
-    if (!channel.userHasWriteAccess(user.nickname)) {
+    if (!channel.isPasswordProtected()) {
       throw new HttpException(
-        'User does not have the required permissions',
-        HttpStatus.FORBIDDEN,
+        'Public channel does not have a password',
+        HttpStatus.BAD_REQUEST,
       );
     }
+
     const isPasswordValid: boolean = await bcrypt.compare(
       password,
       channel.passwordHash,
@@ -154,6 +161,8 @@ export class ChatService {
     if (!isPasswordValid) {
       throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
     }
+
+    await this.enterProtectedChannel(user, channel);
   }
 
   async getChannelUsers(ftId: string, channelId: number) {
@@ -179,10 +188,11 @@ export class ChatService {
     const friend: UserEntity = await this.userService.getUserByNickname(
       nickname,
     );
+    await this.permissionCheck(user, channel);
 
     if (!channel.hasUser(friend.nickname)) {
       throw new HttpException(
-        'User is not in the channel',
+        'User ' + friend.nickname + ' is not in channel',
         HttpStatus.NOT_FOUND,
       );
     }
@@ -194,7 +204,6 @@ export class ChatService {
       );
     }
 
-    await this.permissionCheck(user, channel);
     const userChannel: UsersChannelsEntity = channel.getUserChannel(
       friend.nickname,
     );
@@ -213,10 +222,11 @@ export class ChatService {
     const friend: UserEntity = await this.userService.getUserByNickname(
       nickname,
     );
+    await this.permissionCheck(user, channel);
 
     if (!channel.hasUser(friend.nickname)) {
       throw new HttpException(
-        'User is not in the channel',
+        'User ' + friend.nickname + ' is not in channel',
         HttpStatus.NOT_FOUND,
       );
     }
@@ -228,7 +238,6 @@ export class ChatService {
       );
     }
 
-    await this.permissionCheck(user, channel);
     const userChannel: UsersChannelsEntity = channel.getUserChannel(
       friend.nickname,
     );
@@ -249,10 +258,11 @@ export class ChatService {
     const friend: UserEntity = await this.userService.getUserByNickname(
       nickname,
     );
+    await this.permissionCheck(user, channel);
 
     if (!channel.hasUser(friend.nickname)) {
       throw new HttpException(
-        'User is not in the channel',
+        'User ' + friend.nickname + ' is not in channel',
         HttpStatus.NOT_FOUND,
       );
     }
@@ -264,7 +274,6 @@ export class ChatService {
       );
     }
 
-    await this.permissionCheck(user, channel);
     const userChannel: UsersChannelsEntity = channel.getUserChannel(
       friend.nickname,
     );
@@ -308,7 +317,7 @@ export class ChatService {
     );
   }
 
-  async getChats(ftId: string) {
+  async getChats(ftId: string): Promise<ChannelOutputDto> {
     const user: UserEntity = await this.userService.getUserByFtId(ftId);
     const userChannels: UsersChannelsEntity[] =
       await this.findUnbannedChannelsByUserFtId(user.ftId);
@@ -323,6 +332,41 @@ export class ChatService {
       userChannels,
       unrelatedPublicChannels,
     );
+  }
+
+  private async enterPublicChannel(
+    user: UserEntity,
+    channel: ChannelEntity,
+  ): Promise<void> {
+    if (!channel.hasUser(user.nickname) && channel.type === AccessType.PUBLIC) {
+      const userChannel: UsersChannelsEntity = await this.createUserChannel(
+        user,
+        channel,
+        UserAccessType.MEMBER,
+      );
+
+      channel.users_channels.push(userChannel);
+      await this.channelRepository.save(channel);
+    }
+  }
+
+  private async enterProtectedChannel(
+    user: UserEntity,
+    channel: ChannelEntity,
+  ): Promise<void> {
+    if (
+      !channel.hasUser(user.nickname) &&
+      channel.type === AccessType.PROTECTED
+    ) {
+      const userChannel: UsersChannelsEntity = await this.createUserChannel(
+        user,
+        channel,
+        UserAccessType.MEMBER,
+      );
+
+      channel.users_channels.push(userChannel);
+      await this.channelRepository.save(channel);
+    }
   }
 
   private async findUnrelatedPublicChannelsByUserFtId(
@@ -379,7 +423,7 @@ export class ChatService {
   ): Promise<void> {
     if (!channel.userHasAdminAccess(user.nickname)) {
       throw new HttpException(
-        'User does not have the required permissions',
+        'User' + user.nickname + 'does not have the required permissions',
         HttpStatus.FORBIDDEN,
       );
     }

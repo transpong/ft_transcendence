@@ -131,4 +131,8 @@ export class ChannelEntity {
       return a.createdAt.getTime() - b.createdAt.getTime();
     });
   }
+
+  isPasswordProtected(): boolean {
+    return this.passwordHash !== null && this.passwordSalt !== null;
+  }
 }
