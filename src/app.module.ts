@@ -14,6 +14,7 @@ import { JwtGuard } from './auth/guards/jwt.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { AvatarModule } from './avatar/avatar.module';
 import { ChatModule } from './chat/chat.module';
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ChatModule } from './chat/chat.module';
     AuthModule,
     AvatarModule,
     ChatModule,
+    GatewayModule,
   ],
   controllers: [],
   providers: [

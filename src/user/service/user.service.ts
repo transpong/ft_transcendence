@@ -160,6 +160,17 @@ export class UserService {
       .getMany();
   }
 
+  async newGuestUser(): Promise<UserEntity> {
+    const guestUser: UserEntity = new UserEntity();
+
+    guestUser.ftId = new Date().getTime().toString();
+    guestUser.avatar = 'guest.png';
+    guestUser.status = UserEnum.ONLINE;
+
+    await this.userRepository.save(guestUser);
+    return guestUser;
+  }
+
   private async validNickname(nickname: string): Promise<boolean> {
     if (nickname === '' || nickname === null) return false;
     const userEntity: UserEntity = await this.userRepository.findOneBy({

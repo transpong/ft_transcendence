@@ -19,4 +19,10 @@ export class AuthController {
   async logout(@Req() req: any): Promise<void> {
     await this.authService.logout(req.user.ftLogin);
   }
+
+  @Public()
+  @Get('guest')
+  async guestAuth(@Res() res: Response): Promise<void> {
+    await this.authService.guestAuth(res);
+  }
 }

@@ -16,7 +16,7 @@ export class AuthService {
     const user: UserEntity = await this.userService.getUserByFtId(
       req.user.username,
     );
-    const accessToken: string = this.generateJwtToken(req);
+    const accessToken: string = this.generateJwtToken(user.ftId);
 
     res.cookie('token', accessToken);
     user.status = UserEnum.ONLINE;
@@ -37,9 +37,19 @@ export class AuthService {
     await this.userService.logout(ftLogin);
   }
 
-  private generateJwtToken(req: any): string {
+  async guestAuth(@Res() res: Response): Promise<void> {
+    const user: UserEntity = await this.userService.newGuestUser();
+    const accessToken: string = this.generateJwtToken(user.ftId);
+
+    res.cookie('token', accessToken);
+    console.log(accessToken); // TODO: REMOVE THIS DEBUG LOG
+    res.redirect(process.env.FRONTEND_REDIRECT_NICKNAME);
+    return;
+  }
+
+  private generateJwtToken(ftId: any): string {
     return this.jwtService.sign(
-      { req: req.user.username },
+      { req: ftId },
       { secret: `${process.env.JWT_SECRET}` },
     );
   }
