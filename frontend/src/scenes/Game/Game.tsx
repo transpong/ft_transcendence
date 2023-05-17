@@ -1,6 +1,7 @@
 import React from "react";
 import Sketch from "react-p5";
 import p5Types from "p5"; //Import this for typechecking and intellisense
+import { useOutletContext } from "react-router-dom";
 
 interface ComponentProps {
   // Your component props
@@ -10,9 +11,10 @@ let ball: Ball;
 let player1: Player;
 let player2: Player;
 let game: Game;
-let windowWidth = 1500
-let windowHeight = 700
+let windowWidth = 0
+let windowHeight = 0
 let canvasParent: Element
+let parentBorderWidth = 0
 
 
 class Game {
@@ -71,9 +73,10 @@ class Player{
         this.p5 = p5Origin
     }
 
-    responsivePlayer(newHeight: number, oldHeight: number){
+    responsivePlayer(newHeight: number, oldHeight: number, newWidth: number){
         this.heightPlayer = newHeight * 0.1
         this.positionY = newHeight * (this.positionY / oldHeight)
+        this.positionX = this.positionX == 0 ? 0 : newWidth - this.widthPlayer
     }
 
     printPlayer() {
@@ -179,7 +182,11 @@ class Ball{
 }
 
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
+    const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
     const setup = (p5: p5Types, canvasParentRef: Element) => {
+        parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParentRef.clientHeight) -  canvasParentRef.clientHeight
+        windowHeight = ref.current ? ref.current.clientHeight - parentBorderWidth : canvasParentRef.clientHeight
+        windowWidth = ref.current ? ref.current.clientWidth - parentBorderWidth : canvasParentRef.clientWidth
         p5.createCanvas(windowWidth , windowHeight).parent(canvasParentRef);
         canvasParent = canvasParentRef
         ball = new Ball(p5)
@@ -189,11 +196,6 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     };
 
     const draw = (p5: p5Types) => {
-        if(windowWidth != canvasParent.clientWidth || windowHeight != canvasParent.clientHeight){
-            p5.createCanvas(canvasParent.clientWidth , canvasParent.clientHeight).parent(canvasParent)
-            windowWidth = canvasParent.clientWidth
-            windowHeight = canvasParent.clientHeight
-        }
         p5.background(0);
         player1.printPlayer();
         player2.printPlayer();
@@ -214,12 +216,15 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     };
 
     const windowResized = (p5: p5Types) => {
-        player1.responsivePlayer(canvasParent.clientHeight, windowHeight)
-        player2.responsivePlayer(canvasParent.clientHeight, windowHeight)
-        ball.responsiveBall(canvasParent.clientHeight, windowHeight, canvasParent.clientWidth, windowWidth)
-        p5.createCanvas(canvasParent.clientWidth , canvasParent.clientHeight).parent(canvasParent)
-        windowWidth = canvasParent.clientWidth
-        windowHeight = canvasParent.clientHeight
+        parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParent.clientHeight) -  canvasParent.clientHeight
+        const newWindowHeight = ref.current ? ref.current.clientHeight - parentBorderWidth : canvasParent.clientHeight
+        const newWindowWidth = ref.current ? ref.current.clientWidth - parentBorderWidth : canvasParent.clientWidth
+        player1.responsivePlayer(newWindowHeight, windowHeight, newWindowWidth)
+        player2.responsivePlayer(newWindowHeight, windowHeight, newWindowWidth)
+        ball.responsiveBall(newWindowHeight, windowHeight, newWindowWidth, windowWidth)
+        p5.createCanvas(newWindowWidth , newWindowHeight).parent(canvasParent)
+        windowWidth = newWindowWidth
+        windowHeight = newWindowHeight
     }
 
   return <Sketch setup={setup} draw={draw}  windowResized={windowResized}/>
