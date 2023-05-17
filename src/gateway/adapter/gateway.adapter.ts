@@ -19,6 +19,7 @@ export class GatewayAdapter extends IoAdapter {
   createIOServer(port: number, options?: any): any {
     const server: Server = super.createIOServer(port, options);
 
+    server.use(this.verifyIsCustom.bind(this));
     server.use(this.verifyToken.bind(this));
     server.use(this.setSocketUserId.bind(this));
 
@@ -30,6 +31,15 @@ export class GatewayAdapter extends IoAdapter {
     });
 
     return server;
+  }
+
+  private verifyIsCustom(socket: any, next: any): void {
+    const isCustom: boolean = socket.handshake.headers.custom;
+
+    if (!isCustom) {
+      return next(new Error('Custom header not provided'));
+    }
+    next();
   }
 
   private verifyToken(socket: any, next: any): void {
