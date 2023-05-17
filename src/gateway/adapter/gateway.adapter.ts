@@ -3,6 +3,7 @@ import { INestApplicationContext, Injectable } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/service/user.service';
+import { UserEnum } from '../../user/enum/user.enum';
 
 @Injectable()
 export class GatewayAdapter extends IoAdapter {
@@ -25,8 +26,10 @@ export class GatewayAdapter extends IoAdapter {
 
     server.on('connection', (socket: any) => {
       this.socketIdList.push(socket.id);
+      this.userService.updateStatus(socket.id, UserEnum.INLOBBY);
       socket.on('disconnect', () => {
         this.socketIdList = this.socketIdList.filter((id) => id !== socket.id);
+        this.userService.updateStatus(socket.id, UserEnum.ONLINE);
       });
     });
 

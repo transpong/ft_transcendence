@@ -15,8 +15,6 @@ export class GatewayService {
   users = 0;
 
   async handleConnection(client: Socket) {
-    console.log(client.id);
-
     this.users++;
 
     // Notify connected clients of current users

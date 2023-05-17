@@ -169,6 +169,15 @@ export class UserService {
     return guestUser;
   }
 
+  async updateStatus(ftId: string, status: UserEnum): Promise<void> {
+    const userEntity: UserEntity = await this.userRepository.findOne({
+      where: { ftId: ftId },
+    });
+
+    userEntity.status = status;
+    await this.userRepository.update(userEntity.id, userEntity);
+  }
+
   private async validNickname(nickname: string): Promise<boolean> {
     if (nickname === '' || nickname === null) return false;
     const userEntity: UserEntity = await this.userRepository.findOneBy({
