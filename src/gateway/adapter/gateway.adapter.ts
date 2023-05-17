@@ -1,5 +1,5 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { INestApplicationContext, Inject, Injectable } from '@nestjs/common';
+import { INestApplicationContext, Injectable } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/service/user.service';
@@ -7,10 +7,8 @@ import { UserService } from '../../user/service/user.service';
 @Injectable()
 export class GatewayAdapter extends IoAdapter {
   constructor(
-    @Inject(JwtService)
     private readonly jwtService: JwtService,
-    @Inject(UserService)
-    private userService: UserService,
+    private readonly userService: UserService,
     private app: INestApplicationContext,
   ) {
     super(app);
