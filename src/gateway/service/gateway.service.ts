@@ -4,17 +4,19 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
+import { UserService } from '../../user/service/user.service';
+
 @WebSocketGateway()
 export class GatewayService {
+  constructor(private readonly userService: UserService) {}
+
   @WebSocketServer()
   server: any;
   users = 0;
 
   async handleConnection(client: Socket) {
-    // get total number of connected clients
+    console.log(client.id);
 
-    // A client has connected
-    console.log(client.handshake.headers.token);
     this.users++;
 
     // Notify connected clients of current users

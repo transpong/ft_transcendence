@@ -1,6 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { GatewayAdapter } from './gateway/adapter/gateway.adapter';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from './user/service/user.service';
 
 async function bootstrap(): Promise<void> {
   const app: INestApplication = await NestFactory.create(AppModule);
@@ -13,6 +16,9 @@ async function bootstrap(): Promise<void> {
 
   app.enableCors(corsOptions);
   app.useGlobalPipes(new ValidationPipe());
+  app.useWebSocketAdapter(
+    new GatewayAdapter(app.get(JwtService), app.get(UserService), app),
+  );
 
   await app.listen(process.env.PORT || 3000);
 }
