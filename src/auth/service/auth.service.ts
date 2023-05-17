@@ -33,8 +33,9 @@ export class AuthService {
     return;
   }
 
-  async logout(ftLogin: string): Promise<void> {
+  async logout(ftLogin: string, @Res() res: Response): Promise<void> {
     await this.userService.logout(ftLogin);
+    res.clearCookie('token');
   }
 
   async guestAuth(@Res() res: Response): Promise<void> {
