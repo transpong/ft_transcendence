@@ -29,7 +29,6 @@ export class GatewayAdapter extends IoAdapter {
       this.socketIdList.push(socket.id);
       socket.on('disconnect', () => {
         this.socketIdList = this.socketIdList.filter((id) => id !== socket.id);
-        console.log(this.socketIdList);
       });
     });
 
