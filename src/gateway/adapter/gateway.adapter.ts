@@ -3,7 +3,6 @@ import { INestApplicationContext, Inject, Injectable } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/service/user.service';
-import { UserEntity } from '../../user/entity/user.entity';
 
 @Injectable()
 export class GatewayAdapter extends IoAdapter {
@@ -68,8 +67,10 @@ export class GatewayAdapter extends IoAdapter {
       return next(new Error('User already connected'));
     }
 
-    const user: UserEntity = await this.userService.getUserByFtId(decoded.req);
-    socket.id = user.ftId;
+    if (!(await this.userService.userExists(decoded.req))) {
+      return next(new Error('User not found'));
+    }
+    socket.id = decoded.req;
     next();
   }
 }
