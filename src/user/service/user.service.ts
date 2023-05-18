@@ -177,9 +177,12 @@ export class UserService {
     await this.userRepository.update(userEntity.id, userEntity);
   }
 
-  async addFriend(ftId: string, nickname: string): Promise<void> {
+  async addFriend(ftId: string, friendNickname: string): Promise<void> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
-    const friendEntity: UserEntity = await this.getUserByNickname(nickname);
+    const friendEntity: UserEntity = await this.getUserByNickname(
+      friendNickname,
+    );
+
     if (ftId === friendEntity.ftId) {
       throw new HttpException(
         'You cannot add yourself as a friend',
@@ -187,13 +190,26 @@ export class UserService {
       );
     }
 
-    userEntity.addFriend(friendEntity);
+    if (userEntity.friends.find((friend) => friend.id === friendEntity.id)) {
+      throw new HttpException(
+        'User is already your friend',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    userEntity.friends.push(friendEntity);
     await this.userRepository.save(userEntity);
+
+    friendEntity.friends.push(userEntity);
+    await this.userRepository.save(friendEntity);
   }
 
-  async removeFriend(ftId: string, nickname: string): Promise<void> {
+  async removeFriend(ftId: string, friendNickname: string): Promise<void> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
-    const friendEntity: UserEntity = await this.getUserByNickname(nickname);
+    const friendEntity: UserEntity = await this.getUserByNickname(
+      friendNickname,
+    );
+
     if (ftId === friendEntity.ftId) {
       throw new HttpException(
         'You cannot remove yourself as a friend',
@@ -201,36 +217,79 @@ export class UserService {
       );
     }
 
-    userEntity.removeFriend(friendEntity);
+    if (!userEntity.friends.find((friend) => friend.id === friendEntity.id)) {
+      throw new HttpException(
+        'User is not your friend',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    userEntity.friends = userEntity.friends.filter(
+      (friend) => friend.id !== friendEntity.id,
+    );
     await this.userRepository.save(userEntity);
+    friendEntity.friends = friendEntity.friends.filter(
+      (friend) => friend.id !== userEntity.id,
+    );
+    await this.userRepository.save(friendEntity);
   }
 
-  async blockUser(ftId: string, nickname: string): Promise<void> {
+  async blockUser(ftId: string, userBlockNickName: string): Promise<void> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
-    const blockEntity: UserEntity = await this.getUserByNickname(nickname);
-    if (ftId === blockEntity.ftId) {
+    const userBlockEntity: UserEntity = await this.getUserByNickname(
+      userBlockNickName,
+    );
+
+    if (userEntity.id === userBlockEntity.id) {
       throw new HttpException(
         'You cannot block yourself',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    userEntity.addBlock(blockEntity);
+    if (
+      userEntity.blocks.find((blocked) => blocked.id === userBlockEntity.id)
+    ) {
+      throw new HttpException(
+        'User is already blocked',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    userEntity.blocks.push(userBlockEntity);
     await this.userRepository.save(userEntity);
+    userBlockEntity.blockedBy.push(userEntity);
+    await this.userRepository.save(userBlockEntity);
   }
 
-  async unblockUser(ftId: string, nickname: string): Promise<void> {
+  async unblockUser(ftId: string, userBlockNickName: string): Promise<void> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
-    const blockEntity: UserEntity = await this.getUserByNickname(nickname);
-    if (ftId === blockEntity.ftId) {
+    const userBlockEntity: UserEntity = await this.getUserByNickname(
+      userBlockNickName,
+    );
+
+    if (ftId === userBlockEntity.ftId) {
       throw new HttpException(
         'You cannot unblock yourself',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    userEntity.removeBlock(blockEntity);
+    if (
+      !userEntity.blocks.find((blocked) => blocked.id === userBlockEntity.id)
+    ) {
+      throw new HttpException('User is not blocked', HttpStatus.BAD_REQUEST);
+    }
+
+    userEntity.blocks = userEntity.blocks.filter(
+      (blocked) => blocked.id !== userBlockEntity.id,
+    );
     await this.userRepository.save(userEntity);
+
+    userBlockEntity.blockedBy = userBlockEntity.blockedBy.filter(
+      (blocked) => blocked.id !== userEntity.id,
+    );
+    await this.userRepository.save(userBlockEntity);
   }
 
   async getProfile(ftId: string, nickname: string): Promise<UserProfileDto> {

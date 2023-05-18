@@ -93,10 +93,10 @@ export class UserController {
   }
 
   @Get('profiles/:nickname')
-  async getProfile(
+  async getUserProfile(
     @Req() req,
     @Param('nickname') nickname: string,
   ): Promise<UserProfileDto> {
-    return this.userService.getProfile(req.user.ftLogin, nickname);
+    return this.userService.getProfile(req.user.id, nickname);
   }
 }
