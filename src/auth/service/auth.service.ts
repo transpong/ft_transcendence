@@ -1,8 +1,8 @@
 import { Injectable, Req, Res } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-import { AuthDto } from '../dto/auth.dto';
 import { UserService } from '../../user/service/user.service';
+import { UserEntity } from '../../user/entity/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -12,17 +12,18 @@ export class AuthService {
   ) {}
 
   async ftAuthCallback(@Req() req: any, @Res() res: Response): Promise<void> {
-    const tempUser: AuthDto = AuthDto.fromJSON(req.user); // TODO: simplify this
-    const accessToken: string = this.generateJwtToken(req);
+    const user: UserEntity = await this.userService.getUserByFtId(
+      req.user.username,
+    );
+    const accessToken: string = this.generateJwtToken(user.ftId);
 
     res.cookie('token', accessToken);
-    console.log(accessToken);
-    if (tempUser.hasTwoFactor) {
+    console.log(accessToken); // TODO: REMOVE THIS DEBUG LOG
+    if (req.user.mfa) {
       res.redirect(process.env.FRONTEND_REDIRECT_MFA);
       return;
     }
-
-    if (await this.userService.userHasEmptyNickname(tempUser.username)) {
+    if (!user.nickname) {
       res.redirect(process.env.FRONTEND_REDIRECT_NICKNAME);
     } else {
       res.redirect(process.env.FRONTEND_REDIRECT_HOME);
@@ -30,9 +31,24 @@ export class AuthService {
     return;
   }
 
-  private generateJwtToken(req: any): string {
+  async logout(ftLogin: string, @Res() res: Response): Promise<void> {
+    await this.userService.logout(ftLogin);
+    res.clearCookie('token');
+  }
+
+  async guestAuth(@Res() res: Response): Promise<void> {
+    const user: UserEntity = await this.userService.newGuestUser();
+    const accessToken: string = this.generateJwtToken(user.ftId);
+
+    res.cookie('token', accessToken);
+    console.log(accessToken); // TODO: REMOVE THIS DEBUG LOG
+    res.redirect(process.env.FRONTEND_REDIRECT_NICKNAME);
+    return;
+  }
+
+  private generateJwtToken(ftId: any): string {
     return this.jwtService.sign(
-      { req: req.user.username },
+      { req: ftId },
       { secret: `${process.env.JWT_SECRET}` },
     );
   }

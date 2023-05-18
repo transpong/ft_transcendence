@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user/entity/user.entity';
@@ -15,6 +13,8 @@ import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { AvatarModule } from './avatar/avatar.module';
+import { ChatModule } from './chat/chat.module';
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -36,16 +36,17 @@ import { AvatarModule } from './avatar/avatar.module';
         ChannelMessagesEntity,
       ],
       synchronize: true,
-      // dropSchema: true,
+      //dropSchema: true,
     }),
     UserModule,
     GameModule,
     AuthModule,
     AvatarModule,
+    ChatModule,
+    GatewayModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,

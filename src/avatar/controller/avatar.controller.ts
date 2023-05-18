@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { Public } from '../../auth/decorator/public.decorator';
 import { AvatarService } from '../service/avatar.service';
 

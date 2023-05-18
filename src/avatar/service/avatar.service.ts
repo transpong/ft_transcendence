@@ -39,7 +39,6 @@ export class AvatarService {
 
       return new StreamableFile(fileStream);
     } else {
-      console.error(`Erro ao enviar arquivo: Arquivo ${name} não encontrado`); // TODO: remove this debug log
       const defaultFileStream = createReadStream(defaultFilePath);
 
       return new StreamableFile(defaultFileStream);
@@ -61,6 +60,7 @@ export class AvatarService {
 
     return imageName;
   }
+
   deleteImage(imageName: string): void {
     const imagePath: string = path.join('upload', imageName);
 
