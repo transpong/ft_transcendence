@@ -97,4 +97,35 @@ export class UserEntity {
       (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
     );
   }
+
+  addFriend(friend: UserEntity): void {
+    if (!this.friends.includes(friend)) {
+      this.friends.push(friend);
+    }
+  }
+
+  removeFriend(friend: UserEntity): void {
+    this.friends = this.friends.filter((f) => f.id !== friend.id);
+  }
+
+  addBlock(block: UserEntity): void {
+    if (!this.blocks.includes(block)) {
+      this.blocks.push(block);
+    }
+  }
+
+  removeBlock(block: UserEntity): void {
+    this.blocks = this.blocks.filter((b) => b.id !== block.id);
+  }
+
+  isFriend(user: UserEntity): boolean {
+    return this.friends.some((friend) => friend.id === user.id);
+  }
+
+  isBlocked(user: UserEntity): boolean {
+    const blocked = this.blocks.some((block) => block.id === user.id);
+    const isBlockedBy = user.blocks.some((block) => block.id === this.id);
+
+    return blocked || isBlockedBy;
+  }
 }

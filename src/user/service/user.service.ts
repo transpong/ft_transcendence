@@ -7,6 +7,7 @@ import { generateSecret, verify } from '2fa-util';
 import { AvatarService } from '../../avatar/service/avatar.service';
 import { UserDto } from '../dto/user.dto';
 import { UserEnum } from '../enum/user.enum';
+import { UserProfileDto } from '../dto/user-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -43,7 +44,7 @@ export class UserService {
   async getUserByFtId(ftId: string): Promise<UserEntity> {
     const userEntity: UserEntity = await this.userRepository.findOne({
       where: { ftId: ftId },
-      relations: ['directMessagesFrom', 'friends'],
+      relations: ['directMessagesFrom', 'friends', 'blocks', 'blockedBy'],
     });
 
     if (!userEntity) {
@@ -124,7 +125,7 @@ export class UserService {
   async getUserByNickname(nickname: string): Promise<UserEntity> {
     const userEntity: UserEntity = await this.userRepository.findOne({
       where: { nickname: nickname },
-      relations: ['friends'],
+      relations: ['directMessagesFrom', 'friends', 'blocks', 'blockedBy'],
     });
 
     if (!userEntity) {
@@ -174,6 +175,75 @@ export class UserService {
 
     userEntity.status = status;
     await this.userRepository.update(userEntity.id, userEntity);
+  }
+
+  async addFriend(ftId: string, nickname: string): Promise<void> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+    const friendEntity: UserEntity = await this.getUserByNickname(nickname);
+    if (ftId === friendEntity.ftId) {
+      throw new HttpException(
+        'You cannot add yourself as a friend',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    userEntity.addFriend(friendEntity);
+    await this.userRepository.save(userEntity);
+  }
+
+  async removeFriend(ftId: string, nickname: string): Promise<void> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+    const friendEntity: UserEntity = await this.getUserByNickname(nickname);
+    if (ftId === friendEntity.ftId) {
+      throw new HttpException(
+        'You cannot remove yourself as a friend',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    userEntity.removeFriend(friendEntity);
+    await this.userRepository.save(userEntity);
+  }
+
+  async blockUser(ftId: string, nickname: string): Promise<void> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+    const blockEntity: UserEntity = await this.getUserByNickname(nickname);
+    if (ftId === blockEntity.ftId) {
+      throw new HttpException(
+        'You cannot block yourself',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    userEntity.addBlock(blockEntity);
+    await this.userRepository.save(userEntity);
+  }
+
+  async unblockUser(ftId: string, nickname: string): Promise<void> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+    const blockEntity: UserEntity = await this.getUserByNickname(nickname);
+    if (ftId === blockEntity.ftId) {
+      throw new HttpException(
+        'You cannot unblock yourself',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    userEntity.removeBlock(blockEntity);
+    await this.userRepository.save(userEntity);
+  }
+
+  async getProfile(ftId: string, nickname: string): Promise<UserProfileDto> {
+    const userEntity: UserEntity = await this.getUserByFtId(ftId);
+    const profileEntity: UserEntity = await this.getUserByNickname(nickname);
+    if (ftId === profileEntity.ftId) {
+      throw new HttpException(
+        'This method is not allowed for your own profile',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return UserProfileDto.fromEntity(profileEntity, userEntity);
   }
 
   private async validNickname(nickname: string): Promise<boolean> {

@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Patch,
   Post,
   Req,
@@ -15,6 +17,7 @@ import { Public } from '../../auth/decorator/public.decorator';
 import { AvatarPipe } from '../pipe/avatar.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserDto } from '../dto/user.dto';
+import { UserProfileDto } from '../dto/user-profile.dto';
 
 @Controller('user')
 export class UserController {
@@ -55,5 +58,45 @@ export class UserController {
     file: Express.Multer.File,
   ): Promise<void> {
     return this.userService.updateAvatar(req.user.ftLogin, file);
+  }
+
+  @Post('profiles/:nickname/friends')
+  async addFriend(
+    @Req() req,
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    return this.userService.addFriend(req.user.ftLogin, nickname);
+  }
+
+  @Delete('profiles/:nickname/friends')
+  async removeFriend(
+    @Req() req,
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    return this.userService.removeFriend(req.user.ftLogin, nickname);
+  }
+
+  @Post('profiles/:nickname/block')
+  async blockUser(
+    @Req() req,
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    return this.userService.blockUser(req.user.ftLogin, nickname);
+  }
+
+  @Delete('profiles/:nickname/block')
+  async unblockUser(
+    @Req() req,
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    return this.userService.unblockUser(req.user.ftLogin, nickname);
+  }
+
+  @Get('profiles/:nickname')
+  async getProfile(
+    @Req() req,
+    @Param('nickname') nickname: string,
+  ): Promise<UserProfileDto> {
+    return this.userService.getProfile(req.user.ftLogin, nickname);
   }
 }
