@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { GatewayService } from './service/gateway.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
-import { RoomService } from './service/room.service';
+import { PongService } from './service/pong.service';
 
 @Module({
   imports: [
@@ -12,6 +12,6 @@ import { RoomService } from './service/room.service';
     }),
     UserModule,
   ],
-  providers: [GatewayService, RoomService],
+  providers: [GatewayService, PongService],
 })
 export class GatewayModule {}
