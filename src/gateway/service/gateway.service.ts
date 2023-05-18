@@ -101,8 +101,5 @@ export class GatewayService {
         clearInterval(interval);
       }
     }, 1000);
-    if (counter === 0) {
-      this.server.to(room).emit('timer', 'Game Over');
-    }
   }
 }
