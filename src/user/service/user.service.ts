@@ -118,7 +118,6 @@ export class UserService {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
 
     userEntity.validatedAtMFA = null;
-    userEntity.status = UserEnum.OFFLINE;
     await this.userRepository.save(userEntity);
   }
 
@@ -163,7 +162,6 @@ export class UserService {
 
     guestUser.ftId = new Date().getTime().toString();
     guestUser.avatar = 'guest.png';
-    guestUser.status = UserEnum.ONLINE;
 
     await this.userRepository.save(guestUser);
     return guestUser;

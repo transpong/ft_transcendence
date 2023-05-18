@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { UserService } from '../../user/service/user.service';
 import { UserEntity } from '../../user/entity/user.entity';
-import { UserEnum } from '../../user/enum/user.enum';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +18,6 @@ export class AuthService {
     const accessToken: string = this.generateJwtToken(user.ftId);
 
     res.cookie('token', accessToken);
-    user.status = UserEnum.ONLINE;
     console.log(accessToken); // TODO: REMOVE THIS DEBUG LOG
     if (req.user.mfa) {
       res.redirect(process.env.FRONTEND_REDIRECT_MFA);

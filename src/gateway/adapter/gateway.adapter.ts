@@ -26,10 +26,10 @@ export class GatewayAdapter extends IoAdapter {
 
     server.on('connection', (socket: any) => {
       this.socketIdList.push(socket.id);
-      this.userService.updateStatus(socket.id, UserEnum.INLOBBY);
+      this.userService.updateStatus(socket.id, UserEnum.ONLINE);
       socket.on('disconnect', () => {
         this.socketIdList = this.socketIdList.filter((id) => id !== socket.id);
-        this.userService.updateStatus(socket.id, UserEnum.ONLINE);
+        this.userService.updateStatus(socket.id, UserEnum.OFFLINE);
       });
     });
 
