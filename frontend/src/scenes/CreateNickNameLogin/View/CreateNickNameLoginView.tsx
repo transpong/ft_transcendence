@@ -1,6 +1,6 @@
 import { Button, Flex, Stack, Image, Input } from '@chakra-ui/react'
 import "./CreateNickNameLoginView.css"
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { useState } from 'react';
 import { userService } from '../../../services/users-service';
 
@@ -10,10 +10,6 @@ export default function CreateNickNameLoginView(){
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) =>
     setValue(event.target.value);
 
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const auth42Code = queryParams.get('code');
-    console.log(auth42Code); //TODO logic implementation
     const navigate = useNavigate();
 
     async function handleNicknameUpdate() {

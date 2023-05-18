@@ -1,18 +1,12 @@
 import { Box, Text, Badge, Avatar, Flex, HStack } from "@chakra-ui/react";
-
-interface IPlayerMatch {
-  points: number
-  nickname: string;
-  avatar?: string;
-}
+import { IApiMatchHistory } from "../../services/game-service";
 
 interface Props {
-  winner: IPlayerMatch;
-  loser: IPlayerMatch;
+  match: IApiMatchHistory;
 }
 
 export default function MatchCard(props: Props) {
-  const { winner, loser } = props;
+  const { match } = props;
 
   return (
     <HStack
@@ -25,32 +19,44 @@ export default function MatchCard(props: Props) {
       backgroundColor="rgba(255,255,255, 0.9)"
     >
       <Flex>
-        <Avatar src={winner.avatar || "https://bit.ly/sage-adebayo"} />
+        <Avatar src={match.user1.avatar} />
         <Box ml="3">
-          <Text fontWeight="bold">{winner.nickname}</Text>
-          <Badge ml="1" colorScheme="green">
-            Vitória
-          </Badge>
+          <Text fontWeight="bold">{match.user1.nickname}</Text>
+          {match.user1.isWinner ? (
+            <Badge ml="1" colorScheme="green">
+              Vitória
+            </Badge>
+          ) : (
+            <Badge ml="1" colorScheme="red">
+              Derrota
+            </Badge>
+          )}
         </Box>
       </Flex>
       <Flex>
         <Text ml="10" fontWeight="bold" fontSize="20">
-          {winner.points}
+          {match.user1.score}
         </Text>
         <Text ml="10" fontWeight="bold" fontSize="20">
           x
         </Text>
         <Text ml="10" fontWeight="bold" fontSize="20">
-          {loser.points}
+          {match.user2.score}
         </Text>
       </Flex>
       <Flex>
-        <Avatar ml="10" src={loser.avatar || "https://bit.ly/dan-abramov"} />
+        <Avatar ml="10" src={match.user2.avatar} />
         <Box ml="3">
-          <Text fontWeight="bold">{loser.nickname}</Text>
-          <Badge ml="1" colorScheme="red">
-            Derrota
-          </Badge>
+          <Text fontWeight="bold">{match.user2.nickname}</Text>
+          {match.user2.isWinner ? (
+            <Badge ml="1" colorScheme="green">
+              Vitória
+            </Badge>
+          ) : (
+            <Badge ml="1" colorScheme="red">
+              Derrota
+            </Badge>
+          )}
         </Box>
       </Flex>
     </HStack>

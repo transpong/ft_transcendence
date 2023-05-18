@@ -17,8 +17,9 @@ export default function NavBar() {
     setMe(myData);
   }, []);
 
-  function handleLogoff () {
+  async function handleLogoff () {
     clearCookies();
+    await userService.logout()
     navigate("/")
   }
 

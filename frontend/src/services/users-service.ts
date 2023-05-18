@@ -44,6 +44,11 @@ export class UsersService {
       nickname,
     });
   }
+
+  async logout(): Promise<void> {
+    return this.api.patch("auth/logout");
+  }
+
 }
 
 export const userService = new UsersService();

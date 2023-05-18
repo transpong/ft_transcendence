@@ -1,121 +1,18 @@
 import { Box } from "@chakra-ui/layout";
 import { Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import MatchCard from "../../../components/MatchCard/MatchCard";
-
-interface IPlayerMatch {
-  points: number;
-  nickname: string;
-  avatar?: string;
-}
-
-interface IMatches {
-  winner: IPlayerMatch;
-  loser: IPlayerMatch;
-}
+import { gameService, IApiMatchHistory } from "../../../services/game-service";
 
 export default function MachesHistory(){
-  const [matchesList, setMatchesList] = useState<IMatches[]>([]);
+  const [matchesList, setMatchesList] = useState<IApiMatchHistory[]>([]);
 
-  useEffect(
-    () =>
-      setMatchesList([
-        {
-          winner: {
-            nickname: "Lucas",
-            points: 10,
-          },
-          loser: {
-            nickname: "Yuri",
-            points: 10,
-          },
-        },
-        {
-          winner: {
-            nickname: "Lucas",
-            points: 10,
-            avatar: "https://bit.ly/dan-abramov",
-          },
-          loser: {
-            nickname: "Yuri",
-            points: 10,
-          },
-        },
-        {
-          winner: {
-            nickname: "Lucas",
-            points: 10,
-          },
-          loser: {
-            nickname: "Yuri",
-            points: 10,
-          },
-        },
-        {
-          winner: {
-            nickname: "Lucas",
-            points: 10,
-            avatar: "https://bit.ly/dan-abramov",
-          },
-          loser: {
-            nickname: "Yuri",
-            points: 10,
-          },
-        },
-        {
-          winner: {
-            nickname: "Lucas",
-            points: 10,
-          },
-          loser: {
-            nickname: "Yuri",
-            points: 10,
-          },
-        },
-        {
-          winner: {
-            nickname: "Lucas",
-            points: 10,
-            avatar: "https://bit.ly/dan-abramov",
-          },
-          loser: {
-            nickname: "Yuri",
-            points: 10,
-          },
-        },
-        {
-          winner: {
-            nickname: "Lucas",
-            points: 10,
-          },
-          loser: {
-            nickname: "Yuri",
-            points: 10,
-          },
-        },
-        {
-          winner: {
-            nickname: "Lucas",
-            points: 10,
-          },
-          loser: {
-            nickname: "Yuri",
-            points: 10,
-          },
-        },
-        {
-          winner: {
-            nickname: "Lucas",
-            points: 10,
-          },
-          loser: {
-            nickname: "Yuri",
-            points: 10,
-          },
-        },
-      ]),
-    []
-  );
+
+  useMemo(async () => {
+    const matches = await gameService.getMatchesHistory();
+
+    setMatchesList(matches);
+  }, []);
 
   return (
     <Box h="98%" w={"100%"} overflowY="scroll">
@@ -129,7 +26,7 @@ export default function MachesHistory(){
       </Text>
       <Box>
         {matchesList.map((match) => {
-          return <MatchCard winner={match.winner} loser={match.loser} />;
+          return <MatchCard match={match} />;
         })}
       </Box>
     </Box>

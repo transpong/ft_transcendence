@@ -9,13 +9,14 @@ import {
 interface Props {
   position: number;
   nickname: string;
+  avatar: string;
   matches: number;
   wins: number;
   losses: number;
 }
 
 export default function RankingCard(props: Props) {
-  const { position, nickname, matches, wins, losses } = props;
+  const { position, nickname, matches, wins, losses, avatar } = props;
 
   return (
     <HStack
@@ -34,7 +35,7 @@ export default function RankingCard(props: Props) {
           </Text>
         </VStack>
         <Flex alignItems="center">
-          <Avatar src="https://bit.ly/dan-abramov" />
+          <Avatar src={avatar} />
           <Text ml="3" fontWeight="bold">
             {nickname}
           </Text>

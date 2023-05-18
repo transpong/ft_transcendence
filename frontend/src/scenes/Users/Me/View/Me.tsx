@@ -12,115 +12,27 @@ import MatchCard from "../../../../components/MatchCard/MatchCard";
 import { useNavigate, useOutlet, Outlet } from "react-router-dom";
 import { IApiUserMe, userService } from "../../../../services/users-service";
 import { avatarUrl } from "../../../../helpers/avatar-url";
+import { gameService, IApiMatchHistory, IApiRanking } from "../../../../services/game-service";
 
 export default function Me(){
-  const position = 7;
   const [isUploading, setIsUploading] = useState(false);
   const [me, setMe] = useState<IApiUserMe>();
+  const [matchesList, setMatchesList] = useState<IApiMatchHistory[]>([]);
+  const [userRanking, setUserRanking] = useState<IApiRanking>();
   const navigate = useNavigate();
   let hiddenInput: HTMLInputElement | null = null;
 
   useMemo(async () => {
     const myData = await userService.getMe();
-
     setMe(myData);
+
+    const matches = await gameService.getMatchesHistory(myData.nickname);
+    setMatchesList(matches);
+
+    const ranking = await gameService.getUserRanking(myData.nickname);
+    setUserRanking(ranking);
   }, []);
 
-  const teste = [
-    {
-      winner: {
-        nickname: "Lucas",
-        points: 10,
-      },
-      loser: {
-        nickname: "Yuri",
-        points: 10,
-      },
-    },
-    {
-      winner: {
-        nickname: "Lucas",
-        points: 10,
-        avatar: "https://bit.ly/dan-abramov",
-      },
-      loser: {
-        nickname: "Yuri",
-        points: 10,
-      },
-    },
-    {
-      winner: {
-        nickname: "Lucas",
-        points: 10,
-      },
-      loser: {
-        nickname: "Yuri",
-        points: 10,
-      },
-    },
-    {
-      winner: {
-        nickname: "Lucas",
-        points: 10,
-        avatar: "https://bit.ly/dan-abramov",
-      },
-      loser: {
-        nickname: "Yuri",
-        points: 10,
-      },
-    },
-    {
-      winner: {
-        nickname: "Lucas",
-        points: 10,
-      },
-      loser: {
-        nickname: "Yuri",
-        points: 10,
-      },
-    },
-    {
-      winner: {
-        nickname: "Lucas",
-        points: 10,
-        avatar: "https://bit.ly/dan-abramov",
-      },
-      loser: {
-        nickname: "Yuri",
-        points: 10,
-      },
-    },
-    {
-      winner: {
-        nickname: "Lucas",
-        points: 10,
-      },
-      loser: {
-        nickname: "Yuri",
-        points: 10,
-      },
-    },
-    {
-      winner: {
-        nickname: "Lucas",
-        points: 10,
-      },
-      loser: {
-        nickname: "Yuri",
-        points: 10,
-      },
-    },
-    {
-      winner: {
-        nickname: "Lucas",
-        points: 10,
-      },
-      loser: {
-        nickname: "Yuri",
-        points: 10,
-      },
-    },
-  ];
 
   async function handlePhotoSelect(file: File | null) {
     setIsUploading(true);
@@ -227,11 +139,12 @@ export default function Me(){
             Status
           </Text>
           <RankingCard
-            position={position}
+            position={userRanking?.position || 0}
             nickname={me?.nickname || ""}
-            matches={10}
-            wins={7}
-            losses={3}
+            matches={userRanking?.matches || 0}
+            wins={userRanking?.matches || 0}
+            losses={userRanking?.matches || 0}
+            avatar={me?.avatar || ""}
           />
 
           <Text
@@ -244,8 +157,8 @@ export default function Me(){
           </Text>
           <Box h="98%" w={"100%"} overflowY="scroll">
             <Box>
-              {teste.map((match) => {
-                return <MatchCard winner={match.winner} loser={match.loser} />;
+              {matchesList.map((match) => {
+                return <MatchCard match={match} />;
               })}
             </Box>
           </Box>

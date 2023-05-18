@@ -1,5 +1,4 @@
 import { Button, Flex, Image, Stack } from '@chakra-ui/react'
-import { useNavigate } from 'react-router-dom'
 import "./Login.css"
 
 const API42OAUTHURL = `${
@@ -10,12 +9,17 @@ const API42OAUTHURL = `${
   import.meta.env.VITE_API_42_REDIRECT_URL
 )}&response_type=code`;
 
-export default function LoginView(){
-  const navigate = useNavigate();
+const APIGUESTURL = `${import.meta.env.VITE_API_URL}/auth/guest`;
 
-    const redirectTo42OAuth = () => {
-      window.location.replace(API42OAUTHURL);
-    };
+export default function LoginView(){
+  const redirectTo42OAuth = () => {
+    window.location.replace(API42OAUTHURL);
+  };
+
+  function handleTestLogin() {
+    window.location.replace(APIGUESTURL);
+  }
+
     return (
       <Flex className='LoginBackground' h={"100vh"} align={"center"} justify={"center"}>
         <Flex
@@ -48,7 +52,7 @@ export default function LoginView(){
             <Button
               colorScheme="purple"
               size="lg"
-              onClick={() => navigate("/nickname")}
+              onClick={handleTestLogin}
             >
               LOGIN TESTE
             </Button>
