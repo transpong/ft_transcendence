@@ -15,6 +15,8 @@ let windowWidth = 0
 let windowHeight = 0
 let canvasParent: Element
 let parentBorderWidth = 0
+let button: p5Types.Element 
+let showButtonStart = true
 
 
 class Game {
@@ -43,7 +45,6 @@ class Game {
             this.scoreP1 += 1
         else if(player == 2)
             this.scoreP2 += 1
-        console.log("Player1 ", this.scoreP1, " X ", this.scoreP2, " PlayerP2" )
     }
 
     resetScore(){
@@ -183,6 +184,36 @@ class Ball{
 
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
+
+    const showScore = (p5: p5Types, scoreP1: number, scoreP2: number) => {
+        const score = p5.createButton(`${scoreP2} X ${scoreP1}`);
+        score.style("font-size", `${windowHeight * 0.10}px`)
+        score.style("color", "white")
+        score.style("cursor", "default")
+        const size = Object.entries(score.size()).reduce<Record<string, number>>((acc, item) => {
+            acc[item[0]] = item[1]
+            return acc
+        }, {})
+        score.position(((windowWidth / 2) - (size["width"] / 2)), windowHeight * 0.10 * 2 + parentBorderWidth)
+
+    }
+
+    const showStartButton = (p5: p5Types) => {
+        button = p5.createButton("Começar");
+        button.style("background", "white")
+        button.style("border-radius", "20px")
+        button.style("font-size", `${windowHeight * 0.10}px`)
+        button.mousePressed(() => {
+            game.start()
+            p5.removeElements()
+        })
+        const size = Object.entries( button.size()).reduce<Record<string, number>>((acc, item) => {
+            acc[item[0]] = item[1]
+            return acc
+        }, {})
+        button.position(((windowWidth / 2) - (size["width"] / 2)), (windowHeight / 2) + (size["height"] / 2) + parentBorderWidth)
+    }
+
     const setup = (p5: p5Types, canvasParentRef: Element) => {
         parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParentRef.clientHeight) -  canvasParentRef.clientHeight
         windowHeight = ref.current ? ref.current.clientHeight - parentBorderWidth : canvasParentRef.clientHeight
@@ -194,7 +225,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         player2 = new Player(p5, 2)
         game = new Game(ball)
     };
-
+    
     const draw = (p5: p5Types) => {
         p5.background(0);
         player1.printPlayer();
@@ -210,8 +241,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
             ball.checkPlayerCollision(player1)
             ball.checkPlayerCollision(player2)
         }else{
-            if(p5.keyIsDown(p5.ENTER))
-                game.start()
+            showScore(p5, game.scoreP1, game.scoreP2);
+            showStartButton(p5);
         }
     };
 
@@ -225,6 +256,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         p5.createCanvas(newWindowWidth , newWindowHeight).parent(canvasParent)
         windowWidth = newWindowWidth
         windowHeight = newWindowHeight
+        p5.removeElements()
     }
 
   return <Sketch setup={setup} draw={draw}  windowResized={windowResized}/>
