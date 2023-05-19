@@ -190,8 +190,11 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         score.style("font-size", `${windowHeight * 0.10}px`)
         score.style("color", "white")
         score.style("cursor", "default")
-        const size = score.size()
-        score.position(((windowWidth / 2) - (Object.values(size)[0] / 2)), windowHeight * 0.10 * 2)
+        const size = Object.entries(score.size()).reduce<Record<string, number>>((acc, item) => {
+            acc[item[0]] = item[1]
+            return acc
+        }, {})
+        score.position(((windowWidth / 2) - (size["width"] / 2)), windowHeight * 0.10 * 2 + parentBorderWidth)
 
     }
 
@@ -204,8 +207,11 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
             game.start()
             p5.removeElements()
         })
-        const size = button.size()
-        button.position(((windowWidth / 2) - (Object.values(size)[0] / 2)), (windowHeight / 2) + (Object.values(size)[1] / 2))
+        const size = Object.entries( button.size()).reduce<Record<string, number>>((acc, item) => {
+            acc[item[0]] = item[1]
+            return acc
+        }, {})
+        button.position(((windowWidth / 2) - (size["width"] / 2)), (windowHeight / 2) + (size["height"] / 2) + parentBorderWidth)
     }
 
     const setup = (p5: p5Types, canvasParentRef: Element) => {
