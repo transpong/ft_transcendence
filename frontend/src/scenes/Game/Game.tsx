@@ -16,7 +16,6 @@ let windowHeight = 0
 let canvasParent: Element
 let parentBorderWidth = 0
 let button: p5Types.Element 
-let showButtonStart = true
 
 
 class Game {
@@ -184,6 +183,8 @@ class Ball{
 
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
+    let startButtonColor = "white"
+
 
     const showScore = (p5: p5Types, scoreP1: number, scoreP2: number) => {
         const score = p5.createButton(`${scoreP2} X ${scoreP1}`);
@@ -200,12 +201,18 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
 
     const showStartButton = (p5: p5Types) => {
         button = p5.createButton("Começar");
-        button.style("background", "white")
+        button.style("background", startButtonColor)
         button.style("border-radius", "20px")
         button.style("font-size", `${windowHeight * 0.10}px`)
         button.mousePressed(() => {
             game.start()
             p5.removeElements()
+        })
+        button.mouseOver(() => {
+            startButtonColor = "grey"
+        })
+        button.mouseOut(() => {
+            startButtonColor = "white"
         })
         const size = Object.entries( button.size()).reduce<Record<string, number>>((acc, item) => {
             acc[item[0]] = item[1]
