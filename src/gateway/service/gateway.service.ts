@@ -20,6 +20,8 @@ export class GatewayService {
 
   private mapRooms: Map<string, string> = new Map();
 
+  private pongService: PongService = new PongService();
+
   async handleConnection(client: Socket) {}
 
   async handleDisconnect() {
@@ -65,20 +67,71 @@ export class GatewayService {
       console.log('Primeiro usuário:', firstUser);
       console.log('Segundo usuário:', secondUser);
 
-      this.sendRegressiveCountToRoom(roomName, 10);
-
       // create a pong game for the room
-      this.pong.set(roomName, new PongService());
+      this.pong.set(roomName, this.pongService);
     }
+  }
+
+  @SubscribeMessage('startGame')
+  handleStartGame(client: Socket) {
+    // Start the game and emit the initial game state to players
+    const roomName = this.mapRooms.get(client.id);
+    const gameState = this.pongService.getGameState();
+    this.server.to(roomName).emit('pong', gameState);
+
+    // Start the game loop
+    this.pongService.startGameLoop(roomName, this.server);
   }
 
   @SubscribeMessage('moveUp')
   async handleMoveUp(client: Socket) {
     const roomName = this.mapRooms.get(client.id);
-    const myPong = this.pong.get(roomName);
-    console.log(myPong);
-    myPong.moveUp();
-    this.server.to(roomName).emit('pong', myPong.getCoordinates());
+    const pongService = this.pong.get(roomName);
+
+    if (pongService) {
+      const playerId = this.getPlayerIdInRoom(roomName, client.id);
+      if (playerId === 1) {
+        pongService.movePlayer1Up();
+      } else if (playerId === 2) {
+        pongService.movePlayer2Up();
+      }
+
+      const gameState = pongService.getGameState();
+      this.server.to(roomName).emit('pong', gameState);
+    }
+  }
+
+  @SubscribeMessage('moveDown')
+  async handleMoveDown(client: Socket) {
+    const roomName = this.mapRooms.get(client.id);
+    const pongService = this.pong.get(roomName);
+
+    if (pongService) {
+      const playerId = this.getPlayerIdInRoom(roomName, client.id);
+      if (playerId === 1) {
+        pongService.movePlayer1Down();
+      } else if (playerId === 2) {
+        pongService.movePlayer2Down();
+      }
+
+      const gameState = pongService.getGameState();
+      this.server.to(roomName).emit('pong', gameState);
+    }
+  }
+
+  private getPlayerIdInRoom(roomName: string, playerId: string): number | undefined {
+    const roomUsers = this.server.sockets.adapter.rooms.get(roomName);
+    const iterator = roomUsers.values();
+    const user1 = iterator.next().value;
+    const user2 = iterator.next().value;
+
+    if (user1 === playerId) {
+      return 1;
+    } else if (user2 === playerId) {
+      return 2;
+    }
+
+    return undefined;
   }
 
   private sendMessagesToRoom(room: string, message: string) {
@@ -87,17 +140,6 @@ export class GatewayService {
       this.server.to(room).emit('message', message);
       counter++;
       if (counter === 3) {
-        clearInterval(interval);
-      }
-    }, 1000);
-  }
-
-  private sendRegressiveCountToRoom(room: string, count: number) {
-    let counter = count;
-    const interval = setInterval(() => {
-      this.server.to(room).emit('timer', counter);
-      counter--;
-      if (counter === 0) {
         clearInterval(interval);
       }
     }, 1000);
