@@ -1,4 +1,5 @@
 import { Box, Text, Badge, Avatar, Flex, HStack } from "@chakra-ui/react";
+import { avatarUrl } from "../../helpers/avatar-url";
 import { IApiMatchHistory } from "../../services/game-service";
 
 interface Props {
@@ -19,10 +20,10 @@ export default function MatchCard(props: Props) {
       backgroundColor="rgba(255,255,255, 0.9)"
     >
       <Flex>
-        <Avatar src={match.user1.avatar} />
+        <Avatar src={avatarUrl(match.user_1.avatar)} />
         <Box ml="3">
-          <Text fontWeight="bold">{match.user1.nickname}</Text>
-          {match.user1.isWinner ? (
+          <Text fontWeight="bold">{match.user_1.nickname}</Text>
+          {match.user_1.is_winner ? (
             <Badge ml="1" colorScheme="green">
               Vitória
             </Badge>
@@ -35,20 +36,20 @@ export default function MatchCard(props: Props) {
       </Flex>
       <Flex>
         <Text ml="10" fontWeight="bold" fontSize="20">
-          {match.user1.score}
+          {match.user_1.score}
         </Text>
         <Text ml="10" fontWeight="bold" fontSize="20">
           x
         </Text>
         <Text ml="10" fontWeight="bold" fontSize="20">
-          {match.user2.score}
+          {match.user_2.score}
         </Text>
       </Flex>
       <Flex>
-        <Avatar ml="10" src={match.user2.avatar} />
+        <Avatar ml="10" src={avatarUrl(match.user_2.avatar)} />
         <Box ml="3">
-          <Text fontWeight="bold">{match.user2.nickname}</Text>
-          {match.user2.isWinner ? (
+          <Text fontWeight="bold">{match.user_2.nickname}</Text>
+          {match.user_2.is_winner ? (
             <Badge ml="1" colorScheme="green">
               Vitória
             </Badge>

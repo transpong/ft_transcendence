@@ -14,16 +14,16 @@ export interface IApiRanking {
 
 export interface IApiMatchHistory {
   id: number;
-  createdAt: Date;
-  user1: IApiMatchUser;
-  user2: IApiMatchUser;
+  created_at: Date;
+  user_1: IApiMatchUser;
+  user_2: IApiMatchUser;
 }
 
 interface IApiMatchUser {
   id: number;
-  ftId: string;
+  ft_id: string;
   nickname: string;
-  isWinner: boolean;
+  is_winner: boolean;
   score: number;
   avatar: string;
   custom: number;

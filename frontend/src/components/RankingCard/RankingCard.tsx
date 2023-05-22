@@ -5,6 +5,7 @@ import {
   HStack,
   VStack,
 } from "@chakra-ui/react";
+import { avatarUrl } from "../../helpers/avatar-url";
 
 interface Props {
   position: number;
@@ -35,7 +36,7 @@ export default function RankingCard(props: Props) {
           </Text>
         </VStack>
         <Flex alignItems="center">
-          <Avatar src={avatar} />
+          <Avatar src={avatarUrl(avatar)} />
           <Text ml="3" fontWeight="bold">
             {nickname}
           </Text>
