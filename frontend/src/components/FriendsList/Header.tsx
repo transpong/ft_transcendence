@@ -8,9 +8,8 @@ type Props = {
 
 const Header = (props: Props) => {
   return (
-    <Flex minHeight={"60px"} backgroundColor={"#805AD5"} borderTopRadius={"20px"} justify={"center"}>
-
-      <Flex flexDirection="column" mx="5" justify="center" >
+    <Flex minHeight={"60px"} backgroundColor={"#805AD5"} borderTopRadius={"20px"} justify={"center"} cursor={"pointer"} onClick={() => props.minimized()}>
+      <Flex flexDirection="column" mx="5" justify="center">
         <Text color={"white"} fontSize="larger" fontWeight="bold">
           CHAT
         </Text>
@@ -18,8 +17,8 @@ const Header = (props: Props) => {
       <Flex align={"center"} flexDirection={"row-reverse"}>
       {
           (props.getStatusMinimized() ? 
-          <MinusIcon cursor={"pointer"} onClick={() => props.minimized()}/> : 
-          <AddIcon cursor={"pointer"} onClick={() => props.minimized()}/> )
+          <MinusIcon/> : 
+          <AddIcon/> )
       }
       </Flex>
     </Flex>
