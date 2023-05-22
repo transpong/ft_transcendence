@@ -6,10 +6,10 @@ import {
   Box,
   Input,
 } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import RankingCard from "../../../../components/RankingCard/RankingCard";
 import MatchCard from "../../../../components/MatchCard/MatchCard";
-import { useNavigate, useOutlet, Outlet } from "react-router-dom";
+import { useNavigate, useOutlet, Outlet, useLocation } from "react-router-dom";
 import { IApiUserMe, userService } from "../../../../services/users-service";
 import { avatarUrl } from "../../../../helpers/avatar-url";
 import { gameService, IApiMatchHistory, IApiRanking } from "../../../../services/game-service";
@@ -20,6 +20,8 @@ export default function Me(){
   const [matchesList, setMatchesList] = useState<IApiMatchHistory[]>([]);
   const [userRanking, setUserRanking] = useState<IApiRanking>();
   const navigate = useNavigate();
+  const { key } = useLocation();
+
   let hiddenInput: HTMLInputElement | null = null;
 
   useMemo(async () => {
@@ -32,6 +34,12 @@ export default function Me(){
     const ranking = await gameService.getUserRanking(myData.nickname);
     setUserRanking(ranking);
   }, []);
+
+  useEffect(() => {
+    userService.getMe().then((data) => {
+      setMe(data);
+    });
+  }, [key])
 
 
   async function handlePhotoSelect(file: File | null) {
@@ -46,6 +54,8 @@ export default function Me(){
     await userService.uploadAvatar(photoFormData);
 
     setIsUploading(false);
+
+    window.location.reload()
   }
 
   async function handleMfaActivation() {
@@ -60,6 +70,8 @@ export default function Me(){
 
   async function handleMfadeactivation() {
     await userService.disableMfa();
+    const myData = await userService.getMe();
+    setMe(myData);
   }
 
   return useOutlet() ? (
