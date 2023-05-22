@@ -1,4 +1,5 @@
 import { Box, Text, Badge, Avatar, Flex, HStack } from "@chakra-ui/react";
+import { useNavigate } from "react-router";
 import { avatarUrl } from "../../helpers/avatar-url";
 import { IApiMatchHistory } from "../../services/game-service";
 
@@ -8,6 +9,7 @@ interface Props {
 
 export default function MatchCard(props: Props) {
   const { match } = props;
+  const navigate = useNavigate();
 
   return (
     <HStack
@@ -19,7 +21,7 @@ export default function MatchCard(props: Props) {
       borderRadius="10"
       backgroundColor="rgba(255,255,255, 0.9)"
     >
-      <Flex>
+      <Flex onClick={() => navigate(`/home/profile/${match.user_1.nickname}`)} cursor="pointer">
         <Avatar src={avatarUrl(match.user_1.avatar)} />
         <Box ml="3">
           <Text fontWeight="bold">{match.user_1.nickname}</Text>
@@ -45,7 +47,7 @@ export default function MatchCard(props: Props) {
           {match.user_2.score}
         </Text>
       </Flex>
-      <Flex>
+      <Flex onClick={() => navigate(`/home/profile/${match.user_2.nickname}`)} cursor="pointer">
         <Avatar ml="10" src={avatarUrl(match.user_2.avatar)} />
         <Box ml="3">
           <Text fontWeight="bold">{match.user_2.nickname}</Text>

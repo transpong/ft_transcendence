@@ -5,6 +5,7 @@ import {
   HStack,
   VStack,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router";
 import { avatarUrl } from "../../helpers/avatar-url";
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
 
 export default function RankingCard(props: Props) {
   const { position, nickname, matches, wins, losses, avatar } = props;
+  const navigate = useNavigate();
 
   return (
     <HStack
@@ -35,7 +37,7 @@ export default function RankingCard(props: Props) {
             {position}
           </Text>
         </VStack>
-        <Flex alignItems="center">
+        <Flex alignItems="center" onClick={() => navigate(`/home/profile/${nickname}`)} cursor="pointer">
           <Avatar src={avatarUrl(avatar)} />
           <Text ml="3" fontWeight="bold">
             {nickname}
