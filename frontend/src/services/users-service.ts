@@ -9,6 +9,16 @@ export interface IApiUserMe {
   is_mfa_enabled: boolean;
 }
 
+export interface IUserProfile {
+  id: number;
+  ftId: string;
+  nickname: string;
+  avatar: string;
+  is_friend: boolean;
+  is_blocked: boolean;
+  status: number;
+}
+
 export class UsersService {
   private api: AxiosInstance;
   constructor() {
@@ -49,6 +59,30 @@ export class UsersService {
     return this.api.patch("auth/logout");
   }
 
+  async getProfile(nickname: string): Promise<IUserProfile> {
+    const { data } = await this.api.get<IUserProfile>(`/user/profiles/${nickname}`);
+    return data;
+  }
+
+  async addFriend(nickname: string): Promise<void> {
+    const { data } = await this.api.post<void>(`/user/profiles/${nickname}/friends`);
+    return data;
+  }
+
+  async removeFriend(nickname: string): Promise<void> {
+    const { data } = await this.api.delete<void>(`/user/profiles/${nickname}/friends`);
+    return data;
+  }
+
+  async blockUser(nickname: string): Promise<void> {
+    const { data } = await this.api.post<void>(`/user/profiles/${nickname}/block`);
+    return data;
+  }
+
+  async unblockUser(nickname: string): Promise<void> {
+    const { data } = await this.api.delete<void>(`/user/profiles/${nickname}/block`);
+    return data;
+  }
 }
 
 export const userService = new UsersService();
