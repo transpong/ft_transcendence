@@ -15,7 +15,6 @@ let windowWidth = 0
 let windowHeight = 0
 let canvasParent: Element
 let parentBorderWidth = 0
-let button: p5Types.Element 
 
 
 class Game {
@@ -183,43 +182,78 @@ class Ball{
 
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
-    let startButtonColor = "white"
 
+    class Score {
+        p5;
+        scoreP1;
+        scoreP2;
+        score : p5Types.Element | null = null; 
 
-    const showScore = (p5: p5Types, scoreP1: number, scoreP2: number) => {
-        const score = p5.createButton(`${scoreP2} X ${scoreP1}`);
-        score.style("font-size", `${windowHeight * 0.10}px`)
-        score.style("color", "white")
-        score.style("cursor", "default")
-        const size = Object.entries(score.size()).reduce<Record<string, number>>((acc, item) => {
-            acc[item[0]] = item[1]
-            return acc
-        }, {})
-        score.position(((windowWidth / 2) - (size["width"] / 2)), windowHeight * 0.10 * 2 + parentBorderWidth)
-
+        constructor(p5New: p5Types){
+            this.p5 = p5New
+            this.scoreP1 = 0
+            this.scoreP2 = 0
+        }
+        show(newScoreP1: number, newScoreP2: number){
+            if(this.scoreP1 != newScoreP1 || this.scoreP2 != newScoreP2){
+                this.scoreP1 = newScoreP1
+                this.scoreP2 = newScoreP2
+                this.score = null
+            }
+            if(this.score ===  null){
+                this.score = this.p5.createButton(`${this.scoreP2} X ${this.scoreP1}`);
+                this.score.style("color", "white")
+                this.score.style("cursor", "default")
+                this.score.style("font-size", `${(windowHeight < windowWidth ? windowHeight : windowWidth) * 0.10}px`)
+                const size = Object.entries(this.score.size()).reduce<Record<string, number>>((acc, item) => {
+                    acc[item[0]] = item[1]
+                    return acc
+                }, {})
+                this.score.position(((windowWidth / 2) - (size["width"] / 2)), windowHeight * 0.20 + parentBorderWidth)
+            }
+        }
+        destroy(){
+            if(this.score !== null)
+                this.score = null
+        }
     }
 
-    const showStartButton = (p5: p5Types) => {
-        button = p5.createButton("Começar");
-        button.style("background", startButtonColor)
-        button.style("border-radius", "20px")
-        button.style("font-size", `${windowHeight * 0.10}px`)
-        button.mousePressed(() => {
-            game.start()
-            p5.removeElements()
-        })
-        button.mouseOver(() => {
-            startButtonColor = "grey"
-        })
-        button.mouseOut(() => {
-            startButtonColor = "white"
-        })
-        const size = Object.entries( button.size()).reduce<Record<string, number>>((acc, item) => {
-            acc[item[0]] = item[1]
-            return acc
-        }, {})
-        button.position(((windowWidth / 2) - (size["width"] / 2)), (windowHeight / 2) + (size["height"] / 2) + parentBorderWidth)
+
+    class ButtonStart{
+        p5;
+        button : p5Types.Element | null = null; 
+        constructor(p5New: p5Types){
+            this.p5 = p5New
+        }
+
+        createButton(){
+            if(this.button ===  null) {
+                this.button = this.p5.createButton("Começar");
+                this.button.style("background", "white")
+                this.button.style("border-radius", "20px")
+                this.button.mousePressed(() => {
+                    game.start()
+                    this.p5.removeElements()
+                })
+                this.button.style("font-size", `${(windowHeight < windowWidth ? windowHeight : windowWidth) * 0.10}px`)
+                const size = Object.entries(this.button.size()).reduce<Record<string, number>>((acc, item) => {
+                    acc[item[0]] = item[1]
+                    return acc
+                }, {})
+                this.button.position(((windowWidth / 2) - (size["width"] / 2)), (windowHeight / 2) + (size["height"] / 2) + parentBorderWidth)
+            }
+        }
+        destroy(){
+            if(this.button !== null)
+                this.button = null
+        }
+        
     }
+
+
+    let buttonStart : ButtonStart | null = null
+    let score : Score | null = null
+
 
     const setup = (p5: p5Types, canvasParentRef: Element) => {
         parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParentRef.clientHeight) -  canvasParentRef.clientHeight
@@ -231,6 +265,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         player1 = new Player(p5, 1)
         player2 = new Player(p5, 2)
         game = new Game(ball)
+        buttonStart = new ButtonStart(p5)
+        score = new Score(p5)
     };
     
     const draw = (p5: p5Types) => {
@@ -238,6 +274,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         player1.printPlayer();
         player2.printPlayer();
         if(game.isRunning){
+            buttonStart?.destroy()
+            score?.destroy()
             ball.printBall();
             if(ball.isGoal()){
                 game.scorePlayer(ball.whoScoredGoal());
@@ -248,8 +286,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
             ball.checkPlayerCollision(player1)
             ball.checkPlayerCollision(player2)
         }else{
-            showScore(p5, game.scoreP1, game.scoreP2);
-            showStartButton(p5);
+            score?.show(game.scoreP1, game.scoreP2)
+            buttonStart?.createButton()
         }
     };
 
@@ -263,6 +301,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         p5.createCanvas(newWindowWidth , newWindowHeight).parent(canvasParent)
         windowWidth = newWindowWidth
         windowHeight = newWindowHeight
+        buttonStart?.destroy()
+        score?.destroy()
         p5.removeElements()
     }
 
