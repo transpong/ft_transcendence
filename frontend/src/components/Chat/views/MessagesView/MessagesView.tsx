@@ -1,40 +1,43 @@
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
+import { chatService, IApiDirectMessagesList, IChannelChat } from "../../../../services/chat-service";
+import { IApiUserMe } from "../../../../services/users-service";
 import Divider from "../../Divider";
 import Footer from "./Footer";
 import Messages from "./Messages";
 
-const MessagesView = () => {
-  const [messages, setMessages] = useState<
-    Array<{ from: string; text: string }>
-  >([
-    { from: "computer", text: "Hi, My Name is HoneyChat" },
-    { from: "me", text: "Hey there" },
-    { from: "me", text: "Myself" },
-    {
-      from: "computer",
-      text: "Nice to meet you. You can send me message and i'll reply you with same message.",
-    },
-  ]);
+interface Props {
+  channelInfo?: IChannelChat
+  directInfo?: IApiUserMe; // TODO: change IApiUserMe when back implements it
+}
+
+const MessagesView = (props: Props) => {
+  const [messages, setMessages] = useState<IApiDirectMessagesList>();
   const [inputMessage, setInputMessage] = useState("");
 
-
-  const handleSendMessage = () => {
-    if (!inputMessage.trim().length) {
-      return;
+  useMemo(async () => {
+    if (props.directInfo) {
+      const messagesList = await chatService.getDirectMessages(
+        props.directInfo.nickname
+      );
+      setMessages(messagesList);
     }
-    const data = inputMessage;
+  }, [props.directInfo]);
 
-    setMessages((old) => [...old, { from: "me", text: data }]);
-    setInputMessage("");
 
-    setTimeout(() => {
-      setMessages((old) => [...old, { from: "computer", text: data }]);
-    }, 1000);
+  const handleSendMessage = async () => {
+    if (props.directInfo) {
+      await chatService.sendDirectMessages(props.directInfo.nickname, inputMessage);
+      setInputMessage("");
+      const messagesList = await chatService.getDirectMessages(
+        props.directInfo.nickname
+      );
+      setMessages(messagesList);
+    }
   };
 
   return (
           <Fragment>
-            <Messages messages={messages} />
+            {messages && <Messages messages={messages} />}
             <Divider />
             <Footer
               inputMessage={inputMessage}

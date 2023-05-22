@@ -2,24 +2,12 @@ import { Avatar, AvatarBadge, Divider, Flex, Text } from "@chakra-ui/react";
 import { RiSpyFill, RiTeamFill, RiUserFill  } from 'react-icons/ri'
 import Chat from "../Chat/Chat";
 import { useNavigate } from "react-router";
+import { IChatList } from "../../services/chat-service";
+import { avatarUrl } from "../../helpers/avatar-url";
 
 
-type GroupsType =  {
-  name: string;
-}
-
-type FriendsType = {
-  name: string;
-}
-
-type ListFriendsType = {
-  groups: Array<GroupsType>,
-  other_groups: Array<GroupsType>,
-  friends: Array<FriendsType>,
-  other_users: Array<FriendsType>
-}
 type Props = {
-  list: ListFriendsType;
+  list: IChatList;
   addChat: (chat : React.ReactElement) => void;
   deleteChat: () => void;
 }
@@ -35,8 +23,8 @@ const List = (props: Props) => {
           GRUPOS
         </Text>
       </Flex>
-      {props.list.groups.map((element, index) =>
-        <Flex key={"group" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.name} key={element.name} group_type={2} user_access_type={3} type='group' deleteChat={props.deleteChat}/>)}
+      {props.list.channels.map((element, index) =>
+        <Flex key={"group" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.name} key={element.id} group_type={element.type} user_access_type={element.userAccessType} type='group' deleteChat={props.deleteChat} channelInfo={element}/>)}
         _hover={{
           backgroundColor: "#805AD5",
           textColor: "white",
@@ -56,17 +44,17 @@ const List = (props: Props) => {
         </Text>
       </Flex>
       {props.list.friends.map((element, index) =>
-        <Flex key={"friend" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.name} key={element.name} type='individual' deleteChat={props.deleteChat}/>)}
+        <Flex key={"friend" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.nickname} key={element.nickname} type='individual' deleteChat={props.deleteChat} directInfo={element}/>)}
         _hover={{
           backgroundColor: "#805AD5",
           textColor: "white",
           borderRadius: "20px"
         }}>
-           <Avatar size="sm" name={element.name} marginRight={"1vw"}>
+           <Avatar size="sm" name={avatarUrl(element.avatar)} marginRight={"1vw"}>
             <AvatarBadge boxSize="1.25em" bg="green.500" />
           </Avatar>
           <Text fontSize={"15px"} fontWeight={"bold"}>
-            {element.name}
+            {element.nickname}
           </Text>
         </Flex>
       )}
@@ -77,16 +65,16 @@ const List = (props: Props) => {
           OUTROS
         </Text>
       </Flex>
-      {props.list.other_users.map((element,  index) =>
-        <Flex key={"other" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() => navigate(`/home/profile/${element.name}`)}
+      {props.list.otherUsers.map((element,  index) =>
+        <Flex key={"other" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() => navigate(`/home/profile/${element.nickname}`)}
         _hover={{
           backgroundColor: "#805AD5",
           textColor: "white",
           borderRadius: "20px"
         }}>
-          <Avatar size="sm" name={element.name} marginRight={"1vw"}/>
+          <Avatar size="sm" name={avatarUrl(element.avatar)} marginRight={"1vw"}/>
           <Text fontSize={"15px"} fontWeight={"bold"}>
-            {element.name}
+            {element.nickname}
           </Text>
         </Flex>
       )}
@@ -98,8 +86,8 @@ const List = (props: Props) => {
           OUTROS GRUPOS
         </Text>
       </Flex>
-      {props.list.other_groups.map((element,  index) =>
-        <Flex key={"other" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.name} type='group' group_type={2} deleteChat={props.deleteChat}/>)}
+      {props.list.otherChannels.map((element,  index) =>
+        <Flex key={"other" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.name} key={element.id} type='group' group_type={element.type} deleteChat={props.deleteChat} channelInfo={element}/>)}
         _hover={{
           backgroundColor: "#805AD5",
           textColor: "white",

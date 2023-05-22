@@ -1,15 +1,14 @@
 import { useEffect, useRef } from "react";
 import { Avatar, Flex, Text } from "@chakra-ui/react";
-interface msg  {
-    from: string;
-    text: string;
+import { IApiDirectMessagesList } from "../../../../services/chat-service";
+import { avatarUrl } from "../../../../helpers/avatar-url";
+
+
+interface Props {
+  messages: IApiDirectMessagesList;
 }
 
-interface obj{
-    messages: Array<msg>;
-}
-
-const Messages = ({messages} : obj) => {
+const Messages = ({messages} : Props) => {
   const AlwaysScrollToBottom = () => {
     const elementRef = useRef<HTMLInputElement>(null);
         useEffect(() => {
@@ -21,8 +20,8 @@ const Messages = ({messages} : obj) => {
 
   return (
     <Flex w="100%" h="80%" overflowY="scroll" flexDirection="column" p="3">
-      {messages.map((item, index) => {
-        if (item.from === "me") {
+      {messages.messages.map((item, index) => {
+        if (item.am_i_sender) {
           return (
             <Flex key={index} w="100%" justify="flex-end">
               <Flex
@@ -34,7 +33,7 @@ const Messages = ({messages} : obj) => {
                 p="3"
                 borderRadius={"10px"}
               >
-                <Text wordBreak={"break-word"} overflowWrap={"break-word"}  fontSize={"smaller"}>{item.text}</Text>
+                <Text wordBreak={"break-word"} overflowWrap={"break-word"}  fontSize={"smaller"}>{item.message_text}</Text>
               </Flex>
             </Flex>
           );
@@ -42,8 +41,8 @@ const Messages = ({messages} : obj) => {
           return (
             <Flex key={index} w="100%">
               <Avatar
-                name="Computer"
-                src="https://avataaars.io/?avatarStyle=Transparent&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light"
+                name={messages.user.nickname}
+                src={avatarUrl(messages.user.avatar)}
                 bg="blue.300"
               ></Avatar>
               <Flex
@@ -55,7 +54,7 @@ const Messages = ({messages} : obj) => {
                 p="3"
                 borderRadius={"10px"}
               >
-              <Text  wordBreak={"break-word"} overflowWrap={"break-word"}  fontSize={"smaller"}>{item.text}</Text>
+              <Text  wordBreak={"break-word"} overflowWrap={"break-word"}  fontSize={"smaller"}>{item.message_text}</Text>
               </Flex>
             </Flex>
           );

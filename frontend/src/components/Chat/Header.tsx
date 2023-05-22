@@ -1,5 +1,8 @@
 import {MinusIcon, AddIcon, CloseIcon } from "@chakra-ui/icons";
 import { Flex, Avatar, AvatarBadge, Text } from "@chakra-ui/react";
+import { useNavigate } from "react-router";
+import { IChannelChat } from "../../services/chat-service";
+import { IApiUserMe } from "../../services/users-service";
 import { ScreensObject } from "./Chat";
 import HeaderNavgation from "./HeaderNavigation";
 
@@ -10,15 +13,24 @@ type Props = {
   type: "group" | "individual";
   deleteChat: () => void;
   screenNavigation: number;
+  channelInfo?: IChannelChat;
+  directInfo?: IApiUserMe; // TODO: change IApiUserMe when back implements it
   setScreenNavigation: React.Dispatch<
     React.SetStateAction<keyof ScreensObject>
   >;
 };
 
 const Header = (props: Props) => {
+  const navigate = useNavigate();
+
+  function handleNameClick() {
+    if (props.directInfo)
+      navigate(`/home/profile/${props.directInfo.nickname}`);
+  }
+
   return (
     <Flex paddingBottom={"10px"} paddingTop={"1px"} backgroundColor={"#805AD5"} borderTopRadius={"20px"} justifyContent="space-between">
-      <Flex w={"60%"}>
+      <Flex w={"60%"} onClick={handleNameClick}>
       <Avatar size="md" name={props.name}>
         <AvatarBadge boxSize="1.25em" bg="green.500" />
       </Avatar>
