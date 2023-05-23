@@ -44,7 +44,14 @@ export class UserService {
   async getUserByFtId(ftId: string): Promise<UserEntity> {
     const userEntity: UserEntity = await this.userRepository.findOne({
       where: { ftId: ftId },
-      relations: ['directMessagesFrom', 'friends', 'blocks', 'blockedBy'],
+      relations: [
+        'directMessagesFrom',
+        'friends',
+        'friends.blocks',
+        'friends.blockedBy',
+        'blocks',
+        'blockedBy',
+      ],
     });
 
     if (!userEntity) {
