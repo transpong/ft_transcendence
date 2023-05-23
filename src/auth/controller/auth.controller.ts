@@ -1,4 +1,12 @@
-import { Controller, Get, Patch, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Patch,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { FtOauthGuard } from '../guards/ft.guard';
 import { Response } from 'express';
 import { AuthService } from '../service/auth.service';
@@ -18,6 +26,7 @@ export class AuthController {
   @Patch('logout')
   async logout(@Req() req: any, @Res() res: Response): Promise<void> {
     await this.authService.logout(req.user.ftLogin, res);
+    res.status(HttpStatus.OK).send();
   }
 
   @Public()
