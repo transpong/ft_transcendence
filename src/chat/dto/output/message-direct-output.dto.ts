@@ -1,5 +1,5 @@
 import { SenderDto } from './message-sender-output.dto';
-import { Expose } from '@nestjs/class-transformer';
+import { classToPlain, Expose } from '@nestjs/class-transformer';
 import { MessageOutputDto } from './message-output.dto';
 import { UserEntity } from '../../../user/entity/user.entity';
 import { DirectMessagesEntity } from '../../entity/direct-messages.entity';
@@ -29,5 +29,9 @@ export class MessageDirectOutputDto {
 
   static fromDirectMessageEntity(user: UserEntity): SenderDto {
     return SenderDto.fromUser(user);
+  }
+
+  toJSON() {
+    return classToPlain(this);
   }
 }

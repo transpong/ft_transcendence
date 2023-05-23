@@ -1,6 +1,6 @@
 import { ChatOutputDto } from './chat-output.dto';
 import { UsersChannelsEntity } from '../../entity/user-channels.entity';
-import { Expose } from '@nestjs/class-transformer';
+import { classToPlain, Expose } from '@nestjs/class-transformer';
 import { UserEntity } from '../../../user/entity/user.entity';
 import { UserProfileDto } from '../../../user/dto/user-profile.dto';
 
@@ -36,5 +36,9 @@ export class ChannelOutputDto {
       UserProfileDto.fromEntity(user, otherUser),
     );
     return channelOutputDto;
+  }
+
+  toJSON() {
+    return classToPlain(this);
   }
 }
