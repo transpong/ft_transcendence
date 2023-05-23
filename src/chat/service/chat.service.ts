@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ChannelEntity } from '../entity/channel.entity';
-import { In, Not, Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { UsersChannelsEntity } from '../entity/user-channels.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DirectMessagesEntity } from '../entity/direct-messages.entity';
@@ -331,7 +331,6 @@ export class ChatService {
       await this.findUnbannedChannelsByUserFtId(user.ftId);
     const unrelatedPublicChannels =
       await this.findUnrelatedPublicChannelsByUserFtId(userChannels);
-
     const usersNotFriends: UserEntity[] =
       await this.userService.getNotFriendsByFtId(user);
 
@@ -385,14 +384,18 @@ export class ChatService {
       (userChannel) => userChannel.channel.id,
     );
 
-    return await this.channelRepository.find({
-      where: [
-        {
-          type: Not(AccessType.PRIVATE),
-          users_channels: { id: Not(In(userChannelIds)) },
-        },
-      ],
-      relations: ['users_channels', 'users_channels.user'],
+    const notPrivateChannels: ChannelEntity[] =
+      await this.channelRepository.find({
+        where: [
+          {
+            type: Not(AccessType.PRIVATE),
+          },
+        ],
+        relations: ['users_channels', 'users_channels.user'],
+      });
+
+    return notPrivateChannels.filter((channel) => {
+      return !userChannelIds.includes(channel.id);
     });
   }
 
