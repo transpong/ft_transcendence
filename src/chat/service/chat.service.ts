@@ -331,7 +331,6 @@ export class ChatService {
       await this.findUnbannedChannelsByUserFtId(user.ftId);
     const unrelatedPublicChannels =
       await this.findUnrelatedPublicChannelsByUserFtId(userChannels);
-    console.log(unrelatedPublicChannels);
 
     const usersNotFriends: UserEntity[] =
       await this.userService.getNotFriendsByFtId(user);
