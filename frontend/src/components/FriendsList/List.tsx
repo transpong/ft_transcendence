@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { IChatList } from "../../services/chat-service";
 import { avatarUrl } from "../../helpers/avatar-url";
 import UserBadageStatus from "../UserStatus/UserBadgeStatus";
+import ChannelTypeIcon from "../ChannelTypeIcon/ChannelTypeIcon";
 
 
 type Props = {
@@ -31,10 +32,11 @@ const List = (props: Props) => {
           textColor: "white",
           borderRadius: "20px"
         }}>
-          <Avatar size="sm" name={element.name} key={element.name} marginRight={"1vw"}/>
-          <Text fontSize={"15px"} fontWeight={"bold"}>
+          <Avatar size="sm" name={element.name} key={element.name} marginRight={"1vw"} w="15%"/>
+          <Text fontSize={"15px"} fontWeight={"bold"} w="70%">
             {element.name}
           </Text>
+          <ChannelTypeIcon type={element.type} />
         </Flex>
       )}
       <Divider/>
@@ -94,10 +96,11 @@ const List = (props: Props) => {
           textColor: "white",
           borderRadius: "20px"
         }}>
-          <Avatar size="sm" name={element.name} marginRight={"1vw"}/>
-          <Text fontSize={"15px"} fontWeight={"bold"}>
+          <Avatar size="sm" name={element.name} marginRight={"1vw"}  w="15%"/>
+          <Text fontSize={"15px"} fontWeight={"bold"} w="70%" >
             {element.name}
           </Text>
+          <ChannelTypeIcon type={element.type} />
         </Flex>
       )}
       <Divider/>

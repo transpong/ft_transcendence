@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { avatarUrl } from "../../helpers/avatar-url";
 import { IChannelChat } from "../../services/chat-service";
 import { IUserProfile } from "../../services/users-service";
+import ChannelTypeIcon from "../ChannelTypeIcon/ChannelTypeIcon";
 import UserBadageStatus from "../UserStatus/UserBadgeStatus";
 import UserTextStatus from "../UserStatus/UserTextStatus";
 import { ScreensObject } from "./Chat";
@@ -42,6 +43,7 @@ const Header = (props: Props) => {
           {props.name}
         </Text>
         { props.directInfo ? <UserTextStatus status={props.directInfo.status} /> : null }
+        { props.channelInfo ? <ChannelTypeIcon type={props.channelInfo.type} /> : null }
       </Flex>
       </Flex>
       <Flex align={"center"} >
