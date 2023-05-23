@@ -9,6 +9,7 @@ import {
 import { UsersChannelsEntity } from './user-channels.entity';
 import { ChannelMessagesEntity } from './channelmessages.entity';
 import { UserAccessType } from '../enum/access-type.enum';
+import { AccessType } from '../enum/cannel-type.enum';
 
 @Entity({ name: 'channels' })
 export class ChannelEntity {
@@ -101,7 +102,15 @@ export class ChannelEntity {
   }
 
   isPublic(): boolean {
-    return this.type === 0;
+    return this.type === AccessType.PUBLIC;
+  }
+
+  isProtected(): boolean {
+    return this.type === AccessType.PROTECTED;
+  }
+
+  isPrivate(): boolean {
+    return this.type === AccessType.PRIVATE;
   }
 
   deletePassword(): void {
