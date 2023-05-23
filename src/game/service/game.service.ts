@@ -69,7 +69,6 @@ export class GameService {
     );
 
     this.sortRankingList(matchesRakingDtoList);
-    console.log(matchesRakingDtoList);
 
     const position: number = matchesRakingDtoList.findIndex(
       (matchRakingDto) => matchRakingDto.nickname === user.nickname,
