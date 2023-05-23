@@ -63,8 +63,9 @@ export class AvatarService {
 
   deleteImage(imageName: string): void {
     const imagePath: string = path.join('upload', imageName);
+    const defaultImages: string[] = ['default.jpeg', 'guest.png'];
 
-    if (existsSync(imagePath) && imageName !== 'default.jpeg') {
+    if (existsSync(imagePath) && !defaultImages.includes(imageName)) {
       unlinkSync(imagePath);
     }
   }
