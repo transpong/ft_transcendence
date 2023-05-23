@@ -163,6 +163,7 @@ export class UserService {
 
     guestUser.ftId = new Date().getTime().toString();
     guestUser.avatar = 'guest.png';
+    guestUser.status = UserEnum.OFFLINE;
 
     await this.userRepository.save(guestUser);
     return guestUser;
@@ -302,7 +303,7 @@ export class UserService {
       );
     }
 
-    return UserProfileDto.fromEntity(profileEntity, userEntity);
+    return UserProfileDto.fromEntity(userEntity, profileEntity);
   }
 
   private async validNickname(nickname: string): Promise<boolean> {

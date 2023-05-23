@@ -97,6 +97,6 @@ export class UserController {
     @Req() req,
     @Param('nickname') nickname: string,
   ): Promise<UserProfileDto> {
-    return this.userService.getProfile(req.user.id, nickname);
+    return this.userService.getProfile(req.user.ftLogin, nickname);
   }
 }
