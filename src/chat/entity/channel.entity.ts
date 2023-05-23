@@ -144,4 +144,31 @@ export class ChannelEntity {
   isPasswordProtected(): boolean {
     return this.passwordHash !== null && this.passwordSalt !== null;
   }
+
+  userIsBanned(nickname: string): boolean {
+    for (const userChannel of this.users_channels) {
+      if (userChannel.user.nickname === nickname) {
+        return userChannel.userAccessType === UserAccessType.BANNED;
+      }
+    }
+    return false;
+  }
+
+  userIsKicked(nickname: string): boolean {
+    for (const userChannel of this.users_channels) {
+      if (userChannel.user.nickname === nickname) {
+        return userChannel.userAccessType === UserAccessType.KICKED;
+      }
+    }
+    return false;
+  }
+
+  userIsMuted(nickname: string): boolean {
+    for (const userChannel of this.users_channels) {
+      if (userChannel.user.nickname === nickname) {
+        return userChannel.userAccessType === UserAccessType.MUTED;
+      }
+    }
+    return false;
+  }
 }

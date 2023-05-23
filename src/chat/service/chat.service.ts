@@ -329,8 +329,10 @@ export class ChatService {
     const user: UserEntity = await this.userService.getUserByFtId(ftId);
     const userChannels: UsersChannelsEntity[] =
       await this.findUnbannedChannelsByUserFtId(user.ftId);
-    const unrelatedPublicChannels: UsersChannelsEntity[] =
+    const unrelatedPublicChannels =
       await this.findUnrelatedPublicChannelsByUserFtId(userChannels);
+    console.log(unrelatedPublicChannels);
+
     const usersNotFriends: UserEntity[] =
       await this.userService.getNotFriendsByFtId(user);
 
@@ -379,24 +381,19 @@ export class ChatService {
 
   private async findUnrelatedPublicChannelsByUserFtId(
     userChannels: UsersChannelsEntity[],
-  ): Promise<UsersChannelsEntity[]> {
+  ) {
     const userChannelIds: number[] = userChannels.map(
       (userChannel) => userChannel.channel.id,
     );
 
-    return await this.usersChannelsRepository.find({
+    return await this.channelRepository.find({
       where: [
         {
-          channel: { type: AccessType.PUBLIC, id: Not(In(userChannelIds)) },
+          type: Not(AccessType.PRIVATE),
+          users_channels: { id: Not(In(userChannelIds)) },
         },
       ],
-      relations: [
-        'user',
-        'user.friends',
-        'user.blocks',
-        'user.blockedBy',
-        'channel',
-      ],
+      relations: ['users_channels', 'users_channels.user'],
     });
   }
 

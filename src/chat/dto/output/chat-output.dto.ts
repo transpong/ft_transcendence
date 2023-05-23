@@ -1,5 +1,7 @@
 import { UsersChannelsEntity } from '../../entity/user-channels.entity';
 import { classToPlain, Expose } from '@nestjs/class-transformer';
+import { ChannelEntity } from '../../entity/channel.entity';
+import { UserAccessType } from '../../enum/access-type.enum';
 
 export class ChatOutputDto {
   @Expose({ name: 'id' })
@@ -36,6 +38,23 @@ export class ChatOutputDto {
       dto.bannedAt = userChannel.bannedAt;
       dto.kickedAt = userChannel.kickedAt;
       dto.mutedUntil = userChannel.mutedUntil;
+      dtoList.push(dto);
+    }
+    return dtoList;
+  }
+
+  static fromChannelList(channels: ChannelEntity[], userNickname: string) {
+    const dtoList: ChatOutputDto[] = [];
+
+    for (const channel of channels) {
+      const dto: ChatOutputDto = new ChatOutputDto();
+
+      dto.id = channel.id;
+      dto.name = channel.name;
+      dto.type = channel.type;
+      dto.userAccessType = UserAccessType.NOT_MEMBER;
+      dto.kickedAt = null;
+      dto.mutedUntil = null;
       dtoList.push(dto);
     }
     return dtoList;

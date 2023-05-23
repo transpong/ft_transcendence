@@ -6,4 +6,5 @@ export enum UserAccessType {
   KICKED = 5,
   MUTED = 6,
   BLOCKED = 7,
+  NOT_MEMBER = 8,
 }
