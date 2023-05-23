@@ -140,9 +140,7 @@ export class ChatService {
     await this.permissionCheck(user, channel);
     channel.passwordSalt = await bcrypt.genSalt();
     channel.passwordHash = await bcrypt.hash(password, channel.passwordSalt);
-    if (channel.isPublic()) {
-      channel.type = AccessType.PROTECTED;
-    }
+    channel.type = AccessType.PROTECTED;
     await this.channelRepository.save(channel);
   }
 
