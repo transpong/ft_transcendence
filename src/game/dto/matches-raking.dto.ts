@@ -31,6 +31,7 @@ export class MatchesRakingDto {
     wins: number,
     loses: number,
     score: number,
+    position?: number,
   ): MatchesRakingDto {
     const matchHistoryDto: MatchesRakingDto = new MatchesRakingDto();
 
@@ -41,6 +42,7 @@ export class MatchesRakingDto {
     matchHistoryDto.loses = loses;
     matchHistoryDto.matches = wins + loses;
     matchHistoryDto.score = score;
+    matchHistoryDto.position = position;
     return matchHistoryDto;
   }
 

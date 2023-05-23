@@ -53,8 +53,29 @@ export class GameService {
     const wins: number = this.getWins(matchesHistoryList, nickname);
     const losses: number = this.getLosses(matchesHistoryList, nickname);
     const score: number = this.getScore(matchesHistoryList, nickname);
+    const position: number = await this.getPositionFromUser(user);
 
-    return MatchesRakingDto.toDto(user, wins, losses, score);
+    return MatchesRakingDto.toDto(user, wins, losses, score, position);
+  }
+
+  private async getPositionFromUser(user: UserEntity): Promise<number> {
+    const users: UserEntity[] =
+      await this.userService.getAllUsersThatHaveMatches();
+    const matchesHistoryList: MatchHistoryEntity[] =
+      await this.findAllMatchesHistory();
+    const matchesRakingDtoList: MatchesRakingDto[] = this.getRankingList(
+      users,
+      matchesHistoryList,
+    );
+
+    this.sortRankingList(matchesRakingDtoList);
+    console.log(matchesRakingDtoList);
+
+    const position: number = matchesRakingDtoList.findIndex(
+      (matchRakingDto) => matchRakingDto.nickname === user.nickname,
+    );
+
+    return position + 1;
   }
 
   private getRankingList(
