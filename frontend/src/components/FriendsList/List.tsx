@@ -50,7 +50,7 @@ const List = (props: Props) => {
           textColor: "white",
           borderRadius: "20px"
         }}>
-           <Avatar size="sm" name={avatarUrl(element.avatar)} marginRight={"1vw"}>
+           <Avatar size="sm" src={avatarUrl(element.avatar)} marginRight={"1vw"}>
             <AvatarBadge boxSize="1.25em" bg="green.500" />
           </Avatar>
           <Text fontSize={"15px"} fontWeight={"bold"}>
@@ -72,7 +72,7 @@ const List = (props: Props) => {
           textColor: "white",
           borderRadius: "20px"
         }}>
-          <Avatar size="sm" name={avatarUrl(element.avatar)} marginRight={"1vw"}/>
+          <Avatar size="sm" src={avatarUrl(element.avatar)} marginRight={"1vw"}/>
           <Text fontSize={"15px"} fontWeight={"bold"}>
             {element.nickname}
           </Text>

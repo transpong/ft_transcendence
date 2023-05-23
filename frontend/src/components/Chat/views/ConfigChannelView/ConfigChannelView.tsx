@@ -1,4 +1,5 @@
 import { Button, Flex } from "@chakra-ui/react";
+import { ChannelAccessType, chatService, IChannelChat, UserAccessType } from "../../../../services/chat-service";
 import { ScreensObject } from "../../Chat";
 
 interface Props {
@@ -7,14 +8,21 @@ interface Props {
   >;
   group_type?: number;
   user_access_type?: number;
+  channelInfo?: IChannelChat;
 }
 
-const ConfigChannelView = ({ setScreenNavigation, group_type, user_access_type }: Props) => {
+const ConfigChannelView = ({ setScreenNavigation, group_type, user_access_type, channelInfo }: Props) => {
 
-  const handleChannelUpdate = async () => {
-
-    console.log("data")
+  const handleChannelUpdate = async (type: ChannelAccessType) => {
+    if (channelInfo)
+      await chatService.updateChannelType(channelInfo.id, type);
     setScreenNavigation(1);
+  };
+
+  const handleLeaveChannel = async () => {
+    // if (channelInfo) await chatService.updateChannelType(channelInfo.id, type);
+    // setScreenNavigation(1);
+    // TODO
   };
 
   return (
@@ -24,22 +32,25 @@ const ConfigChannelView = ({ setScreenNavigation, group_type, user_access_type }
       flexDirection="column"
       padding="2"
     >
-      <Button colorScheme={"purple"} onClick={() => setScreenNavigation(4)}>
-        Adicionar Integrantes
-      </Button>
+      {
+        user_access_type == UserAccessType.ADMIN || user_access_type == UserAccessType.OWNER ?
+        <Button colorScheme={"purple"} onClick={() => setScreenNavigation(4)}>
+          Adicionar Integrantes
+        </Button> : null
+      }
       <Button colorScheme={"purple"} onClick={() => setScreenNavigation(3)}>
         Listar Intergrantes
       </Button>
       {
-        user_access_type != 3 ? null :
+        user_access_type != UserAccessType.OWNER ? null :
         (
-          group_type == 2 ?
+          group_type == ChannelAccessType.PROTECTED ?
             <>
               <Flex justifyContent="space-around" h="12vh">
-                <Button colorScheme={"purple"} onClick={handleChannelUpdate} h="100%" w="45%" fontSize="14px">
+                <Button colorScheme={"purple"} onClick={() => handleChannelUpdate(ChannelAccessType.PUBLIC)} h="100%" w="45%" fontSize="14px">
                   Tornar Público
                 </Button>
-                <Button colorScheme={"purple"} onClick={handleChannelUpdate} h="100%" w="45%" fontSize="14px">
+                <Button colorScheme={"purple"} onClick={() => handleChannelUpdate(ChannelAccessType.PRIVATE)} h="100%" w="45%" fontSize="14px">
                   Tornar Privado
                 </Button>
               </Flex>
@@ -47,12 +58,12 @@ const ConfigChannelView = ({ setScreenNavigation, group_type, user_access_type }
                 Configurar Senha
               </Button>
             </>
-          : ( group_type == 3 ?
+          : ( group_type == ChannelAccessType.PRIVATE ?
               <Flex justifyContent="space-around" h="12vh">
                 <Button colorScheme={"purple"} onClick={() => setScreenNavigation(6)} h="100%" w="45%" fontSize="14px">
                   Tornar Protegido
                 </Button>
-                <Button colorScheme={"purple"} onClick={handleChannelUpdate} h="100%" w="45%" fontSize="14px">
+                <Button colorScheme={"purple"} onClick={() => handleChannelUpdate(ChannelAccessType.PUBLIC)} h="100%" w="45%" fontSize="14px">
                   Tornar Público
                 </Button>
               </Flex>
@@ -61,16 +72,16 @@ const ConfigChannelView = ({ setScreenNavigation, group_type, user_access_type }
                 <Button colorScheme={"purple"} onClick={() => setScreenNavigation(6)} h="100%" w="45%" fontSize="14px">
                   Tornar Protegido
                 </Button>
-                <Button colorScheme={"purple"} onClick={handleChannelUpdate} h="100%" w="45%" fontSize="14px">
+                <Button colorScheme={"purple"} onClick={() => handleChannelUpdate(ChannelAccessType.PRIVATE)} h="100%" w="45%" fontSize="14px">
                   Tornar Privado
                 </Button>
               </Flex>
           )
         )
       }
-      <Button colorScheme={"red"} onClick={handleChannelUpdate}>
+      {/* <Button colorScheme={"red"} onClick={handleLeaveChannel}>
         Sair
-      </Button>
+      </Button> */}
     </Flex>
   );
 };

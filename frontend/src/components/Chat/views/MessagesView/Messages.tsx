@@ -1,14 +1,16 @@
 import { useEffect, useRef } from "react";
 import { Avatar, Flex, Text } from "@chakra-ui/react";
-import { IApiDirectMessagesList } from "../../../../services/chat-service";
+import { IApiSender, IMessage } from "../../../../services/chat-service";
 import { avatarUrl } from "../../../../helpers/avatar-url";
+import { useNavigate } from "react-router";
 
 
 interface Props {
-  messages: IApiDirectMessagesList;
+  messages: IMessage[];
+  sender?: IApiSender;
 }
 
-const Messages = ({messages} : Props) => {
+const Messages = ({messages, sender} : Props) => {
   const AlwaysScrollToBottom = () => {
     const elementRef = useRef<HTMLInputElement>(null);
         useEffect(() => {
@@ -18,9 +20,11 @@ const Messages = ({messages} : Props) => {
         return <div ref={elementRef} />;
          };
 
+  const navigate = useNavigate();
+
   return (
     <Flex w="100%" h="80%" overflowY="scroll" flexDirection="column" p="3">
-      {messages.messages.map((item, index) => {
+      {messages.map((item, index) => {
         if (item.am_i_sender) {
           return (
             <Flex key={index} w="100%" justify="flex-end">
@@ -41,9 +45,11 @@ const Messages = ({messages} : Props) => {
           return (
             <Flex key={index} w="100%">
               <Avatar
-                name={messages.user.nickname}
-                src={avatarUrl(messages.user.avatar)}
+                name={sender?.nickname || item.sender?.nickname}
+                src={avatarUrl(sender?.avatar || item.sender?.avatar)}
                 bg="blue.300"
+                onClick={() => navigate(`/home/profile/${sender?.nickname || item.sender?.nickname}`)}
+                cursor="pointer"
               ></Avatar>
               <Flex
                 bg="gray.100"

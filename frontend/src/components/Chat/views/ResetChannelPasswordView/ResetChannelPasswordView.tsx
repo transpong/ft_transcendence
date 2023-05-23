@@ -1,14 +1,16 @@
 import { Button, Input, Flex, Text } from "@chakra-ui/react";
 import { useState } from "react";
+import { chatService, IChannelChat } from "../../../../services/chat-service";
 import { ScreensObject } from "../../Chat";
 
 interface Props {
   setScreenNavigation: React.Dispatch<
     React.SetStateAction<keyof ScreensObject>
   >;
+  channelInfo?: IChannelChat;
 }
 
-const ResetChannelPasswordView = ({ setScreenNavigation }: Props) => {
+const ResetChannelPasswordView = ({ setScreenNavigation, channelInfo }: Props) => {
 
   const [inputPassword, setInputPassword] = useState("");
 
@@ -17,8 +19,10 @@ const ResetChannelPasswordView = ({ setScreenNavigation }: Props) => {
       return;
     }
     const data = inputPassword.trim();
-    console.log(data)
-    setScreenNavigation(1);
+    if (channelInfo) {
+      await chatService.updateChannelPassword(channelInfo.id, data);
+      setScreenNavigation(1);
+    }
   };
 
   return (
@@ -38,7 +42,7 @@ const ResetChannelPasswordView = ({ setScreenNavigation }: Props) => {
         onChange={(e) => setInputPassword(e.target.value)}
       />
       <Button colorScheme={"purple"} onClick={handleSendPassword}>
-        Entrar
+        Atualizar
       </Button>
     </Flex>
   );

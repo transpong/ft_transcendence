@@ -1,14 +1,16 @@
 import { Button, Input, Flex, Text } from "@chakra-ui/react";
 import { useState } from "react";
+import { chatService, IChannelChat } from "../../../../services/chat-service";
 import { ScreensObject } from "../../Chat";
 
 interface Props {
   setScreenNavigation: React.Dispatch<
     React.SetStateAction<keyof ScreensObject>
   >;
+  channelInfo?: IChannelChat;
 }
 
-const AddChannelUsersView = ({ setScreenNavigation }: Props) => {
+const AddChannelUsersView = ({ setScreenNavigation, channelInfo }: Props) => {
 
   const [inputNickname, setInputNickname] = useState("");
 
@@ -17,8 +19,11 @@ const AddChannelUsersView = ({ setScreenNavigation }: Props) => {
       return;
     }
     const data = inputNickname.trim();
-    console.log(data)
-    setScreenNavigation(3);
+    if (channelInfo) {
+      await chatService.addChannelUsers(channelInfo.id, data);
+      setInputNickname("");
+      setScreenNavigation(3);
+    }
   };
 
   return (
@@ -37,7 +42,7 @@ const AddChannelUsersView = ({ setScreenNavigation }: Props) => {
         onChange={(e) => setInputNickname(e.target.value)}
       />
       <Button colorScheme={"purple"} onClick={handleAddUser}>
-        Adiconar
+        Adicionar
       </Button>
     </Flex>
   );

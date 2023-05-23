@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
 import { useState } from "react";
-import { IChannelChat } from "../../services/chat-service";
+import { ChannelAccessType, IChannelChat } from "../../services/chat-service";
 import { IApiUserMe } from "../../services/users-service";
 import Header from "./Header";
 import AddChannelUsersView from "./views/AddChannelUsersView /AddChannelUsersView";
@@ -32,19 +32,38 @@ export interface ScreensObject {
 const Chat = (props: Props) => {
   const [isMinimized, setMinimized] = useState(true);
   const [screenNavigation, setScreenNavigation] =
-    useState<keyof ScreensObject>(props.type == 'group' ? 5 : 1);
+    useState<keyof ScreensObject>(handleInitScreen());
 
   const screensObject: ScreensObject = {
     1: <MessagesView channelInfo={props.channelInfo} directInfo={props.directInfo}/>,
-    2: <ConfigChannelView setScreenNavigation={setScreenNavigation} group_type={props.group_type} user_access_type={props.user_access_type} />,
-    3: <ListChannelUsersView setScreenNavigation={setScreenNavigation} user_access_type={props.user_access_type} />,
-    4: <AddChannelUsersView setScreenNavigation={setScreenNavigation} />,
-    5: <PasswordChannelView setScreenNavigation={setScreenNavigation} />,
-    6: <ResetChannelPasswordView setScreenNavigation={setScreenNavigation} />,
+    2: <ConfigChannelView setScreenNavigation={setScreenNavigation} group_type={props.group_type} user_access_type={props.user_access_type} channelInfo={props.channelInfo} />,
+    3: <ListChannelUsersView setScreenNavigation={setScreenNavigation} user_access_type={props.user_access_type} channelInfo={props.channelInfo} />,
+    4: <AddChannelUsersView setScreenNavigation={setScreenNavigation} channelInfo={props.channelInfo} />,
+    5: <PasswordChannelView setScreenNavigation={setScreenNavigation} channelInfo={props.channelInfo} />,
+    6: <ResetChannelPasswordView setScreenNavigation={setScreenNavigation} channelInfo={props.channelInfo} />,
   };
 
   const minimize = () => setMinimized(!isMinimized);
   const getStatusMinimized = () => isMinimized;
+
+  function handleInitScreen () {
+    if (props.channelInfo) {
+      switch (props.channelInfo.type) {
+        case ChannelAccessType.PUBLIC:
+          return 1;
+        case ChannelAccessType.PRIVATE:
+          return 1;
+        case ChannelAccessType.PROTECTED:
+          return 5;
+        default:
+          // eslint-disable-next-line no-case-declarations
+          const exaustiveCheck: never = props.channelInfo.type;
+          return exaustiveCheck;
+      }
+
+    }
+    return 1;
+  }
 
   return (
     <Flex justify="end" backgroundColor={"white"} marginLeft={"2vh"} borderTopRadius={"30px"}>

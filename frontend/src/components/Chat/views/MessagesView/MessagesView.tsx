@@ -1,27 +1,57 @@
-import { Fragment, useMemo, useState } from "react";
-import { chatService, IApiDirectMessagesList, IChannelChat } from "../../../../services/chat-service";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { chatService, IApiSender, IChannelChat, IMessage } from "../../../../services/chat-service";
 import { IApiUserMe } from "../../../../services/users-service";
 import Divider from "../../Divider";
 import Footer from "./Footer";
 import Messages from "./Messages";
 
 interface Props {
-  channelInfo?: IChannelChat
+  channelInfo?: IChannelChat;
   directInfo?: IApiUserMe; // TODO: change IApiUserMe when back implements it
 }
 
 const MessagesView = (props: Props) => {
-  const [messages, setMessages] = useState<IApiDirectMessagesList>();
+  const [messages, setMessages] = useState<IMessage[]>();
   const [inputMessage, setInputMessage] = useState("");
+  const [sender, setSender] = useState<IApiSender>();
 
   useMemo(async () => {
     if (props.directInfo) {
       const messagesList = await chatService.getDirectMessages(
         props.directInfo.nickname
       );
+      setMessages(messagesList.messages);
+      setSender(messagesList.user);
+    }
+
+    if (props.channelInfo) {
+      const messagesList = await chatService.getChannelMessages(
+        props.channelInfo.id
+      );
       setMessages(messagesList);
     }
-  }, [props.directInfo]);
+  }, [props.directInfo, props.channelInfo]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (props.directInfo) {
+        chatService.getDirectMessages(
+          props.directInfo.nickname
+        ).then(messagesList => {
+          setMessages(messagesList.messages);
+          setSender(messagesList.user);
+        })
+      }
+
+      if (props.channelInfo) {
+        chatService.getChannelMessages(
+          props.channelInfo.id
+        ).then(messagesList => setMessages(messagesList))
+      }
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
 
   const handleSendMessage = async () => {
@@ -31,13 +61,22 @@ const MessagesView = (props: Props) => {
       const messagesList = await chatService.getDirectMessages(
         props.directInfo.nickname
       );
+      setMessages(messagesList.messages);
+    }
+
+    if (props.channelInfo) {
+      await chatService.sendChannelMessages(props.channelInfo.id, inputMessage);
+      setInputMessage("");
+      const messagesList = await chatService.getChannelMessages(
+        props.channelInfo.id
+      );
       setMessages(messagesList);
     }
   };
 
   return (
           <Fragment>
-            {messages && <Messages messages={messages} />}
+            {messages && <Messages messages={messages} sender={sender}/>}
             <Divider />
             <Footer
               inputMessage={inputMessage}

@@ -1,6 +1,7 @@
 import {MinusIcon, AddIcon, CloseIcon } from "@chakra-ui/icons";
 import { Flex, Avatar, AvatarBadge, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router";
+import { avatarUrl } from "../../helpers/avatar-url";
 import { IChannelChat } from "../../services/chat-service";
 import { IApiUserMe } from "../../services/users-service";
 import { ScreensObject } from "./Chat";
@@ -31,7 +32,7 @@ const Header = (props: Props) => {
   return (
     <Flex paddingBottom={"10px"} paddingTop={"1px"} backgroundColor={"#805AD5"} borderTopRadius={"20px"} justifyContent="space-between">
       <Flex w={"60%"} onClick={handleNameClick}>
-      <Avatar size="md" name={props.name}>
+      <Avatar size="md" name={props.name} src={props.directInfo ? avatarUrl(props.directInfo.avatar) : undefined}>
         <AvatarBadge boxSize="1.25em" bg="green.500" />
       </Avatar>
       <Flex flexDirection="column" mx="5" justify="center">
