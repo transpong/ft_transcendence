@@ -42,7 +42,8 @@ const Header = (props: Props) => {
       </Flex>
       </Flex>
       <Flex align={"center"} >
-        <HeaderNavgation type={props.type} screenNavigation={props.screenNavigation} setScreenNavigation={props.setScreenNavigation} />
+        <HeaderNavgation type={props.type} screenNavigation={props.screenNavigation} setScreenNavigation={props.setScreenNavigation}
+          channelInfo={props.channelInfo} directInfo={props.directInfo}/>
         {
           (props.getStatusMinimized() ?
           <MinusIcon  cursor={"pointer"} onClick={() => props.minimized()}/> :

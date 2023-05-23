@@ -1,11 +1,15 @@
 import { SettingsIcon, ChatIcon } from "@chakra-ui/icons";
 import { Button, Box } from "@chakra-ui/react";
 import { useState } from "react";
+import { IChannelChat } from "../../services/chat-service";
+import { IApiUserMe, userService } from "../../services/users-service";
 import { ScreensObject } from "./Chat";
 
 type Props = {
   type: "group" | "individual";
   screenNavigation: number;
+  channelInfo?: IChannelChat;
+  directInfo?: IApiUserMe; // TODO: change IApiUserMe when back implements it
   setScreenNavigation: React.Dispatch<
     React.SetStateAction<keyof ScreensObject>
   >;
@@ -15,11 +19,17 @@ const HeaderNavgation = (props: Props) => {
   const [isBlocked, setIsBlocked] = useState(false);
 
   const blockUser = async () => {
-    setIsBlocked(true);
+    if (props.directInfo) {
+      userService.blockUser(props.directInfo.nickname);
+      setIsBlocked(true);
+    }
   }
 
   const unblockUser = async () => {
-    setIsBlocked(false);
+    if (props.directInfo) {
+      userService.unblockUser(props.directInfo.nickname);
+      setIsBlocked(false);
+    }
   };
 
   return (
