@@ -8,13 +8,10 @@ export class GameController {
   constructor(private readonly gameService: GameService) {}
 
   @Get('matches-history')
-  getMatchesHistory(): Promise<MatchesHistoryDto[]> {
-    return this.gameService.getMatchesHistory();
-  }
-
-  @Get('matches-history')
   getMatchesHistoryFromUser(@Query() nickname): Promise<MatchesHistoryDto[]> {
-    return this.gameService.getMatchesHistoryFromUser(nickname);
+    if (nickname) return this.gameService.getMatchesHistoryFromUser(nickname);
+
+    return this.gameService.getMatchesHistory();
   }
 
   @Get('ranking')

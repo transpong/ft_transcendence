@@ -1,8 +1,8 @@
 import { ChatOutputDto } from './chat-output.dto';
 import { UsersChannelsEntity } from '../../entity/user-channels.entity';
 import { Expose } from '@nestjs/class-transformer';
-import { UserDto } from '../../../user/dto/user.dto';
 import { UserEntity } from '../../../user/entity/user.entity';
+import { UserProfileDto } from '../../../user/dto/user-profile.dto';
 
 export class ChannelOutputDto {
   @Expose({ name: 'channels' })
@@ -12,10 +12,10 @@ export class ChannelOutputDto {
   otherChannels: ChatOutputDto[];
 
   @Expose({ name: 'friends' })
-  friends: UserDto[];
+  friends: UserProfileDto[];
 
   @Expose({ name: 'other_users' })
-  otherUsers: UserDto[];
+  otherUsers: UserProfileDto[];
 
   static getChats(
     user: UserEntity,
@@ -30,10 +30,10 @@ export class ChannelOutputDto {
     channelOutputDto.otherChannels =
       ChatOutputDto.fromUsersChannelsList(unrelated);
     channelOutputDto.friends = user.friends.map((friend) =>
-      UserDto.fromEntity(friend),
+      UserProfileDto.fromEntity(user, friend),
     );
     channelOutputDto.otherUsers = otherUsers.map((otherUser) =>
-      UserDto.fromEntity(otherUser),
+      UserProfileDto.fromEntity(user, otherUser),
     );
     return channelOutputDto;
   }

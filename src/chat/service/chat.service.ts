@@ -382,7 +382,13 @@ export class ChatService {
           channel: { type: AccessType.PUBLIC, id: Not(In(userChannelIds)) },
         },
       ],
-      relations: ['user', 'channel'],
+      relations: [
+        'user',
+        'user.friends',
+        'user.blocks',
+        'user.blockedBy',
+        'channel',
+      ],
     });
   }
 
@@ -391,7 +397,13 @@ export class ChatService {
   ): Promise<UsersChannelsEntity[]> {
     return await this.usersChannelsRepository.find({
       where: { user: { ftId: ftId }, bannedAt: null },
-      relations: ['user', 'channel'],
+      relations: [
+        'user',
+        'user.friends',
+        'user.blocks',
+        'user.blockedBy',
+        'channel',
+      ],
     });
   }
 
