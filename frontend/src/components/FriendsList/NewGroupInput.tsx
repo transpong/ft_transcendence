@@ -8,10 +8,10 @@ const NewGroupInput = () => {
   const handleCreateChannel = async () => {
       await chatService.createChannel({
         name: channelName,
-        password: "a",
-        type: ChannelAccessType.PUBLIC,
+        type: ChannelAccessType.PRIVATE,
       });
 
+      window.location.reload()
   };
 
   return (

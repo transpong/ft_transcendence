@@ -1,22 +1,22 @@
 import { AxiosInstance } from "axios";
 import { apiService } from "./api";
-import { IApiUserMe } from "./users-service";
+import { IUserProfile } from "./users-service";
 
 export interface IChatList {
   channels: IChannelChat[];
-  otherChannels: IChannelChat[];
-  friends: IApiUserMe[]; // TODO change it when backend fix
-  otherUsers: IApiUserMe[];
+  other_channels: IChannelChat[];
+  friends: IUserProfile[];
+  other_users: IUserProfile[];
 }
 
 export interface IChannelChat {
   id: number;
   name: string;
   type: ChannelAccessType;
-  userAccessType: UserAccessType;
-  bannedAt: Date;
-  kickedAt: Date;
-  mutedUntil: Date;
+  user_access_type: UserAccessType;
+  banned_at: Date;
+  kicked_at: Date;
+  muted_until: Date;
 }
 
 export enum UserAccessType {
@@ -42,7 +42,7 @@ export interface IApiDirectMessagesList {
 
 export interface IApiSender {
   id: number;
-  ftId: string;
+  ft_id: string;
   nickname: string;
   avatar: string;
   status: number;
@@ -58,7 +58,7 @@ export interface IMessage {
 
 interface IChatToCreate {
   name: string;
-  password: string;
+  password?: string;
   type: number;
 }
 

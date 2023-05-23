@@ -16,7 +16,14 @@ export interface IUserProfile {
   avatar: string;
   is_friend: boolean;
   is_blocked: boolean;
-  status: number;
+  status: UserEnum;
+}
+
+export enum UserEnum {
+  ONLINE = 0,
+  OFFLINE = 1,
+  ONGAME = 2,
+  INLOBBY = 3,
 }
 
 export class UsersService {

@@ -1,7 +1,7 @@
 import { Flex } from "@chakra-ui/react";
 import { useState } from "react";
 import { ChannelAccessType, IChannelChat } from "../../services/chat-service";
-import { IApiUserMe } from "../../services/users-service";
+import { IUserProfile } from "../../services/users-service";
 import Header from "./Header";
 import AddChannelUsersView from "./views/AddChannelUsersView /AddChannelUsersView";
 import ConfigChannelView from "./views/ConfigChannelView/ConfigChannelView";
@@ -16,7 +16,7 @@ type Props = {
   group_type?: number;
   user_access_type?: number;
   channelInfo?: IChannelChat;
-  directInfo?: IApiUserMe; // TODO: change IApiUserMe when back implements it
+  directInfo?: IUserProfile;
   deleteChat: () => void;
 };
 

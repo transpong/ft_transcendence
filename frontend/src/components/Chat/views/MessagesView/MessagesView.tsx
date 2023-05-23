@@ -1,13 +1,13 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { chatService, IApiSender, IChannelChat, IMessage } from "../../../../services/chat-service";
-import { IApiUserMe } from "../../../../services/users-service";
+import { IUserProfile } from "../../../../services/users-service";
 import Divider from "../../Divider";
 import Footer from "./Footer";
 import Messages from "./Messages";
 
 interface Props {
   channelInfo?: IChannelChat;
-  directInfo?: IApiUserMe; // TODO: change IApiUserMe when back implements it
+  directInfo?: IUserProfile;
 }
 
 const MessagesView = (props: Props) => {

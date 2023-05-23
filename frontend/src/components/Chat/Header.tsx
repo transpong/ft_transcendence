@@ -1,9 +1,11 @@
 import {MinusIcon, AddIcon, CloseIcon } from "@chakra-ui/icons";
-import { Flex, Avatar, AvatarBadge, Text } from "@chakra-ui/react";
+import { Flex, Avatar, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router";
 import { avatarUrl } from "../../helpers/avatar-url";
 import { IChannelChat } from "../../services/chat-service";
-import { IApiUserMe } from "../../services/users-service";
+import { IUserProfile } from "../../services/users-service";
+import UserBadageStatus from "../UserStatus/UserBadgeStatus";
+import UserTextStatus from "../UserStatus/UserTextStatus";
 import { ScreensObject } from "./Chat";
 import HeaderNavgation from "./HeaderNavigation";
 
@@ -15,7 +17,7 @@ type Props = {
   deleteChat: () => void;
   screenNavigation: number;
   channelInfo?: IChannelChat;
-  directInfo?: IApiUserMe; // TODO: change IApiUserMe when back implements it
+  directInfo?: IUserProfile;
   setScreenNavigation: React.Dispatch<
     React.SetStateAction<keyof ScreensObject>
   >;
@@ -33,13 +35,13 @@ const Header = (props: Props) => {
     <Flex paddingBottom={"10px"} paddingTop={"1px"} backgroundColor={"#805AD5"} borderTopRadius={"20px"} justifyContent="space-between">
       <Flex w={"60%"} onClick={handleNameClick}>
       <Avatar size="md" name={props.name} src={props.directInfo ? avatarUrl(props.directInfo.avatar) : undefined}>
-        <AvatarBadge boxSize="1.25em" bg="green.500" />
+        { props.directInfo ? <UserBadageStatus status={props.directInfo.status} /> : null }
       </Avatar>
       <Flex flexDirection="column" mx="5" justify="center">
         <Text color={"white"} fontSize="sm" fontWeight="bold">
           {props.name}
         </Text>
-        <Text fontSize={"small"} color="green.500" fontWeight={"extrabold"}>Online</Text>
+        { props.directInfo ? <UserTextStatus status={props.directInfo.status} /> : null }
       </Flex>
       </Flex>
       <Flex align={"center"} >
