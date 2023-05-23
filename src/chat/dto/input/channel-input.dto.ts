@@ -5,8 +5,6 @@ export class ChannelInputDto {
   @IsString()
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
   password: string;
 
   @IsNotEmpty()
