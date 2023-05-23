@@ -120,6 +120,12 @@ export class ChatService {
     if (channel.isPublic()) {
       channel.deletePassword();
     }
+    if (channel.isProtected() && !channel.isPasswordProtected()) {
+      throw new HttpException(
+        'Protected channel must have a password',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     await this.channelRepository.save(channel);
   }
 
