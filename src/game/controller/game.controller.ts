@@ -8,8 +8,10 @@ export class GameController {
   constructor(private readonly gameService: GameService) {}
 
   @Get('matches-history')
-  getMatchesHistoryFromUser(@Query() nickname): Promise<MatchesHistoryDto[]> {
-    if (nickname) return this.gameService.getMatchesHistoryFromUser(nickname);
+  getMatchesHistoryFromUser(
+    @Query('nickname') nickname?: string,
+  ): Promise<MatchesHistoryDto[]> {
+    if (nickname) return this.gameService.getMatchesHistoryFromUser(nickname); //partial, missing @Query('nickname')
 
     return this.gameService.getMatchesHistory();
   }
