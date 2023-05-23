@@ -24,11 +24,11 @@ export class ChannelEntity {
   @Column({ name: 'name' })
   name: string;
 
-  @Column({ name: 'password_hash' })
-  passwordHash: string;
+  @Column({ name: 'password_hash', nullable: true })
+  passwordHash?: string;
 
-  @Column({ name: 'password_salt' })
-  passwordSalt: string;
+  @Column({ name: 'password_salt', nullable: true })
+  passwordSalt?: string;
 
   @Column({ name: 'type' })
   type: number;

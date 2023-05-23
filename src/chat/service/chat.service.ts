@@ -134,7 +134,9 @@ export class ChatService {
     await this.permissionCheck(user, channel);
     channel.passwordSalt = await bcrypt.genSalt();
     channel.passwordHash = await bcrypt.hash(password, channel.passwordSalt);
-    channel.type = AccessType.PROTECTED;
+    if (channel.isPublic()) {
+      channel.type = AccessType.PROTECTED;
+    }
     await this.channelRepository.save(channel);
   }
 
@@ -480,13 +482,23 @@ export class ChatService {
 
     channel.name = inputDto.name;
     channel.type = inputDto.type;
-    channel.passwordSalt = await bcrypt.genSalt();
-    channel.passwordHash = await bcrypt.hash(
-      inputDto.password,
-      channel.passwordSalt,
-    );
     channel.users_channels = [];
     channel.channel_messages = [];
+
+    if (inputDto.type === AccessType.PROTECTED && !inputDto.password) {
+      throw new HttpException(
+        'Password is required for protected channels',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (inputDto.password) {
+      channel.passwordSalt = await bcrypt.genSalt();
+      channel.passwordHash = await bcrypt.hash(
+        inputDto.password,
+        channel.passwordSalt,
+      );
+    }
     return channel;
   }
 
