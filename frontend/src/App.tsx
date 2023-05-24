@@ -15,17 +15,17 @@ import Game from './scenes/Game/Game';
 function App() {
   return (
     <>
-      <ChakraProvider>
+      <ChakraProvider toastOptions={{ defaultOptions: { position: "bottom" } }}>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LoginView />} />
             <Route path="/nickname" element={<CreateNickNameLogin />} />
             <Route path="/2FA" element={<TwoFactorAuthenticationLogin />} />
-            <Route path="/home/" element={ <HomeView/> } >
+            <Route path="/home/" element={<HomeView />}>
               <Route path="ranking" element={<Ranking />} />
               <Route path="matches" element={<MachesHistory />} />
               <Route path="me/" element={<Me />}>
-                <Route path="mfa" element={<MFA />}/>
+                <Route path="mfa" element={<MFA />} />
               </Route>
               <Route path="profile/:user" element={<Profile />} />
               <Route path="game" element={<Game />} />

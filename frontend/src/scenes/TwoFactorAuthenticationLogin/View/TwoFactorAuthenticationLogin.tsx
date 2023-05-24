@@ -13,12 +13,18 @@ export default function TwoFactorAuthenticationLogin(){
     async function handleMfaValidation() {
       setIsUploading(true);
 
-      await userService.validateMfa(value);
-
-      setTimeout(() => {
-        setIsUploading(false);
-        navigate("/home");
-      }, 1000);
+      try {
+        await userService.validateMfa(value);
+        setTimeout(() => {
+          setIsUploading(false);
+          navigate("/home");
+        }, 1000);
+      } catch {
+        setTimeout(() => {
+          setIsUploading(false);
+          setValue("");
+        }, 1000);
+      }
     }
     return(
         <Flex h={"100vh"} align={"center"} justify={"center"}>

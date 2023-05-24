@@ -14,12 +14,18 @@ export default function Me(){
   async function handleMfaValidation() {
     setIsUploading(true);
 
-    await userService.validateMfa(inputMessage);
-
-    setTimeout(() => {
-      setIsUploading(false);
-      navigate("/home/me")
-    }, 1000);
+    try {
+      await userService.validateMfa(inputMessage);
+      setTimeout(() => {
+        setIsUploading(false);
+        navigate("/home/me")
+      }, 1000);
+    } catch {
+      setTimeout(() => {
+        setIsUploading(false);
+        setInputMessage("");
+      }, 1000);
+    }
   }
 
   return (

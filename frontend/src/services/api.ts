@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import pino from 'pino';
 import { getCookie } from '../helpers/get-cookie';
+import { createStandaloneToast } from "@chakra-ui/react";
 
 class ApiService {
   private axios: AxiosInstance;
@@ -16,6 +17,9 @@ class ApiService {
     });
     this.logger = pino();
     const logger = this.logger;
+
+    const { toast } = createStandaloneToast();
+
 
     this.axios.interceptors.response.use(
       function (response) {
@@ -43,6 +47,13 @@ class ApiService {
           },
           "RequestService > response error"
         );
+
+        toast({
+          title: error.response?.data?.message || error.message || 'Unhandled Error',
+          status: error.response?.status && error.response?.status >= 400 && error.response?.status < 500 ? "warning" : "error",
+          duration: 9000,
+          isClosable: true,
+        });
 
         return Promise.reject(error);
       }

@@ -14,12 +14,19 @@ export default function CreateNickNameLoginView(){
 
     async function handleNicknameUpdate() {
       setIsUploading(true);
-      await userService.updateNickname(value)
 
-      setTimeout(()=> {
-        setIsUploading(false);
-        navigate("/home");
-      })
+      try {
+        await userService.updateNickname(value)
+        setTimeout(() => {
+          setIsUploading(false);
+          navigate("/home");
+        }, 1000);
+      } catch {
+        setTimeout(() => {
+          setIsUploading(false);
+          setValue("");
+        }, 1000);
+      }
     }
 
     return(

@@ -51,11 +51,13 @@ export default function Me(){
 
     photoFormData.append("file", file);
 
-    await userService.uploadAvatar(photoFormData);
+    try {
+      await userService.uploadAvatar(photoFormData);
+      window.location.reload()
+    } catch {
+      setIsUploading(false);
+    }
 
-    setIsUploading(false);
-
-    window.location.reload()
   }
 
   async function handleMfaActivation() {
