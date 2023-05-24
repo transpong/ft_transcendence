@@ -24,6 +24,9 @@ export class PongService {
   private timerDuration = 10; // Duration of the game in seconds
   private timer = this.timerDuration; // Current value of the timer
 
+  private roomNameTmp;
+  private serverTmp;
+
   movePlayer1Up(): void {
     if (this.player1Y >= this.paddleSpeed) {
       this.player1Y -= this.paddleSpeed;
@@ -96,11 +99,13 @@ export class PongService {
 
   startGameLoop(roomName: string, server: any): void {
     if (!this.gameLoopInterval) {
+      this.roomNameTmp = roomName;
+      this.serverTmp = server;
       // Start the game loop
       this.gameLoopInterval = setInterval(() => {
         this.updateGameState();
         const gameState = this.getGameState();
-        server.to(roomName).emit('pong', gameState);
+        this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
       }, 1000 / 60); // Update the game state approximately 60 times per second
       // Start the timer
       this.startTimer();
@@ -114,6 +119,8 @@ export class PongService {
 
       // Stop the timer
       this.stopTimer();
+      // const gameState = this.getGameState();
+      this.serverTmp.to(this.roomNameTmp ).emit('endGame', 'Acabouuuuu');
     }
   }
 
