@@ -4,6 +4,7 @@ import p5Types from "p5"; //Import this for typechecking and intellisense
 import { useOutletContext } from "react-router-dom";
 import io from 'socket.io-client';
 import { getCookie } from '../../helpers/get-cookie';
+import { P } from "pino";
 // import { GameBackEnd } from "./Testes.tsx";
 
 interface ComponentProps {
@@ -11,8 +12,6 @@ interface ComponentProps {
 }
 
 type Props = {
-    canvasWidth: number
-    canvasHeight: number
     ballX: number
     ballY: number
     player1Score: number
@@ -28,10 +27,18 @@ let player2: Player;
 let game: Game;
 let windowWidth = 0
 let windowHeight = 0
+let scalingFactor = 0
 let canvasParent: Element
 let parentBorderWidth = 0
-let gameInfo: Props
-// let gameBackEnd: GameBackEnd | null = null;
+let gameInfo: Props = {
+    ballX: 0,
+    ballY: 0,
+    player1Score: 0,
+    player1Y: 0,
+    player2Score: 0,
+    player2Y: 0,
+    timer: 0,
+  };
 
 class Game {
     isRunning;
@@ -75,7 +82,7 @@ class Player{
     speedY = 2;
     p5;
     constructor(p5Origin: p5Types, idPlayer: number) {
-        this.widthPlayer = 20;
+        this.widthPlayer = 20 * scalingFactor;
         this.heightPlayer = windowHeight * 0.1;
         this.id = idPlayer;
         if(idPlayer == 1){
@@ -154,8 +161,8 @@ class Ball{
 
     printBall() {
         this.p5.circle( this.positionX, this.positionY, this.diameterBall);
-        this.positionX += this.speedX;
-        this.positionY += this.speedX;
+        this.positionX = gameInfo.ballX;
+        this.positionY = gameInfo.ballY;
         return this.checkBorder();
     }
 
@@ -300,11 +307,12 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
                 game.scoreP1 = gameInfo.player1Score;
                 game.scoreP2 = gameInfo.player2Score;
             }
-            console.log("Pong info: ", gameInfo);
+            // console.log("Pong info: ", gameInfo);
             // console.log('Received message PONG:', message);
         });
 
-        socket.on('endGame', (message: string) => {
+        socket.on('endGame', (message: Props) => {
+            gameInfo = message;
             socket.emit('endGame');
             console.log('Game Over:', message);
             socket.disconnect();
@@ -313,6 +321,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParentRef.clientHeight) -  canvasParentRef.clientHeight
         windowHeight = ref.current ? ref.current.clientHeight - parentBorderWidth : canvasParentRef.clientHeight
         windowWidth = ref.current ? ref.current.clientWidth - parentBorderWidth : canvasParentRef.clientWidth
+        scalingFactor = Math.min(windowWidth / 800, windowHeight  / 600);
         p5.createCanvas(windowWidth , windowHeight).parent(canvasParentRef);
         canvasParent = canvasParentRef
         ball = new Ball(p5)
@@ -327,7 +336,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         p5.background(0);
         player1.printPlayer();
         player2.printPlayer();
-        if(game.isRunning){
+        if(gameInfo.timer > 0){
+            console.log("Timer: ", gameInfo.timer)
             buttonStart?.destroy()
             score?.destroy()
             ball.printBall();
@@ -340,6 +350,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
             ball.checkPlayerCollision(player1)
             ball.checkPlayerCollision(player2)
         }else{
+            // console.log("width: ", windowWidth, "Height: ", windowHeight)
             if (oldScoreP1 != game.scoreP1 || oldScoreP2 != game.scoreP2) {
                     p5.removeElements();
                     oldScoreP1 = game.scoreP1;
