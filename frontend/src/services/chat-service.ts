@@ -151,6 +151,9 @@ export class ChatService {
     await this.api.delete(`/chat/channels/${chatId}/leave`);
   }
 
+  async removeUserFromChannel(chatId: number, nickname: string): Promise<void> {
+    await this.api.delete(`/chat/channels/${chatId}/users/${nickname}`);
+  }
 }
 
 export const chatService = new ChatService();

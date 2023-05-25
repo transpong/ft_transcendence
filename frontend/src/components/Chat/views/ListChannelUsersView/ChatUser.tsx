@@ -27,7 +27,10 @@ const ChatUser = ({ user , user_access_type, channelInfo, setScreenNavigation }:
 
   const handleUserRestrictions = async (nickname: string, restriction: UserAccessRestrictions) => {
     if (channelInfo) {
-      await chatService.updateUserChannelRestrictions(channelInfo.id, nickname, restriction);
+      if (restriction === UserAccessRestrictions.KICK)
+        await chatService.removeUserFromChannel(channelInfo.id, nickname);
+      else
+        await chatService.updateUserChannelRestrictions(channelInfo.id, nickname, restriction);
       setScreenNavigation(2);
     }
   };
