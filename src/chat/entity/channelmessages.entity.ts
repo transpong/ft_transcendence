@@ -26,6 +26,8 @@ export class ChannelMessagesEntity {
   @ManyToOne(() => UserEntity, (user) => user.id)
   user: UserEntity;
 
-  @ManyToOne(() => ChannelEntity, (channel) => channel.channel_messages)
+  @ManyToOne(() => ChannelEntity, (channel) => channel.channel_messages, {
+    onDelete: 'CASCADE',
+  })
   channel: ChannelEntity;
 }

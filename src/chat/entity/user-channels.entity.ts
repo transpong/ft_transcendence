@@ -35,7 +35,9 @@ export class UsersChannelsEntity {
   @ManyToOne(() => UserEntity, (user) => user.usersChannels)
   user: UserEntity;
 
-  @ManyToOne(() => ChannelEntity, (channel) => channel.users_channels)
+  @ManyToOne(() => ChannelEntity, (channel) => channel.users_channels, {
+    onDelete: 'CASCADE',
+  })
   channel: ChannelEntity;
 
   updateRestriction(restriction: string): void {
