@@ -377,7 +377,6 @@ export class ChatService {
     const usersNotFriends: UserEntity[] =
       await this.userService.getNotFriendsByFtId(user);
 
-    console.log(unrelatedPublicChannels);
     return ChannelOutputDto.getChats(
       user,
       usersNotFriends,
