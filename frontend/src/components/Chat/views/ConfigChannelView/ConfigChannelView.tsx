@@ -20,9 +20,10 @@ const ConfigChannelView = ({ setScreenNavigation, group_type, user_access_type, 
   };
 
   const handleLeaveChannel = async () => {
-    // if (channelInfo) await chatService.updateChannelType(channelInfo.id, type);
-    // setScreenNavigation(1);
-    // TODO
+    if (channelInfo) {
+      await chatService.leaveChannel(channelInfo.id);
+      window.location.reload();
+    }
   };
 
   return (
@@ -79,9 +80,9 @@ const ConfigChannelView = ({ setScreenNavigation, group_type, user_access_type, 
           )
         )
       }
-      {/* <Button colorScheme={"red"} onClick={handleLeaveChannel}>
+      <Button colorScheme={"red"} onClick={handleLeaveChannel}>
         Sair
-      </Button> */}
+      </Button>
     </Flex>
   );
 };

@@ -146,6 +146,11 @@ export class ChatService {
   async updateUserChannelRestrictions(chatId: number, nickname: string, restriction: UserAccessRestrictions): Promise<void> {
     await this.api.patch(`/chat/channels/${chatId}/users/${nickname}/restrictions`, { restriction });
   }
+
+  async leaveChannel(chatId: number): Promise<void> {
+    await this.api.delete(`/chat/channels/${chatId}/leave`);
+  }
+
 }
 
 export const chatService = new ChatService();
