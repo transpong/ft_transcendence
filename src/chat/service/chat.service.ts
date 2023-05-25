@@ -356,6 +356,77 @@ export class ChatService {
     }
   }
 
+  async leaveChannel(ftId: string, channelId: number): Promise<void> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+
+    if (!channel.hasUser(user.nickname)) {
+      throw new HttpException('User is not in channel', HttpStatus.NOT_FOUND);
+    }
+
+    if (channel.userIsOwner(user.nickname)) {
+      await this.assignOwner(channel);
+    }
+
+    const userChannel: UsersChannelsEntity = channel.getUserChannel(
+      user.nickname,
+    );
+
+    await this.usersChannelsRepository.remove(userChannel);
+  }
+
+  async assignOwner(channelEntity: ChannelEntity) {
+    if (channelEntity.hasAdmin()) {
+      await this.assignOldestAdminAsOwner(channelEntity);
+    } else if (channelEntity.hasMember()) {
+      await this.assignOldestMemberAsOwner(channelEntity);
+    } else {
+      await this.deleteChannel(channelEntity);
+    }
+  }
+
+  private async assignOldestAdminAsOwner(channelEntity: ChannelEntity) {
+    const oldestAdmin: UsersChannelsEntity =
+      await this.usersChannelsRepository.findOne({
+        where: [
+          {
+            channel: { id: channelEntity.id },
+            userAccessType: UserAccessType.ADMIN,
+          },
+        ],
+        order: {
+          createdAt: 'ASC',
+        },
+        relations: ['user', 'channel'],
+      });
+
+    oldestAdmin.userAccessType = UserAccessType.OWNER;
+    await this.usersChannelsRepository.save(oldestAdmin);
+  }
+
+  private async assignOldestMemberAsOwner(channelEntity: ChannelEntity) {
+    const oldestMember: UsersChannelsEntity =
+      await this.usersChannelsRepository.findOne({
+        where: [
+          {
+            channel: { id: channelEntity.id },
+            userAccessType: UserAccessType.MEMBER,
+          },
+        ],
+        order: {
+          createdAt: 'ASC',
+        },
+        relations: ['user', 'channel'],
+      });
+
+    oldestMember.userAccessType = UserAccessType.OWNER;
+    await this.usersChannelsRepository.save(oldestMember);
+  }
+
+  private async deleteChannel(channelEntity: ChannelEntity) {
+    await this.channelRepository.remove(channelEntity);
+  }
+
   private async enterProtectedChannel(
     user: UserEntity,
     channel: ChannelEntity,

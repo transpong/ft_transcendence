@@ -172,4 +172,9 @@ export class ChatController {
   ): Promise<MessageDirectOutputDto> {
     return await this.chatService.getDirectMessages(req.user.ftLogin, nickname);
   }
+
+  @Delete('channels/:channelId/leave')
+  async leaveChannel(@Req() req, @Param('channelId') channelId: number) {
+    await this.chatService.leaveChannel(req.user.ftLogin, channelId);
+  }
 }
