@@ -1,8 +1,10 @@
 import { Button, Flex, Text, Avatar } from "@chakra-ui/react";
+import { Icon } from "@chakra-ui/icon";
 import { useNavigate } from "react-router";
 import { avatarUrl } from "../../../../helpers/avatar-url";
 import { chatService, IApiChannelUsers, IChannelChat, UserAccessRestrictions, UserAccessType } from "../../../../services/chat-service";
 import { ScreensObject } from "../../Chat";
+import { FaCrown } from "react-icons/fa";
 
 interface Props {
   user: IApiChannelUsers;
@@ -50,6 +52,9 @@ const ChatUser = ({ user , user_access_type, channelInfo, setScreenNavigation }:
       <Text ml="3" fontWeight="bold" w="40%" onClick={() => navigate(`/home/profile/${user.nickname}`)} cursor="pointer">
         {user.nickname}
       </Text>
+      {
+        (user.user_access_type == UserAccessType.OWNER) && <Icon  as={FaCrown} color="yellow" boxSize="2em" />
+      }
       {
         user_access_type != user.user_access_type && (user_access_type == UserAccessType.OWNER || (user_access_type == UserAccessType.ADMIN && user.user_access_type != UserAccessType.OWNER )) ?
         <>
