@@ -1,4 +1,4 @@
-import { Avatar, Divider, Flex, Text } from "@chakra-ui/react";
+import { Avatar, Divider, Flex, Text, useToast, IconButton } from "@chakra-ui/react";
 import { RiSpyFill, RiTeamFill, RiUserFill  } from 'react-icons/ri'
 import Chat from "../Chat/Chat";
 import { useNavigate } from "react-router";
@@ -6,7 +6,9 @@ import { IChatList } from "../../services/chat-service";
 import { avatarUrl } from "../../helpers/avatar-url";
 import UserBadageStatus from "../UserStatus/UserBadgeStatus";
 import ChannelTypeIcon from "../ChannelTypeIcon/ChannelTypeIcon";
-
+import { Icon } from "@chakra-ui/icons";
+import { GiGamepad } from "react-icons/gi";
+import { GameInviteToast } from "../Toasts/GameInviteToast/GameInviteToast";
 
 type Props = {
   list: IChatList;
@@ -16,6 +18,16 @@ type Props = {
 
 const List = (props: Props) => {
   const navigate = useNavigate();
+  const toast = useToast();
+
+  async function handleGameInvite(nickname: string) {
+    // TODO this should happens for user that received invitation - the user who invites probably will be automatically redirect to game
+    !toast.isActive(nickname) &&
+      toast({
+        id: nickname,
+        render: () => ( <GameInviteToast nickname={nickname} toast={toast} navigate={navigate} />),
+      });
+  }
 
   return (
     <Flex w="100%" h="100%" overflowY="scroll" flexDirection="column" p="3">
@@ -47,18 +59,35 @@ const List = (props: Props) => {
         </Text>
       </Flex>
       {props.list.friends.map((element, index) =>
-        <Flex key={"friend" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.nickname} key={element.nickname} type='individual' deleteChat={props.deleteChat} directInfo={element}/>)}
-        _hover={{
-          backgroundColor: "#805AD5",
-          textColor: "white",
-          borderRadius: "20px"
-        }}>
-           <Avatar size="sm" src={avatarUrl(element.avatar)} marginRight={"1vw"}>
-            <UserBadageStatus status={element.status} />
-          </Avatar>
-          <Text fontSize={"15px"} fontWeight={"bold"}>
-            {element.nickname}
-          </Text>
+        <Flex>
+          <Flex key={"friend" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.nickname} key={element.nickname} type='individual' deleteChat={props.deleteChat} directInfo={element}/>)}
+          _hover={{
+            backgroundColor: "#805AD5",
+            textColor: "white",
+            borderRadius: "20px"
+          }}>
+            <Avatar size="sm" src={avatarUrl(element.avatar)} marginRight={"1vw"}>
+              <UserBadageStatus status={element.status} />
+            </Avatar>
+            <Text fontSize={"15px"} fontWeight={"bold"}>
+              {element.nickname}
+            </Text>
+          </Flex>
+          <IconButton
+            cursor="pointer"
+            icon={<Icon boxSize="2em" as={GiGamepad} />}
+            onClick={() => handleGameInvite(element.nickname)}
+            borderRadius="10px"
+            _hover={{
+              backgroundColor: "#805AD5",
+              textColor: "white",
+              borderRadius: "20px"
+            }}
+            aria-label="Game Invite"
+            size="sm"
+            title="Game Invite"
+            color="#805AD5"
+          />
         </Flex>
       )}
       <Divider/>
@@ -69,16 +98,33 @@ const List = (props: Props) => {
         </Text>
       </Flex>
       {props.list.other_users.map((element,  index) =>
-        <Flex key={"other" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() => navigate(`/home/profile/${element.nickname}`)}
-        _hover={{
-          backgroundColor: "#805AD5",
-          textColor: "white",
-          borderRadius: "20px"
-        }}>
-          <Avatar size="sm" src={avatarUrl(element.avatar)} marginRight={"1vw"}/>
-          <Text fontSize={"15px"} fontWeight={"bold"}>
-            {element.nickname}
-          </Text>
+        <Flex>
+          <Flex key={"other" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() => navigate(`/home/profile/${element.nickname}`)}
+          _hover={{
+            backgroundColor: "#805AD5",
+            textColor: "white",
+            borderRadius: "20px"
+          }}>
+            <Avatar size="sm" src={avatarUrl(element.avatar)} marginRight={"1vw"}/>
+            <Text fontSize={"15px"} fontWeight={"bold"}>
+              {element.nickname}
+            </Text>
+          </Flex>
+          <IconButton
+            cursor="pointer"
+            icon={<Icon boxSize="2em" as={GiGamepad}/>}
+            onClick={() => handleGameInvite(element.nickname)}
+            borderRadius="10px"
+            _hover={{
+              backgroundColor: "#805AD5",
+              textColor: "white",
+              borderRadius: "20px"
+            }}
+            aria-label="Game Invite"
+            size="sm"
+            title="Game Invite"
+            color="#805AD5"
+          />
         </Flex>
       )}
       <Divider/>
