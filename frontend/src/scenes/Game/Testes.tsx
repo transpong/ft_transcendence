@@ -37,13 +37,37 @@ const Frontend: React.FC = () => {
         console.log('Game Over:', message);
     });
 
-    // // Clean up the socket connection when the component unmounts
-    // return () => {
-    //   socket.disconnect();
-    // };
   }, []);
 
   return <div>Frontend</div>;
 };
 
-export default Frontend;
+export class GameBackEnd {
+  socket;
+
+  constructor() {
+    this.socket = io('http://localhost:3001', {
+        extraHeaders: {
+        Authorization: `Bearer ${getCookie("token")}`,
+        Custom: 'true',
+      },
+    });
+
+    this.socket.on('startGame', (message: string) => {
+        this.socket.emit('startGame');
+        console.log('Game Startou', message);
+    });
+
+        // Listen for 'message' events and log the received messages
+        this.socket.on('message', (message: string) => {
+          console.log('Received message:', message);
+        });
+    }
+
+  handleJoinRoom() {
+    this.socket.connect();
+    console.log('Front Join Room');
+    this.socket.emit('joinRoom');
+  }
+}
+

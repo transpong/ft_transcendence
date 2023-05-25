@@ -2,10 +2,25 @@ import React from "react";
 import Sketch from "react-p5";
 import p5Types from "p5"; //Import this for typechecking and intellisense
 import { useOutletContext } from "react-router-dom";
+import io from 'socket.io-client';
+import { getCookie } from '../../helpers/get-cookie';
+// import { GameBackEnd } from "./Testes.tsx";
 
 interface ComponentProps {
   // Your component props
 }
+
+type Props = {
+    canvasWidth: number
+    canvasHeight: number
+    ballX: number
+    ballY: number
+    player1Score: number
+    player1Y: number
+    player2Score: number
+    player2Y: number
+    timer: number
+};
 
 let ball: Ball;
 let player1: Player;
@@ -15,7 +30,8 @@ let windowWidth = 0
 let windowHeight = 0
 let canvasParent: Element
 let parentBorderWidth = 0
-
+let gameInfo: Props
+// let gameBackEnd: GameBackEnd | null = null;
 
 class Game {
     isRunning;
@@ -139,7 +155,7 @@ class Ball{
     printBall() {
         this.p5.circle( this.positionX, this.positionY, this.diameterBall);
         this.positionX += this.speedX;
-        this.positionY += this.speedY;
+        this.positionY += this.speedX;
         return this.checkBorder();
     }
 
@@ -250,12 +266,50 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
 
     }
 
-
     let buttonStart : ButtonStart | null = null
     let score : Score | null = null
-
+    let oldScoreP1: number = 0
+    let oldScoreP2: number = 0
 
     const setup = (p5: p5Types, canvasParentRef: Element) => {
+        const socket = io('http://localhost:3001', {
+            extraHeaders: {
+                Authorization: `Bearer ${getCookie("token")}`,
+                Custom: 'true',
+            },
+        });
+
+        socket.connect();
+        socket.emit('joinRoom');
+
+        socket.on('startGame', (message: Props) => {
+            socket.emit('startGame');
+            gameInfo = message;
+            console.log("Game Startou: ", gameInfo);
+        });
+
+        // Listen for 'message' events and log the received messages
+        socket.on('message', (message: string) => {
+          console.log('Received message:', message);
+        });
+
+        // Message with Game Back Info
+        socket.on('pong', (message: Props) => {
+            gameInfo = message;
+            if (game){
+                game.scoreP1 = gameInfo.player1Score;
+                game.scoreP2 = gameInfo.player2Score;
+            }
+            console.log("Pong info: ", gameInfo);
+            // console.log('Received message PONG:', message);
+        });
+
+        socket.on('endGame', (message: string) => {
+            socket.emit('endGame');
+            console.log('Game Over:', message);
+            socket.disconnect();
+        });
+
         parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParentRef.clientHeight) -  canvasParentRef.clientHeight
         windowHeight = ref.current ? ref.current.clientHeight - parentBorderWidth : canvasParentRef.clientHeight
         windowWidth = ref.current ? ref.current.clientWidth - parentBorderWidth : canvasParentRef.clientWidth
@@ -277,15 +331,20 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
             buttonStart?.destroy()
             score?.destroy()
             ball.printBall();
-            if(ball.isGoal()){
-                game.scorePlayer(ball.whoScoredGoal());
-                game.stop();
-            }
+            // if(ball.isGoal()){
+            //     game.scorePlayer(ball.whoScoredGoal());
+            //     game.stop();
+            // }
             player1.movePlayer();
             player2.movePlayer();
             ball.checkPlayerCollision(player1)
             ball.checkPlayerCollision(player2)
         }else{
+            if (oldScoreP1 != game.scoreP1 || oldScoreP2 != game.scoreP2) {
+                    p5.removeElements();
+                    oldScoreP1 = game.scoreP1;
+                    oldScoreP2 = game.scoreP2;
+                }
             score?.show(game.scoreP1, game.scoreP2)
             buttonStart?.createButton()
         }
@@ -305,7 +364,6 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         score?.destroy()
         p5.removeElements()
     }
-
   return <Sketch setup={setup} draw={draw}  windowResized={windowResized}/>
 }
 
