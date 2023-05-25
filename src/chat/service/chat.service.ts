@@ -19,8 +19,6 @@ import { ChannelOutputDto } from '../dto/output/channel-output.dto';
 
 @Injectable()
 export class ChatService {
-  '';
-
   constructor(
     @InjectRepository(ChannelEntity)
     private readonly channelRepository: Repository<ChannelEntity>,
@@ -84,6 +82,23 @@ export class ChatService {
       );
     }
 
+    if (channel.userIsBanned(user.nickname)) {
+      throw new HttpException(
+        'User ' + user.nickname + ' is banned in this channel',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (channel.userIsMuted(user.nickname)) {
+      throw new HttpException(
+        'User ' +
+          user.nickname +
+          ' is muted in this channel until ' +
+          (await this.getMuttedDate(user, channel)),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     if (channel.isPublic() && !channel.hasUser(user.nickname)) {
       await this.enterPublicChannel(user, channel);
     }
@@ -101,6 +116,21 @@ export class ChatService {
     const toUser: UserEntity = await this.userService.getUserByNickname(
       nickname,
     );
+
+    if (fromUser.nickname === toUser.nickname) {
+      throw new HttpException(
+        'You cannot send a message to yourself',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (toUser.isBlocked(fromUser)) {
+      throw new HttpException(
+        'You cannot send a message to this user',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const message: DirectMessagesEntity =
       MessageInputDto.toDirectMessagesEntity(dto, fromUser, toUser);
 
@@ -284,6 +314,10 @@ export class ChatService {
       friend.nickname,
     );
 
+    if (restrictions === 'kick') {
+      await this.usersChannelsRepository.remove(userChannel);
+      return;
+    }
     userChannel.updateRestriction(restrictions);
     await this.usersChannelsRepository.save(userChannel);
   }
@@ -295,7 +329,7 @@ export class ChatService {
     const user: UserEntity = await this.userService.getUserByFtId(ftId);
     const channel: ChannelEntity = await this.getChannelById(channelId);
 
-    if (!channel.userHasWriteAccess(user.nickname)) {
+    if (!channel.userHasWriteAccess(user.nickname) && !channel.isPublic()) {
       throw new HttpException(
         'User does not have the required permissions',
         HttpStatus.FORBIDDEN,
@@ -316,6 +350,14 @@ export class ChatService {
     const directMessages: DirectMessagesEntity[] =
       await this.findDirectMessages(user, friend);
 
+    if (user.isBlocked(friend)) {
+      return MessageDirectOutputDto.fromDirectMessageEntityList(
+        user,
+        friend,
+        [],
+      );
+    }
+
     return MessageDirectOutputDto.fromDirectMessageEntityList(
       user,
       friend,
@@ -328,10 +370,14 @@ export class ChatService {
     const userChannels: UsersChannelsEntity[] =
       await this.findUnbannedChannelsByUserFtId(user.ftId);
     const unrelatedPublicChannels =
-      await this.findUnrelatedPublicChannelsByUserFtId(userChannels);
+      await this.findUnrelatedPublicChannelsByUserFtId(
+        userChannels,
+        user.nickname,
+      );
     const usersNotFriends: UserEntity[] =
       await this.userService.getNotFriendsByFtId(user);
 
+    console.log(unrelatedPublicChannels);
     return ChannelOutputDto.getChats(
       user,
       usersNotFriends,
@@ -356,6 +402,87 @@ export class ChatService {
     }
   }
 
+  async leaveChannel(ftId: string, channelId: number): Promise<void> {
+    const user: UserEntity = await this.userService.getUserByFtId(ftId);
+    const channel: ChannelEntity = await this.getChannelById(channelId);
+
+    if (!channel.hasUser(user.nickname)) {
+      throw new HttpException('User is not in channel', HttpStatus.NOT_FOUND);
+    }
+
+    if (channel.userIsOwner(user.nickname)) {
+      await this.assignOwner(channel);
+    }
+
+    const userChannel: UsersChannelsEntity = channel.getUserChannel(
+      user.nickname,
+    );
+
+    await this.usersChannelsRepository.remove(userChannel);
+  }
+
+  async assignOwner(channelEntity: ChannelEntity) {
+    if (channelEntity.hasAdmin()) {
+      await this.assignOldestAdminAsOwner(channelEntity);
+    } else if (channelEntity.hasMember()) {
+      await this.assignOldestMemberAsOwner(channelEntity);
+    } else {
+      await this.deleteChannel(channelEntity);
+    }
+  }
+
+  private async getMuttedDate(
+    user: UserEntity,
+    channel: ChannelEntity,
+  ): Promise<Date> {
+    const userChannel: UsersChannelsEntity = channel.getUserChannel(
+      user.nickname,
+    );
+    return userChannel.mutedUntil;
+  }
+
+  private async assignOldestAdminAsOwner(channelEntity: ChannelEntity) {
+    const oldestAdmin: UsersChannelsEntity =
+      await this.usersChannelsRepository.findOne({
+        where: [
+          {
+            channel: { id: channelEntity.id },
+            userAccessType: UserAccessType.ADMIN,
+          },
+        ],
+        order: {
+          createdAt: 'ASC',
+        },
+        relations: ['user', 'channel'],
+      });
+
+    oldestAdmin.userAccessType = UserAccessType.OWNER;
+    await this.usersChannelsRepository.save(oldestAdmin);
+  }
+
+  private async assignOldestMemberAsOwner(channelEntity: ChannelEntity) {
+    const oldestMember: UsersChannelsEntity =
+      await this.usersChannelsRepository.findOne({
+        where: [
+          {
+            channel: { id: channelEntity.id },
+            userAccessType: UserAccessType.MEMBER,
+          },
+        ],
+        order: {
+          createdAt: 'ASC',
+        },
+        relations: ['user', 'channel'],
+      });
+
+    oldestMember.userAccessType = UserAccessType.OWNER;
+    await this.usersChannelsRepository.save(oldestMember);
+  }
+
+  private async deleteChannel(channelEntity: ChannelEntity) {
+    await this.channelRepository.remove(channelEntity);
+  }
+
   private async enterProtectedChannel(
     user: UserEntity,
     channel: ChannelEntity,
@@ -377,6 +504,7 @@ export class ChatService {
 
   private async findUnrelatedPublicChannelsByUserFtId(
     userChannels: UsersChannelsEntity[],
+    nickname: string,
   ) {
     const userChannelIds: number[] = userChannels.map(
       (userChannel) => userChannel.channel.id,
@@ -387,28 +515,37 @@ export class ChatService {
         where: [
           {
             type: Not(AccessType.PRIVATE),
+            users_channels: { bannedAt: null },
           },
         ],
         relations: ['users_channels', 'users_channels.user'],
       });
 
     return notPrivateChannels.filter((channel) => {
-      return !userChannelIds.includes(channel.id);
+      return (
+        !userChannelIds.includes(channel.id) && !channel.userIsBanned(nickname)
+      );
     });
   }
 
   private async findUnbannedChannelsByUserFtId(
     ftId: string,
   ): Promise<UsersChannelsEntity[]> {
-    return await this.usersChannelsRepository.find({
-      where: { user: { ftId: ftId }, bannedAt: null },
-      relations: [
-        'user',
-        'user.friends',
-        'user.blocks',
-        'user.blockedBy',
-        'channel',
-      ],
+    const userChannels: UsersChannelsEntity[] =
+      await this.usersChannelsRepository.find({
+        where: { user: { ftId: ftId }, bannedAt: null },
+        relations: [
+          'user',
+          'user.friends',
+          'user.blocks',
+          'user.blockedBy',
+          'channel',
+        ],
+      });
+
+    // filter banned channels
+    return userChannels.filter((userChannel) => {
+      return userChannel.bannedAt === null;
     });
   }
 

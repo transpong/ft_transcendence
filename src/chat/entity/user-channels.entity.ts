@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { ChannelEntity } from './channel.entity';
-import { UserAccessType } from '../enum/access-type.enum';
 
 @Entity({ name: 'user_channels' })
 export class UsersChannelsEntity {
@@ -42,26 +41,22 @@ export class UsersChannelsEntity {
   updateRestriction(restriction: string): void {
     switch (restriction) {
       case 'block':
-        this.userAccessType = UserAccessType.BLOCKED;
+        this.bannedAt = new Date();
         break;
       case 'unblock':
-        this.userAccessType = UserAccessType.MEMBER;
+        this.bannedAt = null;
         break;
       case 'kick':
         this.kickedAt = new Date();
-        this.userAccessType = UserAccessType.KICKED;
         break;
       case 'unkick':
         this.kickedAt = null;
-        this.userAccessType = UserAccessType.MEMBER;
         break;
       case 'mute':
         this.mutedUntil = new Date(Date.now() + 1000 * 60 * 60 * 24);
-        this.userAccessType = UserAccessType.MUTED;
         break;
       case 'unmute':
         this.mutedUntil = null;
-        this.userAccessType = UserAccessType.MEMBER;
         break;
       default:
         break;
