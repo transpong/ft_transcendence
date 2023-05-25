@@ -21,7 +21,7 @@ const ResetChannelPasswordView = ({ setScreenNavigation, channelInfo }: Props) =
     const data = inputPassword.trim();
     if (channelInfo) {
       await chatService.updateChannelPassword(channelInfo.id, data);
-      setScreenNavigation(1);
+      window.location.reload();
     }
   };
 

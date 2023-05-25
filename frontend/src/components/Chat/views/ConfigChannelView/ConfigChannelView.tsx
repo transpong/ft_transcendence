@@ -14,9 +14,10 @@ interface Props {
 const ConfigChannelView = ({ setScreenNavigation, group_type, user_access_type, channelInfo }: Props) => {
 
   const handleChannelUpdate = async (type: ChannelAccessType) => {
-    if (channelInfo)
+    if (channelInfo) {
       await chatService.updateChannelType(channelInfo.id, type);
-    setScreenNavigation(1);
+      window.location.reload();
+    }
   };
 
   const handleLeaveChannel = async () => {
