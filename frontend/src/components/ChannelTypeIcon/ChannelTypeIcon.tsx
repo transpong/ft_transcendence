@@ -1,5 +1,7 @@
-import { LockIcon, UnlockIcon, WarningTwoIcon } from "@chakra-ui/icons";
+import { Icon } from "@chakra-ui/icons";
 import { ChannelAccessType } from "../../services/chat-service";
+import { BsShieldLock } from "react-icons/bs";
+import { RxLockOpen2, RxLockClosed } from "react-icons/rx";
 
 type Props = {
   type: ChannelAccessType;
@@ -7,11 +9,11 @@ type Props = {
 
 const ChannelTypeIcon = ({ type }: Props) => {
   return type == ChannelAccessType.PUBLIC ? (
-    <UnlockIcon color="green" />
+    <Icon boxSize="1.2em" as={RxLockOpen2} color="green" />
   ) : type == ChannelAccessType.PRIVATE ? (
-    <LockIcon color="black" />
+    <Icon boxSize="1.2em" as={RxLockClosed} color="black" />
   ) : type == ChannelAccessType.PROTECTED ? (
-    <WarningTwoIcon color="red" />
+    <Icon boxSize="1.2em" as={BsShieldLock} color="black" display="Protected" />
   ) : null;
 };
 
