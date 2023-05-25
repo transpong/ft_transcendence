@@ -7,7 +7,7 @@ import { Socket } from 'socket.io';
 import { UserService } from '../../user/service/user.service';
 import { PongService } from './pong.service';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class GatewayService {
   constructor(private readonly userService: UserService) {}
 
@@ -22,17 +22,21 @@ export class GatewayService {
 
   private pongService: PongService = new PongService();
 
-  async handleConnection(client: Socket) {}
+  async handleConnection(client: Socket) {
+    console.log('Client Handle Connection');
+  }
 
   async handleDisconnect() {
     this.server.emit('users', this.users);
   }
 
+
   @SubscribeMessage('joinRoom')
   async handleRoom(client: Socket) {
-    this.users.push(client.id);
-
+    if (this.users[0] !== client.id)
+      this.users.push(client.id);
     if (this.users.length === 2) {
+      console.log('Entreiii')
       // create a new room if it doesn't exist
       const user1 = this.users[0];
       const user2 = this.users[1];
@@ -69,6 +73,7 @@ export class GatewayService {
 
       // create a pong game for the room
       this.pong.set(roomName, this.pongService);
+      this.server.to(roomName).emit('startGame', 'Game Found!');
     }
   }
 
@@ -81,6 +86,19 @@ export class GatewayService {
 
     // Start the game loop
     this.pongService.startGameLoop(roomName, this.server);
+  }
+
+  @SubscribeMessage('endGame')
+  async handleEndGame(client: Socket) {
+    const roomName = this.mapRooms.get(client.id);
+    // delete the room from the map
+    this.mapRooms.delete(roomName);
+
+    // delete the pong game from the map
+    this.pong.delete(roomName);
+
+    // delete the room
+    this.server.socketsLeave(roomName);
   }
 
   @SubscribeMessage('moveUp')
