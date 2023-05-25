@@ -86,9 +86,11 @@ export class ChannelEntity {
     for (const userChannel of this.users_channels) {
       if (
         userChannel.user.nickname === nickname &&
-        UserAccessValids.includes(userChannel.userAccessType)
+        !this.userIsBanned(nickname)
       ) {
-        return true;
+        if (UserAccessValids.includes(userChannel.userAccessType)) {
+          return true;
+        }
       }
     }
     return false;
@@ -166,7 +168,7 @@ export class ChannelEntity {
   userIsMuted(nickname: string): boolean {
     for (const userChannel of this.users_channels) {
       if (userChannel.user.nickname === nickname) {
-        return userChannel.mutedUntil !== null;
+        return this.checkMutted(userChannel.mutedUntil);
       }
     }
     return false;
@@ -188,5 +190,14 @@ export class ChannelEntity {
       }
     }
     return false;
+  }
+
+  private checkMutted(muttedUntil: Date): boolean {
+    if (muttedUntil > new Date()) {
+      return true;
+    } else if (muttedUntil !== null && muttedUntil < new Date()) {
+      muttedUntil = null;
+      return false;
+    }
   }
 }
