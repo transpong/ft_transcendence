@@ -11,7 +11,7 @@ const ChannelTypeIcon = ({ type }: Props) => {
   return type == ChannelAccessType.PUBLIC ? (
     <Icon boxSize="1.2em" as={RxLockOpen2} color="green" />
   ) : type == ChannelAccessType.PRIVATE ? (
-    <Icon boxSize="1.2em" as={RxLockClosed} color="black" />
+    <Icon boxSize="1.2em" as={RxLockClosed} color="red" />
   ) : type == ChannelAccessType.PROTECTED ? (
     <Icon boxSize="1.2em" as={BsShieldLock} color="black" display="Protected" />
   ) : null;
