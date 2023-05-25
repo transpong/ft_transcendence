@@ -205,7 +205,7 @@ export class ChatService {
     const user: UserEntity = await this.userService.getUserByFtId(ftId);
     const channel: ChannelEntity = await this.getChannelById(channelId);
 
-    if (!channel.userHasWriteAccess(user.nickname)) {
+    if (!channel.userHasWriteAccess(user.nickname) && !channel.isPublic()) {
       throw new HttpException(
         'User does not have the required permissions',
         HttpStatus.FORBIDDEN,
@@ -406,7 +406,10 @@ export class ChatService {
     const channel: ChannelEntity = await this.getChannelById(channelId);
 
     if (!channel.hasUser(user.nickname)) {
-      throw new HttpException('User is not in channel', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'You are not a member of this channel',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     if (channel.userIsOwner(user.nickname)) {
