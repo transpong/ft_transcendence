@@ -148,7 +148,7 @@ export class ChannelEntity {
   userIsBanned(nickname: string): boolean {
     for (const userChannel of this.users_channels) {
       if (userChannel.user.nickname === nickname) {
-        return userChannel.userAccessType === UserAccessType.BANNED;
+        return userChannel.bannedAt !== null;
       }
     }
     return false;
@@ -157,7 +157,7 @@ export class ChannelEntity {
   userIsKicked(nickname: string): boolean {
     for (const userChannel of this.users_channels) {
       if (userChannel.user.nickname === nickname) {
-        return userChannel.userAccessType === UserAccessType.KICKED;
+        return userChannel.kickedAt !== null;
       }
     }
     return false;
@@ -166,7 +166,25 @@ export class ChannelEntity {
   userIsMuted(nickname: string): boolean {
     for (const userChannel of this.users_channels) {
       if (userChannel.user.nickname === nickname) {
-        return userChannel.userAccessType === UserAccessType.MUTED;
+        return userChannel.mutedUntil !== null;
+      }
+    }
+    return false;
+  }
+
+  hasAdmin(): boolean {
+    for (const userChannel of this.users_channels) {
+      if (userChannel.userAccessType === UserAccessType.ADMIN) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  hasMember(): boolean {
+    for (const userChannel of this.users_channels) {
+      if (userChannel.userAccessType === UserAccessType.MEMBER) {
+        return true;
       }
     }
     return false;
