@@ -303,12 +303,6 @@ export class UserService {
   async getProfile(ftId: string, nickname: string): Promise<UserProfileDto> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
     const profileEntity: UserEntity = await this.getUserByNickname(nickname);
-    if (ftId === profileEntity.ftId) {
-      throw new HttpException(
-        'This method is not allowed for your own profile',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
     return UserProfileDto.fromEntity(userEntity, profileEntity);
   }
