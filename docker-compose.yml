@@ -7,3 +7,21 @@ services:
     container_name: postgres.transpong.42.com
     ports:
       - 5432:5432
+    networks:
+      - transpong
+
+  api:
+    build:
+      context: . # TODO reset
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    ports:
+      - 3001:3001
+    networks:
+      - transpong
+
+networks:
+  transpong:
+    driver: bridge
