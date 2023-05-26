@@ -3,6 +3,7 @@ import "./CreateNickNameLoginView.css"
 import { useNavigate } from "react-router";
 import { useState } from 'react';
 import { userService } from '../../../services/users-service';
+import ftgif from "../../../../docs/gifs/42.gif";
 
 export default function CreateNickNameLoginView(){
   const [value, setValue] = useState('')
@@ -43,7 +44,7 @@ export default function CreateNickNameLoginView(){
             >
                 <Image
                     className={"school42"}
-                    src={"docs/gifs/42.gif"}
+                    src={ftgif}
                     height={"200px"}
                     width={"200px"}
                     margin={"0 auto"}

@@ -10,7 +10,7 @@ interface Props {
   channelInfo?: IChannelChat;
 }
 
-const ResetChannelPasswordView = ({ setScreenNavigation, channelInfo }: Props) => {
+const ResetChannelPasswordView = ({ channelInfo }: Props) => {
 
   const [inputPassword, setInputPassword] = useState("");
 

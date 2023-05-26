@@ -2,6 +2,7 @@ import { Button, Flex, Stack, Image, Input } from '@chakra-ui/react'
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { userService } from '../../../services/users-service';
+import ftgif from '../../../../docs/gifs/42.gif'
 import "./TwoFactorAuthenticationLogin.css"
 
 export default function TwoFactorAuthenticationLogin(){
@@ -40,7 +41,7 @@ export default function TwoFactorAuthenticationLogin(){
             >
                 <Image
                     className={"school42"}
-                    src={"docs/gifs/42.gif"}
+                    src={ftgif}
                     height={"200px"}
                     width={"200px"}
                     margin={"0 auto"}

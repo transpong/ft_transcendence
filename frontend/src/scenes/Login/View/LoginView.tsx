@@ -1,5 +1,6 @@
 import { Button, Flex, Image, Stack } from '@chakra-ui/react'
 import "./Login.css"
+import ftgif from "../../../../docs/gifs/42.gif";
 
 const API42OAUTHURL = `${
   import.meta.env.VITE_API_42_URL
@@ -34,7 +35,7 @@ export default function LoginView(){
         >
           <Image
             className="school42"
-            src="docs/gifs/42.gif"
+            src={ftgif}
             height="200px"
             width="200px"
             margin={"0 auto"}

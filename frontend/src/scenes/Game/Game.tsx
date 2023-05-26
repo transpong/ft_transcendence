@@ -1,11 +1,7 @@
-import React from "react";
+import * as React from "react";
 import Sketch from "react-p5";
-import p5Types from "p5"; //Import this for typechecking and intellisense
+import * as p5Types from "p5"; //Import this for typechecking and intellisense
 import { useOutletContext } from "react-router-dom";
-
-interface ComponentProps {
-  // Your component props
-}
 
 let ball: Ball;
 let player1: Player;
@@ -38,7 +34,7 @@ class Game {
         this.isRunning = true;
     }
 
-    scorePlayer(player: number = 0){
+    scorePlayer(player = 0){
         if(player == 1)
             this.scoreP1 += 1
         else if(player == 2)
@@ -127,8 +123,8 @@ class Ball{
     responsiveBall(newHeight: number, oldHeight: number, newWidth: number, oldWidth: number){
         this.positionY = newHeight * (this.positionY / oldHeight)
         this.positionX = newWidth * (this.positionX / oldWidth)
-        this.diameterBall = ((newHeight + newWidth) / 2) * 0.015;;
-        
+        this.diameterBall = ((newHeight + newWidth) / 2) * 0.015;
+
     }
 
     centralize(){
@@ -180,14 +176,14 @@ class Ball{
     }
 }
 
-const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
+const Pong: React.FC = () => {
     const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
 
     class Score {
         p5;
         scoreP1;
         scoreP2;
-        score : p5Types.Element | null = null; 
+        score : p5Types.Element | null = null;
 
         constructor(p5New: p5Types){
             this.p5 = p5New
@@ -221,7 +217,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
 
     class ButtonStart{
         p5;
-        button : p5Types.Element | null = null; 
+        button : p5Types.Element | null = null;
         constructor(p5New: p5Types){
             this.p5 = p5New
         }
@@ -247,7 +243,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
             if(this.button !== null)
                 this.button = null
         }
-        
+
     }
 
 
@@ -268,7 +264,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         buttonStart = new ButtonStart(p5)
         score = new Score(p5)
     };
-    
+
     const draw = (p5: p5Types) => {
         p5.background(0);
         player1.printPlayer();
