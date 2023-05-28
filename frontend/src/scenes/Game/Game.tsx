@@ -2,6 +2,8 @@ import React from "react";
 import Sketch from "react-p5";
 import p5Types from "p5"; //Import this for typechecking and intellisense
 import { useOutletContext } from "react-router-dom";
+import { Socket, io } from "socket.io-client";
+import { getCookie } from "../../helpers/get-cookie";
 
 interface ComponentProps {
   // Your component props
@@ -15,27 +17,37 @@ let windowWidth = 0
 let windowHeight = 0
 let canvasParent: Element
 let parentBorderWidth = 0
-
+let backendWidth = 800
+let backendHeight = 600
+let fatorEscalaY = 0
+let fatorEscalaX = 0
 
 class Game {
     isRunning;
     scoreP1;
     scoreP2
     ballGame;
-    constructor(ballGame: Ball){
+    p5;
+    constructor(ballGame: Ball, newP5: p5Types){
         this.isRunning = false
         this.scoreP1 = 0
         this.scoreP2 = 0
         this.ballGame = ballGame
+        this.p5 = newP5
     }
 
     stop(){
-        this.isRunning = false
+        if(this.isRunning == true){
+            this.p5.removeElements()
+            this.isRunning = false;
+        }
     }
 
     start(){
-        this.ballGame.centralize();
-        this.isRunning = true;
+        if(this.isRunning == false){
+            this.p5.removeElements()
+            this.isRunning = true;
+        }
     }
 
     scorePlayer(player: number = 0){
@@ -58,9 +70,10 @@ class Player{
     widthPlayer = 0;
     speedY = 2;
     p5;
-    constructor(p5Origin: p5Types, idPlayer: number) {
-        this.widthPlayer = 20;
-        this.heightPlayer = windowHeight * 0.1;
+    socket;
+    constructor(p5Origin: p5Types, idPlayer: number, newSocket: Socket) {
+        this.widthPlayer = 10 * fatorEscalaX;
+        this.heightPlayer = 80 * fatorEscalaY;
         this.id = idPlayer;
         if(idPlayer == 1){
             this.positionX = 0;
@@ -70,39 +83,25 @@ class Player{
         this.positionY = (windowHeight / 2) - (this.heightPlayer / 2);
         this.speedY = 2;
         this.p5 = p5Origin
+        this.socket = newSocket
     }
 
-    responsivePlayer(newHeight: number, oldHeight: number, newWidth: number){
-        this.heightPlayer = newHeight * 0.1
-        this.positionY = newHeight * (this.positionY / oldHeight)
+    responsivePlayer(newWidth: number, newFatorEscalaX: number, newFatorEscalaY: number){
+        this.heightPlayer = 80 * newFatorEscalaY;
+        this.widthPlayer = 10 * newFatorEscalaX;
         this.positionX = this.positionX == 0 ? 0 : newWidth - this.widthPlayer
     }
 
-    printPlayer() {
-        this.p5.rect( this.positionX, this.positionY, this.widthPlayer, this.heightPlayer);
+    printPlayer(newPositionY: number) {
+        this.p5.rect( this.positionX, newPositionY * fatorEscalaY, this.widthPlayer, this.heightPlayer);
     }
 
     movePlayer(){
-        if(this.id == 1){
-            if(this.p5.keyIsDown(this.p5.SHIFT)){
-                this.positionY -= this.speedY
-                if(this.positionY < 0) this.positionY = 0
-            }
-            if(this.p5.keyIsDown(this.p5.CONTROL)){
-                this.positionY += this.speedY
-                if(this.positionY + this.heightPlayer > windowHeight)this.positionY = windowHeight - this.heightPlayer
-            }
+        if(this.p5.keyIsDown(this.p5.UP_ARROW)){
+            this.socket.emit('moveUp')
         }
-
-        if(this.id == 2){
-            if(this.p5.keyIsDown(this.p5.UP_ARROW)){
-                this.positionY -= this.speedY
-                if(this.positionY < 0) this.positionY = 0
-            }
-            if(this.p5.keyIsDown(this.p5.DOWN_ARROW)){
-                this.positionY += this.speedY
-                if(this.positionY + this.heightPlayer > windowHeight) this.positionY = windowHeight - this.heightPlayer
-            }
+        if(this.p5.keyIsDown(this.p5.DOWN_ARROW)){
+            this.socket.emit('moveDown')
         }
     }
 }
@@ -131,57 +130,72 @@ class Ball{
 
     }
 
-    centralize(){
-        this.positionX = windowWidth / 2;
-        this.positionY = windowHeight / 2;
-    }
-
-    printBall() {
-        this.p5.circle( this.positionX, this.positionY, this.diameterBall);
-        this.positionX += this.speedX;
-        this.positionY += this.speedY;
-        return this.checkBorder();
-    }
-
-    checkBorder() {
-        if(this.positionY - (this.diameterBall / 2) < 0) this.speedY *= -1;
-        if(this.positionY + (this.diameterBall / 2) > windowHeight) this.speedY *= -1;
-        return 0;
-    }
-
-    isGoal(){
-        if(this.positionX - (this.diameterBall / 2) < 0) return true;
-        if(this.positionX + (this.diameterBall / 2) > windowWidth) return true;
-        return false
-    }
-
-    whoScoredGoal(){
-        if(this.positionX - (this.diameterBall / 2) < 0) return 1;
-        if(this.positionX + (this.diameterBall / 2) > windowWidth) return 2;
-        return 0;
-    }
-
-    checkPlayerCollision(player: Player){
-        const yMenor = player.positionY
-        const yMaior = player.positionY + player.heightPlayer
-        if(player.id == 1){
-            const xReferencia = player.positionX + player.widthPlayer
-            if(this.positionX - (this.diameterBall / 2) <= xReferencia && this.positionX - (this.diameterBall / 2) > 0){
-                if(this.positionY >= yMenor && this.positionY <= yMaior)
-                    this.speedX *= -1;
-            }
-        }else if(player.id == 2){
-            const xReferencia = player.positionX
-            if(this.positionX + (this.diameterBall / 2) >= xReferencia && this.positionX  < windowWidth){
-                if(this.positionY >= yMenor && this.positionY <= yMaior)
-                    this.speedX *= -1;
-            }
-        }
+    printBall(positionX: number, positionY: number) {
+        this.p5.circle( positionX * fatorEscalaX, positionY * fatorEscalaY, this.diameterBall);
     }
 }
 
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
+    type BackendGame = {
+        ballX: number;
+        ballY: number;
+        player1Score: number;
+        player1Y: number;
+        player2Score: number;
+        player2Y: number;
+        timer: number;
+    }
+
+    let backendGame: BackendGame = {
+        ballX: 0,
+        ballY: 0,
+        player1Score: 0,
+        player1Y: 0,
+        player2Score: 0,
+        player2Y: 0,
+        timer: 0,
+    }
+    const socket = io('http://localhost:3001', {
+        extraHeaders: {
+            Authorization: `Bearer ${getCookie("token")}`,
+            Custom: 'true',
+        },
+    }); // Replace with your server URL
+    socket.connect();
+    // console.log('Conect Front');
+    // Send 'joinRoom' message when the component mounts
+    socket.emit('joinRoom');
+
+    socket.on('startGame', (message: BackendGame) => {
+        socket.emit('startGame');
+        backendGame = message;
+        game.start()
+        console.log('Game Startou', message);
+    });
+
+    // Listen for 'message' events and log the received messages
+    socket.on('message', (message: string) => {
+      console.log('Received message 1:', message);
+    });
+
+
+    socket.on('pong', (message: BackendGame) => {
+        backendGame = message;
+        console.log('Received message 2:', message);
+    });
+
+    socket.on('endGame', (message: string) => {
+        socket.emit('endGame');
+        game.stop()
+        console.log('Game Over:', message);
+        socket.disconnect();
+    });
+
+    // // Clean up the socket connection when the component unmounts
+    // return () => {
+    // };
+
 
     class Score {
         p5;
@@ -198,6 +212,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
             if(this.scoreP1 != newScoreP1 || this.scoreP2 != newScoreP2){
                 this.scoreP1 = newScoreP1
                 this.scoreP2 = newScoreP2
+                this.p5.removeElements()
                 this.score = null
             }
             if(this.score ===  null){
@@ -259,34 +274,29 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParentRef.clientHeight) -  canvasParentRef.clientHeight
         windowHeight = ref.current ? ref.current.clientHeight - parentBorderWidth : canvasParentRef.clientHeight
         windowWidth = ref.current ? ref.current.clientWidth - parentBorderWidth : canvasParentRef.clientWidth
+        fatorEscalaX = windowWidth / backendWidth
+        fatorEscalaY = windowHeight / backendHeight
         p5.createCanvas(windowWidth , windowHeight).parent(canvasParentRef);
         canvasParent = canvasParentRef
         ball = new Ball(p5)
-        player1 = new Player(p5, 1)
-        player2 = new Player(p5, 2)
-        game = new Game(ball)
+        player1 = new Player(p5, 1, socket)
+        player2 = new Player(p5, 2, socket)
+        game = new Game(ball,  p5)
         buttonStart = new ButtonStart(p5)
         score = new Score(p5)
     };
 
     const draw = (p5: p5Types) => {
         p5.background(0);
-        player1.printPlayer();
-        player2.printPlayer();
         if(game.isRunning){
+            player1.printPlayer(backendGame.player1Y);
+            player2.printPlayer(backendGame.player2Y);
             buttonStart?.destroy()
             score?.destroy()
-            ball.printBall();
-            if(ball.isGoal()){
-                game.scorePlayer(ball.whoScoredGoal());
-                game.stop();
-            }
+            ball.printBall(backendGame.ballX, backendGame.ballY);
             player1.movePlayer();
-            player2.movePlayer();
-            ball.checkPlayerCollision(player1)
-            ball.checkPlayerCollision(player2)
         }else{
-            score?.show(game.scoreP1, game.scoreP2)
+            score?.show(backendGame.player1Score, backendGame.player2Score)
             buttonStart?.createButton()
         }
     };
@@ -295,12 +305,15 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParent.clientHeight) -  canvasParent.clientHeight
         const newWindowHeight = ref.current ? ref.current.clientHeight - parentBorderWidth : canvasParent.clientHeight
         const newWindowWidth = ref.current ? ref.current.clientWidth - parentBorderWidth : canvasParent.clientWidth
-        player1.responsivePlayer(newWindowHeight, windowHeight, newWindowWidth)
-        player2.responsivePlayer(newWindowHeight, windowHeight, newWindowWidth)
+        fatorEscalaY = newWindowHeight / backendHeight
+        fatorEscalaX = newWindowWidth / backendWidth
+        player1.responsivePlayer(newWindowWidth, fatorEscalaX, fatorEscalaY)
+        player2.responsivePlayer(newWindowWidth,  fatorEscalaX, fatorEscalaY)
         ball.responsiveBall(newWindowHeight, windowHeight, newWindowWidth, windowWidth)
         p5.createCanvas(newWindowWidth , newWindowHeight).parent(canvasParent)
         windowWidth = newWindowWidth
         windowHeight = newWindowHeight
+
         buttonStart?.destroy()
         score?.destroy()
         p5.removeElements()
