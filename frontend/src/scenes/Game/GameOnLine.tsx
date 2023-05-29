@@ -1,6 +1,6 @@
-import React from "react";
+import * as React from "react";
 import Sketch from "react-p5";
-import p5Types from "p5"; //Import this for typechecking and intellisense
+import * as p5Types from "p5"; //Import this for typechecking and intellisense
 import { useOutletContext } from "react-router-dom";
 import { Socket } from "socket.io-client";
 
