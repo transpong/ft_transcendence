@@ -19,6 +19,10 @@ const UserTextStatus = ({ status }: Props) => {
     <Text fontSize={"small"} color="blue.500" fontWeight={"extrabold"}>
       In Game
     </Text>
+  ) : status == UserEnum.INLOBBY ? (
+    <Text fontSize={"small"} color="yellow.500" fontWeight={"extrabold"}>
+      In Lobby
+    </Text>
   ) : null;
 };
 

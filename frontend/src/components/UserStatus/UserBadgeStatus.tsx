@@ -13,6 +13,8 @@ const UserBadageStatus = ({ status }: Props) => {
     <AvatarBadge boxSize="1.25em" bg="gray.500" />
   ) : status == UserEnum.ONGAME ? (
     <AvatarBadge boxSize="1.25em" bg="blue.500" />
+  ) : status == UserEnum.INLOBBY ? (
+    <AvatarBadge boxSize="1.25em" bg="yellow.500" />
   ) : null;
 };
 
