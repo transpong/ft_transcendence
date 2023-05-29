@@ -1,7 +1,7 @@
 import { Button, Flex, Stack, Image, Input } from '@chakra-ui/react'
 import "./CreateNickNameLoginView.css"
 import { useNavigate } from "react-router";
-import { useState } from 'react';
+import { KeyboardEvent, useState } from 'react';
 import { userService } from '../../../services/users-service';
 import ftgif from "../../../../docs/gifs/42.gif";
 
@@ -52,7 +52,17 @@ export default function CreateNickNameLoginView(){
                     marginBottom={"20px"}
                 />
                 <Stack spacing={10} direction={"column"} align={"center"}>
-                    <Input onChange={handleChange} placeholder={"Apelido"} size={"md"} textColor={"white"}/>
+                    <Input
+                      onChange={handleChange}
+                      placeholder={"Apelido"}
+                      size={"md"}
+                      textColor={"white"}
+                      onKeyPress={(e: KeyboardEvent<HTMLInputElement>) => {
+                        if (e.key === "Enter") {
+                          handleNicknameUpdate();
+                        }
+                      }}
+                    />
                     <Button onClick={handleNicknameUpdate} colorScheme={"purple"} size={"lg"} isLoading={isUploading}>
                         LOGIN
                     </Button>
