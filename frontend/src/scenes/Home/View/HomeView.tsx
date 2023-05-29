@@ -5,11 +5,19 @@ import FriendsList from "../../../components/FriendsList/FriendsList";
 import { useRef, useState } from "react";
 import './Home.css'
 import { Outlet } from "react-router-dom";
+import { Socket, io } from "socket.io-client";
+import { getCookie } from "../../../helpers/get-cookie";
 
 
 export default function PageBase() {
   const [listChats, setListChats] = useState<React.ReactElement | null>(null);
   const ref = useRef<HTMLDivElement>(null)
+    const [socketGame] = useState<Socket>(io('http://localhost:3001', {
+      extraHeaders: {
+        Authorization: `Bearer ${getCookie("token")}`,
+        Custom: 'true',
+      },
+    }))
 
   const addChatList = (newChat: React.ReactElement) => {
     setListChats(newChat);
@@ -18,17 +26,17 @@ export default function PageBase() {
   const deleteChatList = () => {
     setListChats(null);
   };
-  
+
   return (
     <Flex className="MainBackground" h={"100vh"}>
       <NavBar></NavBar>
       <Flex h={"85%"} flexDirection={"row-reverse"}>
         <Flex position={"fixed"} align={"end"} bottom={"0px"}>
           {listChats}
-          <FriendsList addChat={addChatList} deleteChat={deleteChatList} />
+        <FriendsList addChat={addChatList} deleteChat={deleteChatList} />
         </Flex>
         <Flex ref={ref} className="MainView">
-          <Outlet context={{ref}}/>
+          <Outlet context={{ref, socketGame}}/>
         </Flex>
       </Flex>
     </Flex>

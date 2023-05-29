@@ -1,7 +1,11 @@
-import * as React from "react";
+import React from "react";
 import Sketch from "react-p5";
-import * as p5Types from "p5"; //Import this for typechecking and intellisense
+import p5Types from "p5"; //Import this for typechecking and intellisense
 import { useOutletContext } from "react-router-dom";
+
+interface ComponentProps {
+  // Your component props
+}
 
 let ball: Ball;
 let player1: Player;
@@ -34,7 +38,7 @@ class Game {
         this.isRunning = true;
     }
 
-    scorePlayer(player = 0){
+    scorePlayer(player: number = 0){
         if(player == 1)
             this.scoreP1 += 1
         else if(player == 2)
@@ -123,7 +127,7 @@ class Ball{
     responsiveBall(newHeight: number, oldHeight: number, newWidth: number, oldWidth: number){
         this.positionY = newHeight * (this.positionY / oldHeight)
         this.positionX = newWidth * (this.positionX / oldWidth)
-        this.diameterBall = ((newHeight + newWidth) / 2) * 0.015;
+        this.diameterBall = ((newHeight + newWidth) / 2) * 0.015;;
 
     }
 
@@ -176,7 +180,7 @@ class Ball{
     }
 }
 
-const Pong: React.FC = () => {
+const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
 
     class Score {
