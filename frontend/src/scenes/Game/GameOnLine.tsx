@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import Sketch from "react-p5";
 import p5Types from "p5"; //Import this for typechecking and intellisense
 import { useOutletContext } from "react-router-dom";
-import { Socket, io } from "socket.io-client";
-import { getCookie } from "../../helpers/get-cookie";
+import { Socket } from "socket.io-client";
 
 interface ComponentProps {
   // Your component props
@@ -62,10 +61,6 @@ class Game {
     }
 }
 
-
-/*
-    Refatorar pegando info do Back
-*/
 class Player{
     id = 0
     positionX = 0;
@@ -140,70 +135,57 @@ class Ball{
 }
 
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
-    const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
-    let [socket, setSocket] = useState<Socket | null>(null)
+    const { ref, socketGame } = useOutletContext<{ref: React.RefObject<HTMLDivElement>, socketGame: Socket}>();
     type BackendGame = {
-        player1Y: number;
-        player2Y: number;
-        heightPlayer: number;
-        widthPlayer: number;
-        player1Score: number;
-        player2Score: number;
         ballX: number;
         ballY: number;
-        diameterBall: number;
+        player1Score: number;
+        player1Y: number;
+        player2Score: number;
+        player2Y: number;
         timer: number;
     }
 
     let backendGame: BackendGame = {
-        player1Y: 0,
-        player2Y: 0,
-        heightPlayer: 0,
-        widthPlayer: 0,
-        player1Score: 0,
-        player2Score: 0,
-        diameterBall: 0,
         ballX: 0,
         ballY: 0,
+        player1Score: 0,
+        player1Y: 0,
+        player2Score: 0,
+        player2Y: 0,
         timer: 0,
     }
-    if (socket != null) {
-        socket.disconnect();
-        setSocket(null);
-    }
-    socket = io('http://localhost:3001', {
-        extraHeaders: {
-            Authorization: `Bearer ${getCookie("token")}`,
-            Custom: 'true',
-        },
-    });
-    socket.connect();
     // console.log('Conect Front');
     // Send 'joinRoom' message when the component mounts
-    socket.emit('joinRoom');
+    if(!socketGame.disconnected) {
+        socketGame.disconnect() ;
+    }
+    socketGame.connect();
+    socketGame.emit('joinRoom');
 
-    socket.on('startGame', (message: BackendGame) => {
-        socket?.emit('startGame');
+    socketGame.on('startGame', (message: BackendGame) => {
+        socketGame.emit('startGame');
         backendGame = message;
-        game.start();
+        game.start()
+        console.log('Game Startou', message);
     });
 
-    // // Listen for 'message' events and log the received messages
-    // socket.on('message', (message: string) => {
-    //   console.log('Received message 1:', message);
-    // });
-
-
-    socket.on('pong', (message: BackendGame) => {
-        backendGame = message;
-        // console.log('Received message 2:', message);
+    // Listen for 'message' events and log the received messages
+    socketGame.on('message', (message: string) => {
+      console.log('Received message 1:', message);
     });
 
-    socket.on('endGame', (message: string) => {
-        socket?.emit('endGame');
-        game.stop()
+
+    socketGame.on('pong', (message: BackendGame) => {
+        backendGame = message;
+        console.log('Received message 2:', message);
+    });
+
+    socketGame.on('endGame', (message: string) => {
+        socketGame.emit('endGame');
+        game.stop();
         console.log('Game Over:', message);
-        socket?.disconnect();
+        socketGame.disconnect();
     });
 
     class Score {
@@ -254,8 +236,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
             if(this.button ===  null) {
                 this.button = this.p5.createButton("Aguardando...");
                 this.button.style("background", "white")
-                this.button.style("border-radius", "10px")
                 this.button.style("cursor", "default")
+                this.button.style("border-radius", "20px")
                 this.button.style("font-size", `${(windowHeight < windowWidth ? windowHeight : windowWidth) * 0.08}px`)
                 const size = Object.entries(this.button.size()).reduce<Record<string, number>>((acc, item) => {
                     acc[item[0]] = item[1]
@@ -285,8 +267,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         p5.createCanvas(windowWidth , windowHeight).parent(canvasParentRef);
         canvasParent = canvasParentRef
         ball = new Ball(p5)
-        player1 = new Player(p5, 1, socket!)
-        player2 = new Player(p5, 2, socket!)
+        player1 = new Player(p5, 1, socketGame)
+        player2 = new Player(p5, 2, socketGame)
         game = new Game(ball,  p5)
         buttonStart = new ButtonStart(p5)
         score = new Score(p5)
@@ -294,15 +276,14 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
 
     const draw = (p5: p5Types) => {
         p5.background(0);
-        // console.log(ref.current?.firstChild.);
         if(game.isRunning){
             player1.printPlayer(backendGame.player1Y);
             player2.printPlayer(backendGame.player2Y);
-            // buttonStart?.destroy()
-            // score?.destroy()
+            buttonStart?.destroy()
+            score?.destroy()
             ball.printBall(backendGame.ballX, backendGame.ballY);
             player1.movePlayer();
-        } else {
+        }else{
             score?.show(backendGame.player1Score, backendGame.player2Score)
             buttonStart?.createButton()
         }
