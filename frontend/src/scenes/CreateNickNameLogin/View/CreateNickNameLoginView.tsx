@@ -53,6 +53,7 @@ export default function CreateNickNameLoginView(){
                 />
                 <Stack spacing={10} direction={"column"} align={"center"}>
                     <Input
+                      className={'loginBoxInput'}
                       onChange={handleChange}
                       placeholder={"Apelido"}
                       size={"md"}
