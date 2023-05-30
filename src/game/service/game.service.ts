@@ -16,18 +16,19 @@ export class GameService {
     private readonly userService: UserService,
   ) {}
 
-  async getMatchesHistory(): Promise<MatchesHistoryDto[]> {
+  async getMatchesHistory(status?: number): Promise<MatchesHistoryDto[]> {
     const matchesHistoryList: MatchHistoryEntity[] =
-      await this.findAllMatchesHistory();
+      await this.findAllMatchesHistory(status);
 
     return MatchesHistoryDto.toDtoList(matchesHistoryList);
   }
 
   async getMatchesHistoryFromUser(
     nickname: string,
+    status?: number,
   ): Promise<MatchesHistoryDto[]> {
     const matchesHistoryList: MatchHistoryEntity[] =
-      await this.findMatchesHistoryFromUser(nickname);
+      await this.findMatchesHistoryFromUser(nickname, status);
 
     return MatchesHistoryDto.toDtoList(matchesHistoryList);
   }
@@ -222,19 +223,23 @@ export class GameService {
     return score;
   }
 
-  private async findAllMatchesHistory() {
+  private async findAllMatchesHistory(status?: number) {
     return this.matchHistoryRepository.find({
       relations: ['user1', 'user2', 'winner'],
       order: { createdAt: 'DESC' },
+      where: {
+        status,
+      },
     });
   }
 
-  private async findMatchesHistoryFromUser(nickname: string) {
+  private async findMatchesHistoryFromUser(nickname: string, status?: number) {
     return this.matchHistoryRepository.find({
       relations: ['user1', 'user2', 'winner'],
       where: [
         { user1: { nickname: nickname } },
         { user2: { nickname: nickname } },
+        { status },
       ],
       order: { createdAt: 'DESC' },
     });
