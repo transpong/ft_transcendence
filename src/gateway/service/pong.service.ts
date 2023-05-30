@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { GameService } from '../../game/service/game.service';
+import { MatchStatus } from '../../game/enum/MatchStatus';
 
 @Injectable()
 export class PongService {
@@ -6,14 +8,14 @@ export class PongService {
   private readonly canvasHeight = 600; // Height of the game canvas
   private readonly widthPlayer = 10; // Width of the paddles
   private readonly heightPlayer = 80; // Height of the paddles
-  private readonly diameterBall= 10; // Size of the ball
+  private readonly diameterBall = 10; // Size of the ball
   private readonly paddleSpeed = 10; // Speed at which the paddles move
   private readonly ballSpeed = 3; // Speed at which the ball moves
 
   private player1Y = this.canvasHeight / 2 - this.heightPlayer / 2; // Initial Y position of player 1's paddle
   private player2Y = this.canvasHeight / 2 - this.heightPlayer / 2; // Initial Y position of player 2's paddle
-  private ballX = this.canvasWidth / 2 - this.diameterBall/ 2; // Initial X position of the ball
-  private ballY = this.canvasHeight / 2 - this.diameterBall/ 2; // Initial Y position of the ball
+  private ballX = this.canvasWidth / 2 - this.diameterBall / 2; // Initial X position of the ball
+  private ballY = this.canvasHeight / 2 - this.diameterBall / 2; // Initial Y position of the ball
   private ballSpeedX = this.ballSpeed; // Initial speed of the ball along the X-axis
   private ballSpeedY = this.ballSpeed; // Initial speed of the ball along the Y-axis
 
@@ -27,6 +29,8 @@ export class PongService {
   private roomNameTmp;
   private serverTmp;
 
+  constructor(private readonly gameService: GameService) {}
+
   movePlayer1Up(): void {
     if (this.player1Y >= this.paddleSpeed) {
       this.player1Y -= this.paddleSpeed;
@@ -34,7 +38,10 @@ export class PongService {
   }
 
   movePlayer1Down(): void {
-    if (this.player1Y + this.heightPlayer + this.paddleSpeed <= this.canvasHeight) {
+    if (
+      this.player1Y + this.heightPlayer + this.paddleSpeed <=
+      this.canvasHeight
+    ) {
       this.player1Y += this.paddleSpeed;
     }
   }
@@ -46,7 +53,10 @@ export class PongService {
   }
 
   movePlayer2Down(): void {
-    if (this.player2Y + this.heightPlayer + this.paddleSpeed <= this.canvasHeight) {
+    if (
+      this.player2Y + this.heightPlayer + this.paddleSpeed <=
+      this.canvasHeight
+    ) {
       this.player2Y += this.paddleSpeed;
     }
   }
@@ -56,17 +66,20 @@ export class PongService {
     this.ballY += this.ballSpeedY;
 
     // Check collision with walls
-    if (this.ballY <= 0 || this.ballY + this.diameterBall>= this.canvasHeight) {
+    if (
+      this.ballY <= 0 ||
+      this.ballY + this.diameterBall >= this.canvasHeight
+    ) {
       this.ballSpeedY *= -1; // Reverse the ball's Y speed
     }
 
     // Check collision with paddles
     if (
       (this.ballX <= this.widthPlayer &&
-        this.ballY + this.diameterBall>= this.player1Y &&
+        this.ballY + this.diameterBall >= this.player1Y &&
         this.ballY <= this.player1Y + this.heightPlayer) ||
-      (this.ballX + this.diameterBall>= this.canvasWidth - this.widthPlayer &&
-        this.ballY + this.diameterBall>= this.player2Y &&
+      (this.ballX + this.diameterBall >= this.canvasWidth - this.widthPlayer &&
+        this.ballY + this.diameterBall >= this.player2Y &&
         this.ballY <= this.player2Y + this.heightPlayer)
     ) {
       this.ballSpeedX *= -1; // Reverse the ball's X speed
@@ -87,8 +100,8 @@ export class PongService {
   }
 
   resetBallPosition(scoringPlayer: number): void {
-    this.ballX = this.canvasWidth / 2 - this.diameterBall/ 2; // Reset X position of the ball
-    this.ballY = this.canvasHeight / 2 - this.diameterBall/ 2; // Reset Y position of the ball
+    this.ballX = this.canvasWidth / 2 - this.diameterBall / 2; // Reset X position of the ball
+    this.ballY = this.canvasHeight / 2 - this.diameterBall / 2; // Reset Y position of the ball
 
     // Reset X speed of the ball based on the scoring player
     this.ballSpeedX = this.ballSpeed * (scoringPlayer === 1 ? 1 : -1);
@@ -113,15 +126,31 @@ export class PongService {
     }
   }
 
-  stopGameLoop(): void {
+  async stopGameLoop() {
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
 
       // Stop the timer
       this.stopTimer();
-      // const gameState = this.getGameState();
-      this.serverTmp.to(this.roomNameTmp ).emit('endGame', 'Acabouuuuu');
+
+      const gameState = this.getGameState();
+      console.log('ENDGAME', gameState);
+
+      const matchEntity = await this.gameService.getByRoomName(
+        this.roomNameTmp,
+      );
+      matchEntity.user1Score = gameState.player1Score;
+      matchEntity.user2Score = gameState.player2Score;
+      matchEntity.status = MatchStatus.FINISHED;
+      if (gameState.player1Score > gameState.player2Score) {
+        matchEntity.setWinner(1);
+      } else {
+        matchEntity.setWinner(2);
+      }
+
+      await this.gameService.updateMatch(matchEntity);
+      this.serverTmp.to(this.roomNameTmp).emit('endGame', 'Acabouuuuu');
     }
   }
 
@@ -135,7 +164,6 @@ export class PongService {
       this.stopGameLoop();
     }
   }
-
 
   private startTimer(): void {
     this.timer = this.timerDuration;

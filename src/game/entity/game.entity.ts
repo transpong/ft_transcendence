@@ -60,4 +60,12 @@ export class MatchHistoryEntity {
   isReady(): boolean {
     return this.user1IsReady && this.user2IsReady;
   }
+
+  setWinner(nbr: number): void {
+    if (nbr === 1) {
+      this.winner = this.user1;
+    } else if (nbr === 2) {
+      this.winner = this.user2;
+    }
+  }
 }
