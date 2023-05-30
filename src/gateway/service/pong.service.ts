@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common';
 import { GameService } from '../../game/service/game.service';
 import { MatchStatus } from '../../game/enum/MatchStatus';
 
-@Injectable()
 export class PongService {
   private readonly canvasWidth = 800; // Width of the game canvas
   private readonly canvasHeight = 600; // Height of the game canvas
@@ -25,12 +23,31 @@ export class PongService {
   private timerInterval: NodeJS.Timeout | null = null;
   private timerDuration = 10; // Duration of the game in seconds
   private timer = this.timerDuration; // Current value of the timer
-  private namePlayer1 = ''; // Player 1's nickname
-  private namePlayer2 = ''; // Player 2's nickname
   private roomNameTmp;
   private serverTmp;
 
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private namePlayer1: string,
+    private namePlayer2: string,
+  ) {}
+
+  moveUp(player: string): void {
+    console.log(player + ' ' + this.namePlayer1 + ' ' + this.namePlayer2);
+    if (player == this.namePlayer1) {
+      this.movePlayer1Up();
+    } else if (player == this.namePlayer2) {
+      this.movePlayer2Up();
+    }
+  }
+
+  moveDown(player: string): void {
+    if (player == this.namePlayer1) {
+      this.movePlayer1Down();
+    } else if (player == this.namePlayer2) {
+      this.movePlayer2Down();
+    }
+  }
 
   movePlayer1Up(): void {
     if (this.player1Y >= this.paddleSpeed) {
@@ -111,10 +128,8 @@ export class PongService {
     this.ballSpeedY = this.ballSpeed;
   }
 
-  startGameLoop(roomName: string, server: any, players: string[]): void {
+  startGameLoop(roomName: string, server: any): void {
     if (!this.gameLoopInterval) {
-      this.namePlayer1 = players[0];
-      this.namePlayer2 = players[1];
       this.roomNameTmp = roomName;
       this.serverTmp = server;
       // Start the game loop
@@ -205,6 +220,8 @@ export class PongService {
       player1Score: this.player1Score,
       player2Score: this.player2Score,
       timer: this.timer,
+      player1Name: this.namePlayer1,
+      player2Name: this.namePlayer2,
     };
   }
 }
