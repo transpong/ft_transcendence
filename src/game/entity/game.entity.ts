@@ -48,4 +48,16 @@ export class MatchHistoryEntity {
 
   @Column({ name: 'user_2_is_ready' })
   user2IsReady: boolean;
+
+  readyPlayer(player: string): void {
+    if (player === this.user1.ftId) {
+      this.user1IsReady = true;
+    } else {
+      this.user2IsReady = true;
+    }
+  }
+
+  isReady(): boolean {
+    return this.user1IsReady && this.user2IsReady;
+  }
 }
