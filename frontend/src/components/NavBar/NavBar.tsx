@@ -41,6 +41,9 @@ export default function NavBar() {
         <Button colorScheme={"purple"} onClick={() => navigate("/home/matches")}>
           Lista de Jogos
         </Button>
+        <Button colorScheme={"purple"} onClick={() => navigate("/home/matches/live")}>
+          Jogos ao vivo
+        </Button>
         <Button colorScheme={"purple"} onClick={() => navigate("/home/ranking")}>
           Ranking
         </Button>

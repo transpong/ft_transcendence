@@ -17,6 +17,8 @@ export interface IApiMatchHistory {
   created_at: Date;
   user_1: IApiMatchUser;
   user_2: IApiMatchUser;
+  room_id: string;
+  status: MatchStatus;
 }
 
 interface IApiMatchUser {
@@ -28,6 +30,13 @@ interface IApiMatchUser {
   avatar: string;
   custom: number;
 }
+
+export enum MatchStatus {
+  IS_WAITING = 0,
+  IS_PLAYING = 1,
+  FINISHED = 2,
+}
+
 
 export class GameService {
   private api: AxiosInstance;
@@ -45,12 +54,13 @@ export class GameService {
     return data;
   }
 
-  async getMatchesHistory(nickname?: string): Promise<IApiMatchHistory[]> {
+  async getMatchesHistory(nickname?: string, status?: MatchStatus): Promise<IApiMatchHistory[]> {
     const { data } = await this.api.get<IApiMatchHistory[]>(
       "/game/matches-history",
       {
         params: {
           nickname,
+          status,
         },
       }
     );

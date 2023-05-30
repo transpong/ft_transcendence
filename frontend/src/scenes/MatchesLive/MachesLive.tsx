@@ -1,15 +1,15 @@
 import { Box } from "@chakra-ui/layout";
 import { Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
-import MatchCard from "../../../components/MatchCard/MatchCard";
-import { gameService, IApiMatchHistory, MatchStatus } from "../../../services/game-service";
+import MatchCard from "../../components/MatchCard/MatchCard";
+import { gameService, IApiMatchHistory, MatchStatus } from "../../services/game-service";
 
-export default function MachesHistory(){
+export default function MachesLive(){
   const [matchesList, setMatchesList] = useState<IApiMatchHistory[]>([]);
 
 
   useMemo(async () => {
-    const matches = await gameService.getMatchesHistory(undefined, MatchStatus.FINISHED);
+    const matches = await gameService.getMatchesHistory(undefined, MatchStatus.IS_PLAYING);
 
     setMatchesList(matches);
   }, []);
@@ -22,7 +22,7 @@ export default function MachesHistory(){
         textColor="white"
         textAlign="center"
       >
-        Lista de Jogos
+        Jogos ao Vivo
       </Text>
       <Box>
         {matchesList.map((match) => {

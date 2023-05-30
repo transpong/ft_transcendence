@@ -11,6 +11,7 @@ import Me from './scenes/Users/Me/View/Me';
 import MFA from './scenes/Users/MFA/View/MFA';
 import Profile from './scenes/Users/Profiles/View/Profiles';
 import Game from './scenes/Game/GameOnLine';
+import MachesLive from './scenes/MatchesLive/MachesLive';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/home/" element={<HomeView />}>
               <Route path="ranking" element={<Ranking />} />
               <Route path="matches" element={<MachesHistory />} />
+              <Route path="matches/live" element={<MachesLive />} />
               <Route path="me/" element={<Me />}>
                 <Route path="mfa" element={<MFA />} />
               </Route>
