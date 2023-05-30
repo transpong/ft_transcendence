@@ -117,6 +117,14 @@ export default function Me(){
           <Text fontSize={"35px"} fontWeight={"bold"} marginBottom={"15px"}>
             {me?.nickname}
           </Text>
+          <Button
+            size={"lg"}
+            colorScheme={"purple"}
+            mb={"4px"}
+            onClick={() => navigate("/nickname")}
+          >
+            Alterar Nickname
+          </Button>
           {!me?.is_mfa_enabled ? (
             <Button
               size={"lg"}

@@ -20,7 +20,7 @@ export default function CreateNickNameLoginView(){
         await userService.updateNickname(value)
         setTimeout(() => {
           setIsUploading(false);
-          navigate("/home");
+          navigate("/home/me");
         }, 1000);
       } catch {
         setTimeout(() => {
@@ -65,7 +65,7 @@ export default function CreateNickNameLoginView(){
                       }}
                     />
                     <Button onClick={handleNicknameUpdate} colorScheme={"purple"} size={"lg"} isLoading={isUploading}>
-                        LOGIN
+                        Salvar
                     </Button>
                 </Stack>
             </Flex>
