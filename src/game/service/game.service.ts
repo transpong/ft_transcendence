@@ -203,7 +203,11 @@ export class GameService {
 
   async isMatchHistoryExist(ftId: string) {
     const matchHistory = await this.matchHistoryRepository.findOne({
-      where: [{ user1: { ftId } }, { user2: { ftId } }, { status: 2 }],
+      where: [
+        { user1: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+        { user2: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+      ],
+      relations: ['user1', 'user2', 'winner'],
     });
 
     return matchHistory ? true : false;
