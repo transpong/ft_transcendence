@@ -25,7 +25,8 @@ export class PongService {
   private timerInterval: NodeJS.Timeout | null = null;
   private timerDuration = 10; // Duration of the game in seconds
   private timer = this.timerDuration; // Current value of the timer
-
+  private namePlayer1 = ''; // Player 1's nickname
+  private namePlayer2 = ''; // Player 2's nickname
   private roomNameTmp;
   private serverTmp;
 
@@ -110,8 +111,10 @@ export class PongService {
     this.ballSpeedY = this.ballSpeed;
   }
 
-  startGameLoop(roomName: string, server: any): void {
+  startGameLoop(roomName: string, server: any, players: string[]): void {
     if (!this.gameLoopInterval) {
+      this.namePlayer1 = players[0];
+      this.namePlayer2 = players[1];
       this.roomNameTmp = roomName;
       this.serverTmp = server;
       // Start the game loop
@@ -135,21 +138,23 @@ export class PongService {
       this.stopTimer();
 
       const gameState = this.getGameState();
-      console.log('ENDGAME', gameState);
-
       const matchEntity = await this.gameService.getByRoomName(
         this.roomNameTmp,
       );
-      matchEntity.user1Score = gameState.player1Score;
-      matchEntity.user2Score = gameState.player2Score;
+
+      matchEntity.setScore(
+        this.namePlayer1,
+        this.namePlayer1,
+        gameState.player1Score,
+        gameState.player2Score,
+      );
+
       matchEntity.status = MatchStatus.FINISHED;
-      if (gameState.player1Score > gameState.player2Score) {
-        matchEntity.setWinner(1);
-      } else {
-        matchEntity.setWinner(2);
-      }
+      matchEntity.setWinner();
 
       await this.gameService.updateMatch(matchEntity);
+
+      console.log(matchEntity);
       this.serverTmp.to(this.roomNameTmp).emit('endGame', 'Acabouuuuu');
     }
   }

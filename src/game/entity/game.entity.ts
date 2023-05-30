@@ -61,11 +61,28 @@ export class MatchHistoryEntity {
     return this.user1IsReady && this.user2IsReady;
   }
 
-  setWinner(nbr: number): void {
-    if (nbr === 1) {
+  setWinner(): void {
+    if (this.user1Score > this.user2Score) {
       this.winner = this.user1;
-    } else if (nbr === 2) {
+    } else if (this.user1Score < this.user2Score) {
       this.winner = this.user2;
+    } else {
+      this.winner = null;
+    }
+  }
+
+  setScore(
+    player1: string,
+    player2: string,
+    score1: number,
+    score2: number,
+  ): void {
+    if (player1 === this.user1.ftId) {
+      this.user1Score = score2;
+      this.user2Score = score1;
+    } else if (player1 === this.user2.ftId) {
+      this.user1Score = score1;
+      this.user2Score = score2;
     }
   }
 }

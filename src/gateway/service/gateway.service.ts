@@ -153,7 +153,11 @@ export class GatewayService {
         }
         this.server.to(roomName).emit('pong', gameState);
 
-        pongService.startGameLoop(roomName, this.server);
+        pongService.startGameLoop(
+          roomName,
+          this.server,
+          this.createPlayerArray(client.id, roomName),
+        );
         return;
       }
       console.log('not ready ' + client.id);
@@ -168,8 +172,6 @@ export class GatewayService {
   @SubscribeMessage('endGame')
   async handleEndGame(client: Socket) {
     const roomName = this.playerRooms.get(client.id);
-    const pongService = this.pongGames.get(roomName);
-
     // delete the room from the map
     this.playerRooms.delete(roomName);
 
@@ -236,6 +238,21 @@ export class GatewayService {
 
   private pongRoom(roomName: string): PongService | undefined {
     return this.pongGames.get(roomName);
+  }
+
+  private createPlayerArray(myId: string, roomName: string): string[] {
+    const roomUsers = this.server.sockets.adapter.rooms.get(roomName);
+    const iterator = roomUsers.values();
+    const user1 = iterator.next().value;
+    const user2 = iterator.next().value;
+
+    if (user1 === myId) {
+      return [user1, user2];
+    } else if (user2 === myId) {
+      return [user2, user1];
+    }
+
+    return undefined;
   }
 
   private sendMessagesToRoom(room: string, message: string) {
