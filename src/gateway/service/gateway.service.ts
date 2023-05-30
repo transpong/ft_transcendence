@@ -6,6 +6,7 @@ import {
 import { Socket } from 'socket.io';
 import { PongService } from './pong.service';
 import { GameService } from '../../game/service/game.service';
+import { MatchStatus } from '../../game/enum/MatchStatus';
 
 @WebSocketGateway({ cors: true })
 export class GatewayService {
@@ -16,41 +17,42 @@ export class GatewayService {
 
   private usersWaiting: Array<string> = [];
 
-  // <roomName, pongService>
-  private pong: Map<string, PongService> = new Map();
+  private pongGames: Map<string, PongService> = new Map();
 
-  private mapRooms: Map<string, string> = new Map();
+  private playerRooms: Map<string, string> = new Map();
 
   async handleConnection(client: Socket) {
-    console.log('Client:\t' + client.id + ' connected'); // TODO: remove
+    console.log('new connection: ' + client.id);
   }
 
-  async handleDisconnect() {
-    this.server.emit('users', this.usersWaiting);
+  async handleDisconnect(client: Socket) {
+    console.log('disconnected: ' + client.id);
   }
 
   @SubscribeMessage('joinRoom')
   async handleRoom(client: Socket) {
-    if (this.usersWaiting[0] !== client.id) this.usersWaiting.push(client.id);
-    console.log('there is' + this.usersWaiting.length + 'users');
-
-    if (
-      this.usersWaiting.length === 2 &&
-      (client.id === this.usersWaiting[0] || client.id === this.usersWaiting[1])
-    ) {
-      await this.makeRoom(client);
+    if (this.usersWaiting.includes(client.id)) {
+      return;
     }
+
+    this.usersWaiting.push(client.id);
+    if (this.usersWaiting.length > 1) {
+      await this.makeRoom(client);
+      return;
+    }
+    console.log('user waiting: ' + client.id);
   }
 
   private async makeRoom(client) {
-    const user1 = client.id;
-    let user2;
+    console.log('creating room...');
 
-    if (client.id === this.usersWaiting[0]) {
-      user2 = this.usersWaiting[1];
-    } else {
-      user2 = this.usersWaiting[0];
+    if (await this.gameService.isMatchHistoryExist(client.id)) {
+      console.log('match history exist');
+      return;
     }
+
+    const user1 = client.id;
+    const user2 = this.usersWaiting.find((user) => user !== user1);
 
     const roomName = this.createRoomName(user1, user2);
 
@@ -63,7 +65,10 @@ export class GatewayService {
     // send the room name to the users inside the room
     this.server.to(roomName).emit('room', roomName);
 
-    // send messages to the room only to the users inside the room
+    // print double rooms
+    console.log(this.findDoubleRooms());
+
+    // send messages only to the users inside the room
     this.sendMessagesToRoom(roomName, 'Partida Encontrada');
 
     // delete users from the users waiting list
@@ -71,28 +76,40 @@ export class GatewayService {
       (user) => user !== user1 && user !== user2,
     );
 
-    // add users to the map
-    this.mapRooms.set(user1, roomName);
-    this.mapRooms.set(user2, roomName);
+    console.log('users waiting: ' + this.usersWaiting);
 
-    console.log('joined room: ' + roomName);
+    // add users to the map
+    this.playerRooms.set(user1, roomName);
+    this.playerRooms.set(user2, roomName);
+
     // throw new Error('Method not implemented.');
 
     // add users to MatchHistoryEntity
     await this.gameService.createMatchHistory(user1, user2, roomName);
 
     // create a pong game for the room
-    this.pong.set(roomName, new PongService());
+    this.pongGames.set(roomName, new PongService());
     this.server
       .to(roomName)
-      .emit('startGame', 'Game Found! Waiting for players...');
+      .emit('toGame', this.pongGames.get(roomName).getGameState()); // TODO: remove
   }
 
-  private createRoomName(user1: string, user2: string): string {
-    return `${user1}-${user2}-${Date.now()}`;
+  findDoubleRooms() {
+    const availableRooms = [];
+    const rooms = this.server.sockets.adapter.rooms;
+
+    if (rooms) {
+      for (const [key] of rooms) {
+        if (key.length !== 13) {
+          availableRooms.push(key);
+        }
+      }
+    }
+
+    return availableRooms;
   }
 
-  private printUsersInRoom(roomName: string) {
+  private getUsersFromRoom(roomName: string) {
     // get the users from the room
     const roomUsers = this.server.sockets.adapter.rooms.get(roomName);
     const iterator = roomUsers.values();
@@ -103,29 +120,53 @@ export class GatewayService {
     console.log('Segundo usuário:', secondUser);
   }
 
+  private createRoomName(user1: string, user2: string): string {
+    return `${user1}-${user2}-${Date.now()}`;
+  }
+
   @SubscribeMessage('startGame')
-  handleStartGame(client: Socket) {
-    // Start the game and emit the initial game state to players
-    const roomName = this.mapRooms.get(client.id);
-    console.log('roomName get', roomName);
+  async handleStartGame(client: Socket, message: string) {
+    console.log('calling startGame from ' + message, client.id);
 
-    throw new Error('Method not implemented.');
-    const pongService = this.pong.get(roomName);
-    const gameState = pongService.getGameState();
-    this.server.to(roomName).emit('pong', gameState);
+    const roomName = await this.gameService.getRoomId(client.id);
+    const match = await this.gameService.getByRoomName(roomName);
 
-    // Start the game loop
-    pongService.startGameLoop(roomName, this.server);
+    match.readyPlayer(client.id);
+    await this.gameService.updateMatch(match);
+    // throw new Error('Method not implemented.');
+    if (match.isReady() && match.status === MatchStatus.IS_WAITING) {
+      console.log('start game' + client.id);
+      // this.server.to(roomName).emit('startGame', 'Game Started!');
+      // start game loop
+
+      console.log('roomName from: ' + client.id + ' is ' + roomName + message);
+      const pongService = this.pongGames.get(roomName);
+      const gameState = pongService.getGameState();
+      if (client.id === 'anhigo-s') {
+        console.log(gameState);
+      }
+      this.server.to(roomName).emit('pong', gameState);
+
+      pongService.startGameLoop(roomName, this.server);
+      return;
+    }
+    console.log('not ready ' + client.id);
+
+    this.server.to(roomName).emit('ready', false);
+    setTimeout(() => {
+      console.log('timeout');
+      this.handleStartGame(client, message);
+    }, 1000);
   }
 
   @SubscribeMessage('endGame')
   async handleEndGame(client: Socket) {
-    const roomName = this.mapRooms.get(client.id);
+    const roomName = this.playerRooms.get(client.id);
     // delete the room from the map
-    this.mapRooms.delete(roomName);
+    this.playerRooms.delete(roomName);
 
     // delete the pong game from the map
-    this.pong.delete(roomName);
+    this.pongGames.delete(roomName);
 
     // delete the room
     this.server.socketsLeave(roomName);
@@ -133,8 +174,8 @@ export class GatewayService {
 
   @SubscribeMessage('moveUp')
   async handleMoveUp(client: Socket) {
-    const roomName = this.mapRooms.get(client.id);
-    const pongService = this.pong.get(roomName);
+    const roomName = this.playerRooms.get(client.id);
+    const pongService = this.pongGames.get(roomName);
 
     if (pongService) {
       const playerId = this.getPlayerIdInRoom(roomName, client.id);
@@ -151,8 +192,8 @@ export class GatewayService {
 
   @SubscribeMessage('moveDown')
   async handleMoveDown(client: Socket) {
-    const roomName = this.mapRooms.get(client.id);
-    const pongService = this.pong.get(roomName);
+    const roomName = this.playerRooms.get(client.id);
+    const pongService = this.pongGames.get(roomName);
 
     if (pongService) {
       const playerId = this.getPlayerIdInRoom(roomName, client.id);
@@ -186,7 +227,7 @@ export class GatewayService {
   }
 
   private pongRoom(roomName: string): PongService | undefined {
-    return this.pong.get(roomName);
+    return this.pongGames.get(roomName);
   }
 
   private sendMessagesToRoom(room: string, message: string) {
@@ -194,7 +235,7 @@ export class GatewayService {
     const interval = setInterval(() => {
       this.server.to(room).emit('message', message);
       counter++;
-      if (counter === 3) {
+      if (counter === 1) {
         clearInterval(interval);
       }
     }, 1000);
