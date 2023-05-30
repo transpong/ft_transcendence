@@ -26,17 +26,26 @@ export class MatchHistoryEntity {
   user2: UserEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.id)
-  winner: UserEntity;
+  winner?: UserEntity;
 
-  @Column({ name: 'user_1_score' })
-  user1Score: number;
+  @Column({ name: 'user_1_score', nullable: true })
+  user1Score?: number;
 
-  @Column({ name: 'user_2_score' })
-  user2Score: number;
+  @Column({ name: 'user_2_score', nullable: true })
+  user2Score?: number;
 
   @Column({ name: 'status' })
   status: number;
 
-  @Column({ name: 'custom' })
-  custom: number;
+  @Column({ name: 'custom', nullable: true })
+  custom?: number;
+
+  @Column({ name: 'room_id' })
+  roomId: string;
+
+  @Column({ name: 'user_1_is_ready' })
+  user1IsReady: boolean;
+
+  @Column({ name: 'user_2_is_ready' })
+  user2IsReady: boolean;
 }
