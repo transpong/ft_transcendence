@@ -178,13 +178,6 @@ export class GatewayService {
 
     // delete the room
     this.server.socketsLeave(roomName);
-
-    // update status of the match
-    const match = await this.gameService.getByRoomName(roomName);
-    const gameState = pongService.getGameState();
-
-    console.log(gameState);
-    await this.gameService.updateMatch(match);
   }
 
   @SubscribeMessage('moveUp')
