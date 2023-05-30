@@ -2,11 +2,12 @@ import { Flex } from "@chakra-ui/react";
 // import NavBar from "../NavBar/NavBar";
 import NavBar from "../../../components/NavBar/NavBar";
 import FriendsList from "../../../components/FriendsList/FriendsList";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import './Home.css'
 import { Outlet } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import { getCookie } from "../../../helpers/get-cookie";
+import { useNavigate } from 'react-router-dom'
 
 
 export default function PageBase() {
@@ -19,6 +20,8 @@ export default function PageBase() {
       },
     }))
 
+  const navigate = useNavigate();
+
   const addChatList = (newChat: React.ReactElement) => {
     setListChats(newChat);
   };
@@ -26,6 +29,13 @@ export default function PageBase() {
   const deleteChatList = () => {
     setListChats(null);
   };
+
+  useEffect(() => {
+    const authCookie = getCookie("token");
+
+    if (!authCookie)
+      navigate("/");
+  }, [])
 
   return (
     <Flex className="MainBackground" h={"100vh"}>
