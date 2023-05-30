@@ -27,6 +27,13 @@ export class GatewayService {
 
   async handleDisconnect(client: Socket) {
     console.log('User: ' + client.id + ' disconnected');
+
+    if (this.usersWaiting.includes(client.id)) {
+      this.usersWaiting = this.usersWaiting.filter(
+        (user) => user !== client.id,
+      );
+      return;
+    }
   }
 
   // ###########################################################################
@@ -92,7 +99,10 @@ export class GatewayService {
     await this.gameService.createMatchHistory(user1, user2, roomName);
 
     // create a pong game for the room
-    this.pongGames.set(roomName, new PongService(this.gameService));
+    this.pongGames.set(
+      roomName,
+      new PongService(this.gameService, user1, user2),
+    );
     this.server
       .to(roomName)
       .emit('toGame', this.pongGames.get(roomName).getGameState()); // TODO: remove
@@ -131,6 +141,7 @@ export class GatewayService {
   @SubscribeMessage('startGame')
   async handleStartGame(client: Socket, message: string) {
     console.log('calling startGame from ' + message, client.id);
+
     if (await this.gameService.isMatchHistoryExist(client.id)) {
       const roomName = await this.gameService.getRoomId(client.id);
       const match = await this.gameService.getByRoomName(roomName);
@@ -138,10 +149,9 @@ export class GatewayService {
       match.readyPlayer(client.id);
       await this.gameService.updateMatch(match);
       // throw new Error('Method not implemented.');
+      console.log('match status: ' + match.user1IsReady + match.user2IsReady);
       if (match.isReady() && match.status === MatchStatus.IS_WAITING) {
         console.log('start game' + client.id);
-        // this.server.to(roomName).emit('startGame', 'Game Started!');
-        // start game loop
 
         console.log(
           'roomName from: ' + client.id + ' is ' + roomName + message,
@@ -153,20 +163,16 @@ export class GatewayService {
         }
         this.server.to(roomName).emit('pong', gameState);
 
-        pongService.startGameLoop(
-          roomName,
-          this.server,
-          this.createPlayerArray(client.id, roomName),
-        );
+        pongService.startGameLoop(roomName, this.server);
         return;
       }
       console.log('not ready ' + client.id);
       this.server.to(roomName).emit('ready', false);
     }
-    // setTimeout(() => {
-    //   console.log('timeout');
-    //   this.handleStartGame(client, message);
-    // }, 1000);
+    setTimeout(() => {
+      console.log('timeout');
+      this.handleStartGame(client, message);
+    }, 1000);
   }
 
   @SubscribeMessage('endGame')
@@ -188,12 +194,7 @@ export class GatewayService {
     const pongService = this.pongGames.get(roomName);
 
     if (pongService) {
-      const playerId = this.getPlayerIdInRoom(roomName, client.id);
-      if (playerId === 1) {
-        pongService.movePlayer1Up();
-      } else if (playerId === 2) {
-        pongService.movePlayer2Up();
-      }
+      pongService.moveUp(client.id);
 
       const gameState = pongService.getGameState();
       this.server.to(roomName).emit('pong', gameState);
@@ -206,12 +207,7 @@ export class GatewayService {
     const pongService = this.pongGames.get(roomName);
 
     if (pongService) {
-      const playerId = this.getPlayerIdInRoom(roomName, client.id);
-      if (playerId === 1) {
-        pongService.movePlayer1Down();
-      } else if (playerId === 2) {
-        pongService.movePlayer2Down();
-      }
+      pongService.moveDown(client.id);
 
       const gameState = pongService.getGameState();
       this.server.to(roomName).emit('pong', gameState);
