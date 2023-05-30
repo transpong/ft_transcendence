@@ -4,88 +4,118 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { UserService } from '../../user/service/user.service';
 import { PongService } from './pong.service';
+import { GameService } from '../../game/service/game.service';
 
 @WebSocketGateway({ cors: true })
 export class GatewayService {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly gameService: GameService) {}
 
   @WebSocketServer()
   server: any;
 
-  private users: Array<string> = [];
+  private usersWaiting: Array<string> = [];
 
+  // <roomName, pongService>
   private pong: Map<string, PongService> = new Map();
 
   private mapRooms: Map<string, string> = new Map();
 
-  private pongService: PongService = new PongService();
-
   async handleConnection(client: Socket) {
-    console.log('Client Handle Connection');
+    console.log('Client:\t' + client.id + ' connected'); // TODO: remove
   }
 
   async handleDisconnect() {
-    this.server.emit('users', this.users);
+    this.server.emit('users', this.usersWaiting);
   }
-
 
   @SubscribeMessage('joinRoom')
   async handleRoom(client: Socket) {
-    if (this.users[0] !== client.id)
-      this.users.push(client.id);
-    if (this.users.length === 2) {
-      console.log('Entreiii')
-      // create a new room if it doesn't exist
-      const user1 = this.users[0];
-      const user2 = this.users[1];
+    if (this.usersWaiting[0] !== client.id) this.usersWaiting.push(client.id);
+    console.log('there is' + this.usersWaiting.length + 'users');
 
-      const roomName = `${user1}-${user2}`;
-
-      // add users to the room
-      this.server.socketsJoin(roomName);
-
-      // send the room name to the client
-      this.server.to(roomName).emit('room', roomName);
-
-      // send messages to the room
-      this.sendMessagesToRoom(roomName, 'Partida Encontrada');
-
-      // filter users from the list
-      this.users = this.users.filter(
-        (user) => user !== user1 && user !== user2,
-      );
-      console.log('users', this.users);
-
-      // add users to the map
-      this.mapRooms.set(user1, roomName);
-      this.mapRooms.set(user2, roomName);
-
-      // get the users from the room
-      const roomUsers = this.server.sockets.adapter.rooms.get(roomName);
-      const iterator = roomUsers.values();
-      const firstUser = iterator.next().value;
-      const secondUser = iterator.next().value;
-
-      console.log('Primeiro usuário:', firstUser);
-      console.log('Segundo usuário:', secondUser);
-
-      // create a pong game for the room
-      this.pong.set(roomName, this.pongService);
-      this.server.to(roomName).emit('startGame', 'Game Found!');
+    if (
+      this.usersWaiting.length === 2 &&
+      (client.id === this.usersWaiting[0] || client.id === this.usersWaiting[1])
+    ) {
+      await this.makeRoom(client);
     }
+  }
+
+  private async makeRoom(client) {
+    const user1 = client.id;
+    let user2;
+
+    if (client.id === this.usersWaiting[0]) {
+      user2 = this.usersWaiting[1];
+    } else {
+      user2 = this.usersWaiting[0];
+    }
+
+    const roomName = this.createRoomName(user1, user2);
+
+    // add this user to the room
+    this.server.socketsJoin(roomName, client.id);
+
+    // add the other user to the room
+    this.server.socketsJoin(roomName, user2);
+
+    // send the room name to the users inside the room
+    this.server.to(roomName).emit('room', roomName);
+
+    // send messages to the room only to the users inside the room
+    this.sendMessagesToRoom(roomName, 'Partida Encontrada');
+
+    // delete users from the users waiting list
+    this.usersWaiting = this.usersWaiting.filter(
+      (user) => user !== user1 && user !== user2,
+    );
+
+    // add users to the map
+    this.mapRooms.set(user1, roomName);
+    this.mapRooms.set(user2, roomName);
+
+    console.log('joined room: ' + roomName);
+    // throw new Error('Method not implemented.');
+
+    // add users to MatchHistoryEntity
+    await this.gameService.createMatchHistory(user1, user2, roomName);
+
+    // create a pong game for the room
+    this.pong.set(roomName, new PongService());
+    this.server
+      .to(roomName)
+      .emit('startGame', 'Game Found! Waiting for players...');
+  }
+
+  private createRoomName(user1: string, user2: string): string {
+    return `${user1}-${user2}-${Date.now()}`;
+  }
+
+  private printUsersInRoom(roomName: string) {
+    // get the users from the room
+    const roomUsers = this.server.sockets.adapter.rooms.get(roomName);
+    const iterator = roomUsers.values();
+    const firstUser = iterator.next().value;
+    const secondUser = iterator.next().value;
+
+    console.log('Primeiro usuário:', firstUser);
+    console.log('Segundo usuário:', secondUser);
   }
 
   @SubscribeMessage('startGame')
   handleStartGame(client: Socket) {
     // Start the game and emit the initial game state to players
     const roomName = this.mapRooms.get(client.id);
-    const gameState = this.pongService.getGameState();
+    console.log('roomName get', roomName);
+
+    throw new Error('Method not implemented.');
+    const pongService = this.pong.get(roomName);
+    const gameState = pongService.getGameState();
     this.server.to(roomName).emit('pong', gameState);
 
     // Start the game loop
-    this.pongService.startGameLoop(roomName, this.server);
+    pongService.startGameLoop(roomName, this.server);
   }
 
   @SubscribeMessage('endGame')
@@ -137,7 +167,10 @@ export class GatewayService {
     }
   }
 
-  private getPlayerIdInRoom(roomName: string, playerId: string): number | undefined {
+  private getPlayerIdInRoom(
+    roomName: string,
+    playerId: string,
+  ): number | undefined {
     const roomUsers = this.server.sockets.adapter.rooms.get(roomName);
     const iterator = roomUsers.values();
     const user1 = iterator.next().value;
@@ -150,6 +183,10 @@ export class GatewayService {
     }
 
     return undefined;
+  }
+
+  private pongRoom(roomName: string): PongService | undefined {
+    return this.pong.get(roomName);
   }
 
   private sendMessagesToRoom(room: string, message: string) {
