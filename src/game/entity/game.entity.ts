@@ -52,7 +52,7 @@ export class MatchHistoryEntity {
   readyPlayer(player: string): void {
     if (player === this.user1.ftId) {
       this.user1IsReady = true;
-    } else {
+    } else if (player === this.user2.ftId) {
       this.user2IsReady = true;
     }
   }

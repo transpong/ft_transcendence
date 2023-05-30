@@ -75,7 +75,7 @@ export class GatewayAdapter extends IoAdapter {
     });
 
     if (this.socketIdList.includes(decoded.req)) {
-      return next(new Error('User already connected'));
+      return next(new Error('User ' + decoded.req + ' already connected'));
     }
 
     if (!(await this.userService.userExists(decoded.req))) {

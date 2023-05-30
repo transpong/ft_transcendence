@@ -1,4 +1,5 @@
 export enum MatchStatus {
-  IS_PLAYING = 0,
-  FINISHED = 1,
+  IS_WAITING = 0,
+  IS_PLAYING = 1,
+  FINISHED = 2,
 }

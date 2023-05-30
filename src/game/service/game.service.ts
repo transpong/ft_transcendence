@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MatchHistoryEntity } from '../entity/game.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { UserService } from '../../user/service/user.service';
 import { MatchesHistoryDto } from '../dto/matches-history.dto';
 import { MatchesRakingDto } from '../dto/matches-raking.dto';
@@ -69,7 +69,7 @@ export class GameService {
     matchHistory.user1IsReady = false;
     matchHistory.user2IsReady = false;
     matchHistory.roomId = roomName;
-    matchHistory.status = MatchStatus.IS_PLAYING;
+    matchHistory.status = MatchStatus.IS_WAITING;
     await this.matchHistoryRepository.save(matchHistory);
   }
 
@@ -170,6 +170,42 @@ export class GameService {
       }
     });
     return losses;
+  }
+
+  getByRoomName(roomName: string) {
+    return this.matchHistoryRepository.findOne({
+      where: { roomId: roomName },
+      relations: ['user1', 'user2', 'winner'],
+    });
+  }
+
+  async getRoomId(ftId: string) {
+    const matchHistory = await this.matchHistoryRepository.findOne({
+      where: [
+        { user1: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+        { user2: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+      ],
+
+      relations: ['user1', 'user2', 'winner'],
+    });
+
+    if (matchHistory) {
+      return matchHistory.roomId;
+    }
+
+    return null;
+  }
+
+  async updateMatch(matchHistory: MatchHistoryEntity) {
+    return this.matchHistoryRepository.save(matchHistory);
+  }
+
+  async isMatchHistoryExist(ftId: string) {
+    const matchHistory = await this.matchHistoryRepository.findOne({
+      where: [{ user1: { ftId } }, { user2: { ftId } }, { status: 2 }],
+    });
+
+    return matchHistory ? true : false;
   }
 
   private getScore(matchesHistoryList: MatchHistoryEntity[], nickname: string) {
