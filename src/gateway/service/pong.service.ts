@@ -33,7 +33,6 @@ export class PongService {
   ) {}
 
   moveUp(player: string): void {
-    console.log(player + ' ' + this.namePlayer1 + ' ' + this.namePlayer2);
     if (player == this.namePlayer1) {
       this.movePlayer1Up();
     } else if (player == this.namePlayer2) {
@@ -137,7 +136,10 @@ export class PongService {
         // if conexao off emit endGame
         this.updateGameState();
         const gameState = this.getGameState();
-        console.log(this.roomNameTmp);
+        // console.log(this.roomNameTmp);
+        // this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
+        this.serverTmp.to(this.namePlayer1).emit('pong', gameState);
+        this.serverTmp.to(this.namePlayer2).emit('pong', gameState);
         this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
       }, 1000 / 60); // Update the game state approximately 60 times per second
       // Start the timer

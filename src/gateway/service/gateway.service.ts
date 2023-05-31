@@ -71,13 +71,10 @@ export class GatewayService {
     const roomName = this.createRoomName(user1, user2);
 
     // add this user to the room
-    this.server.socketsJoin(roomName, user1);
+    client.join(roomName);
 
-    // add the other user to the room
-    this.server.socketsJoin(roomName, user2);
-
-    // send the room name to the users inside the room
-    this.server.to(roomName).emit('room', roomName);
+    // send the room name to the user
+    this.server.emit('roomName', roomName);
 
     // // print double rooms
     // console.log(this.findDoubleRooms());
@@ -139,6 +136,11 @@ export class GatewayService {
 
   private createRoomName(user1: string, user2: string): string {
     return `${user1}-${user2}-${Date.now()}`;
+  }
+
+  @SubscribeMessage('enterRoom')
+  async handleEnterRoom(client: Socket, message: string) {
+    client.join(message);
   }
 
   @SubscribeMessage('startGame')
