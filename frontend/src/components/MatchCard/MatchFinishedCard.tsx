@@ -25,14 +25,20 @@ export default function MatchFinishedCard(props: Props) {
         <Avatar src={avatarUrl(match.user_1.avatar)} />
         <Box ml="3">
           <Text fontWeight="bold">{match.user_1.nickname}</Text>
-          {match.user_1.is_winner ? (
+          {match.user_1.is_winner && !match.draw ? (
             <Badge ml="1" colorScheme="green">
               Vitória
             </Badge>
           ) : (
-            <Badge ml="1" colorScheme="red">
-              Derrota
-            </Badge>
+            !match.user_1.is_winner && !match.draw ? (
+              <Badge ml="1" colorScheme="red">
+                Derrota
+              </Badge>
+            ) : (
+              <Badge ml="1" colorScheme="blue">
+                Empate
+              </Badge>
+            )
           )}
         </Box>
       </Flex>
@@ -51,14 +57,20 @@ export default function MatchFinishedCard(props: Props) {
         <Avatar ml="10" src={avatarUrl(match.user_2.avatar)} />
         <Box ml="3">
           <Text fontWeight="bold">{match.user_2.nickname}</Text>
-          {match.user_2.is_winner ? (
+          {match.user_2.is_winner && !match.draw ? (
             <Badge ml="1" colorScheme="green">
               Vitória
             </Badge>
           ) : (
-            <Badge ml="1" colorScheme="red">
-              Derrota
-            </Badge>
+            !match.user_2.is_winner && !match.draw ? (
+              <Badge ml="1" colorScheme="red">
+                Derrota
+              </Badge>
+            ) : (
+              <Badge ml="1" colorScheme="blue">
+                Empate
+              </Badge>
+            )
           )}
         </Box>
       </Flex>

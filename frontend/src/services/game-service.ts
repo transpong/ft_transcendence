@@ -19,6 +19,7 @@ export interface IApiMatchHistory {
   user_2: IApiMatchUser;
   room_id: string;
   status: MatchStatus;
+  draw: boolean;
 }
 
 interface IApiMatchUser {
