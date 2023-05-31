@@ -1,20 +1,18 @@
 import { Flex } from "@chakra-ui/layout";
-import {
-  Text,
-  Avatar,
-  Button,
-  Box,
-  Input,
-} from "@chakra-ui/react";
+import { Text, Avatar, Button, Box, Input } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
 import RankingCard from "../../../../components/RankingCard/RankingCard";
 import MatchCard from "../../../../components/MatchCard/MatchCard";
 import { useNavigate, useOutlet, Outlet, useLocation } from "react-router-dom";
 import { IApiUserMe, userService } from "../../../../services/users-service";
 import { avatarUrl } from "../../../../helpers/avatar-url";
-import { gameService, IApiMatchHistory, IApiRanking } from "../../../../services/game-service";
+import {
+  gameService,
+  IApiMatchHistory,
+  IApiRanking,
+} from "../../../../services/game-service";
 
-export default function Me(){
+export default function Me() {
   const [isUploading, setIsUploading] = useState(false);
   const [me, setMe] = useState<IApiUserMe>();
   const [matchesList, setMatchesList] = useState<IApiMatchHistory[]>([]);
@@ -39,8 +37,7 @@ export default function Me(){
     userService.getMe().then((data) => {
       setMe(data);
     });
-  }, [key])
-
+  }, [key]);
 
   async function handlePhotoSelect(file: File | null) {
     setIsUploading(true);
@@ -53,11 +50,10 @@ export default function Me(){
 
     try {
       await userService.uploadAvatar(photoFormData);
-      window.location.reload()
+      window.location.reload();
     } catch {
       setIsUploading(false);
     }
-
   }
 
   async function handleMfaActivation() {
@@ -66,7 +62,7 @@ export default function Me(){
     navigate(`/home/me/mfa`, {
       state: {
         qr_code: data.qr_code_url,
-      }
+      },
     });
   }
 
@@ -164,8 +160,8 @@ export default function Me(){
             position={userRanking?.position || 0}
             nickname={me?.nickname || ""}
             matches={userRanking?.matches || 0}
-            wins={userRanking?.matches || 0}
-            losses={userRanking?.matches || 0}
+            wins={userRanking?.wins || 0}
+            losses={userRanking?.loses || 0}
             avatar={me?.avatar || ""}
           />
 
