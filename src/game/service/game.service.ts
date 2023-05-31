@@ -55,9 +55,10 @@ export class GameService {
     const wins: number = this.getWins(matchesHistoryList, nickname);
     const losses: number = this.getLosses(matchesHistoryList, nickname);
     const score: number = this.getScore(matchesHistoryList, nickname);
+    const draws: number = this.getDraws(matchesHistoryList, nickname);
     const position: number = await this.getPositionFromUser(user);
 
-    return MatchesRakingDto.toDto(user, wins, losses, score, position);
+    return MatchesRakingDto.toDto(user, wins, losses, score, draws, position);
   }
 
   async createMatchHistory(user1: string, user2: string, roomName: string) {
@@ -104,11 +105,13 @@ export class GameService {
       const wins: number = this.getWins(matchesHistoryList, user.nickname);
       const losses: number = this.getLosses(matchesHistoryList, user.nickname);
       const score: number = this.getScore(matchesHistoryList, user.nickname);
+      const draws: number = this.getDraws(matchesHistoryList, user.nickname);
       const matchesRakingDto: MatchesRakingDto = MatchesRakingDto.toDto(
         user,
         wins,
         losses,
         score,
+        draws,
       );
 
       matchesRakingDtoList.push(matchesRakingDto);
@@ -171,6 +174,18 @@ export class GameService {
       }
     });
     return losses;
+  }
+
+  getDraws(matchesHistoryList: MatchHistoryEntity[], nickname: string) {
+    let draws = 0;
+
+    // get draws when matchesHistoryList.winner == null and matchesHistoryList.user1.nickname == nickname || matchesHistoryList.user2.nickname == nickname
+    matchesHistoryList.forEach((matchHistory) => {
+      if (!matchHistory.winner) {
+        draws++;
+      }
+    });
+    return draws;
   }
 
   getByRoomName(roomName: string) {

@@ -35,15 +35,37 @@ export class MatchesUserDto {
     matchHistoryDto.ftId = user.ftId;
     matchHistoryDto.nickname = user.nickname;
     if (matchHistory.status === MatchStatus.FINISHED) {
-      matchHistoryDto.isWinner = matchHistory.winner.id === user.id;
-      matchHistoryDto.score =
-        matchHistory.winner.id === user.id
-          ? matchHistory.user1Score
-          : matchHistory.user2Score;
+      matchHistoryDto.isWinner = MatchesUserDto.updateWinner(
+        matchHistory,
+        user,
+      );
+      matchHistoryDto.score = MatchesUserDto.updateScore(matchHistory, user);
     }
     matchHistoryDto.avatar = user.avatar;
     matchHistoryDto.custom = matchHistory.custom;
     return matchHistoryDto;
+  }
+
+  private static updateWinner(
+    matchHistory: MatchHistoryEntity,
+    user: UserEntity,
+  ): boolean {
+    if (matchHistory.winner != null) {
+      return matchHistory.winner.id === user.id;
+    } else {
+      return false;
+    }
+  }
+
+  private static updateScore(
+    matchHistory: MatchHistoryEntity,
+    user: UserEntity,
+  ): number {
+    if (user.ftId == matchHistory.user1.ftId) {
+      return matchHistory.user1Score;
+    } else if (user.ftId == matchHistory.user2.ftId) {
+      return matchHistory.user2Score;
+    }
   }
 
   toJSON() {
