@@ -21,7 +21,7 @@ export class PongService {
   private player2Score = 0; // Player 2's score
   private gameLoopInterval: NodeJS.Timeout | null = null;
   private timerInterval: NodeJS.Timeout | null = null;
-  private timerDuration = 10; // Duration of the game in seconds
+  private timerDuration = 500; // Duration of the game in seconds
   private timer = this.timerDuration; // Current value of the timer
   private roomNameTmp;
   private serverTmp;
@@ -137,6 +137,7 @@ export class PongService {
         // if conexao off emit endGame
         this.updateGameState();
         const gameState = this.getGameState();
+        console.log(this.roomNameTmp);
         this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
       }, 1000 / 60); // Update the game state approximately 60 times per second
       // Start the timer
@@ -169,7 +170,6 @@ export class PongService {
 
       await this.gameService.updateMatch(matchEntity);
 
-      console.log(matchEntity);
       this.serverTmp.to(this.roomNameTmp).emit('endGame', 'Acabouuuuu');
     }
   }
@@ -180,6 +180,7 @@ export class PongService {
     // Check if the game is over
     if (this.timer <= 0) {
       const gameState = this.getGameState();
+
       this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
       this.stopGameLoop();
     }

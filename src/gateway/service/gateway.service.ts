@@ -34,6 +34,8 @@ export class GatewayService {
       );
       return;
     }
+
+    // TODO: cancelar a partida a dar vitória para o outro jogador
   }
 
   // ###########################################################################
@@ -42,6 +44,7 @@ export class GatewayService {
 
   @SubscribeMessage('joinRoom')
   async handleRoom(client: Socket) {
+    console.log('calling joinRoom from ' + client.id);
     if (this.usersWaiting.includes(client.id)) {
       return;
     }
@@ -68,7 +71,7 @@ export class GatewayService {
     const roomName = this.createRoomName(user1, user2);
 
     // add this user to the room
-    this.server.socketsJoin(roomName, client.id);
+    this.server.socketsJoin(roomName, user1);
 
     // add the other user to the room
     this.server.socketsJoin(roomName, user2);
@@ -76,8 +79,8 @@ export class GatewayService {
     // send the room name to the users inside the room
     this.server.to(roomName).emit('room', roomName);
 
-    // print double rooms
-    console.log(this.findDoubleRooms());
+    // // print double rooms
+    // console.log(this.findDoubleRooms());
 
     // send messages only to the users inside the room
     this.sendMessagesToRoom(roomName, 'Partida Encontrada');
@@ -158,9 +161,7 @@ export class GatewayService {
         );
         const pongService = this.pongGames.get(roomName);
         const gameState = pongService.getGameState();
-        if (client.id === 'anhigo-s') {
-          console.log(gameState);
-        }
+
         this.server.to(roomName).emit('pong', gameState);
 
         pongService.startGameLoop(roomName, this.server);
