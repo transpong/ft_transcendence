@@ -228,6 +228,16 @@ export class GameService {
     return matchHistory ? true : false;
   }
 
+  async deleteMatchHistory(roomId: string) {
+    const matchHistory = await this.matchHistoryRepository.findOne({
+      where: { roomId: roomId },
+    });
+
+    if (matchHistory) {
+      await this.matchHistoryRepository.delete(matchHistory.id);
+    }
+  }
+
   private getScore(matchesHistoryList: MatchHistoryEntity[], nickname: string) {
     let score = 0;
 

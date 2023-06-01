@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
+import { MatchStatus } from '../enum/MatchStatus';
 
 @Entity({ name: 'match_history' })
 export class MatchHistoryEntity {
@@ -83,6 +84,20 @@ export class MatchHistoryEntity {
     } else if (player1 === this.user2.ftId) {
       this.user1Score = score1;
       this.user2Score = score2;
+    }
+  }
+
+  giveUp(player: string): void {
+    if (player === this.user1.ftId) {
+      this.user1Score = 0;
+      this.user2Score = 1;
+      this.status = MatchStatus.FINISHED;
+      this.winner = this.user2;
+    } else if (player === this.user2.ftId) {
+      this.user1Score = 1;
+      this.user2Score = 0;
+      this.status = MatchStatus.FINISHED;
+      this.winner = this.user1;
     }
   }
 }

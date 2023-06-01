@@ -1,5 +1,7 @@
 import { GameService } from '../../game/service/game.service';
 import { MatchStatus } from '../../game/enum/MatchStatus';
+import { Socket } from 'socket.io';
+import { MatchHistoryEntity } from '../../game/entity/game.entity';
 
 export class PongService {
   private readonly canvasWidth = 800; // Width of the game canvas
@@ -25,6 +27,8 @@ export class PongService {
   private timer = this.timerDuration; // Current value of the timer
   private roomNameTmp;
   private serverTmp;
+
+  private spectators: Array<Socket> = [];
 
   constructor(
     private readonly gameService: GameService,
@@ -140,14 +144,19 @@ export class PongService {
         // this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
         this.serverTmp.to(this.namePlayer1).emit('pong', gameState);
         this.serverTmp.to(this.namePlayer2).emit('pong', gameState);
-        this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
+
+        if (this.spectators.length > 0) {
+          this.spectators.forEach((spectator) => {
+            spectator.emit('pong', gameState);
+          });
+        }
       }, 1000 / 60); // Update the game state approximately 60 times per second
       // Start the timer
       this.startTimer();
     }
   }
 
-  async stopGameLoop() {
+  async stopGameLoop(clientName?: string): Promise<void> {
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
@@ -156,9 +165,19 @@ export class PongService {
       this.stopTimer();
 
       const gameState = this.getGameState();
-      const matchEntity = await this.gameService.getByRoomName(
-        this.roomNameTmp,
-      );
+      const matchEntity: MatchHistoryEntity =
+        await this.gameService.getByRoomName(this.roomNameTmp);
+
+      if (clientName) {
+        if (
+          matchEntity.user1.ftId == clientName ||
+          matchEntity.user2.ftId == clientName
+        ) {
+        }
+        matchEntity.giveUp(clientName);
+        await this.gameService.updateMatch(matchEntity);
+        return;
+      }
 
       matchEntity.setScore(
         this.namePlayer1,
@@ -208,6 +227,14 @@ export class PongService {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
+    }
+  }
+
+  getOpponentName(clientName: string): string {
+    if (this.namePlayer1 == clientName) {
+      return this.namePlayer2;
+    } else {
+      return this.namePlayer1;
     }
   }
 
