@@ -181,7 +181,10 @@ export class GameService {
 
     // get draws when matchesHistoryList.winner == null and matchesHistoryList.user1.nickname == nickname || matchesHistoryList.user2.nickname == nickname
     matchesHistoryList.forEach((matchHistory) => {
-      if (!matchHistory.winner) {
+      if (
+        !matchHistory.winner &&
+        matchHistory.status === MatchStatus.FINISHED
+      ) {
         draws++;
       }
     });
