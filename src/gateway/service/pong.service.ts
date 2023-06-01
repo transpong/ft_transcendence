@@ -254,4 +254,14 @@ export class PongService {
       player2Name: this.namePlayer2,
     };
   }
+
+  addSpectator(clientName: Socket): void {
+    if (
+      !this.spectators.includes(clientName) &&
+      this.namePlayer1 != clientName.id &&
+      this.namePlayer2 != clientName.id
+    ) {
+      this.spectators.push(clientName);
+    }
+  }
 }

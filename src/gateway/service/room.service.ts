@@ -133,18 +133,23 @@ export class RoomService {
   }
 
   async endGame(client: Socket, server: any) {
+    if (!(await this.gameService.isMatchHistoryExist(client.id))) {
+      return;
+    }
     const roomName = this.roomNameFromClient(client);
     const pongGame = this.pongGames.get(roomName);
 
-    await pongGame.stopGameLoop();
+    if (pongGame) {
+      await pongGame.stopGameLoop();
 
-    // emit game state to all users in room
-    this.emitToRoom(
-      server,
-      roomName,
-      'message',
-      'user ' + client.id + ' give up',
-    );
+      // emit game state to all users in room
+      this.emitToRoom(
+        server,
+        roomName,
+        'message',
+        'user ' + client.id + ' give up',
+      );
+    }
 
     // remove room
     this.rooms.delete(roomName);
@@ -155,6 +160,15 @@ export class RoomService {
     // remove room from roomFromPlayer
     this.roomFromPlayer.delete(client.id);
     this.roomFromPlayer.delete(pongGame.getOpponentName(client.id));
+  }
+
+  async enterSpectator(client: Socket, roomName: string) {
+    if (!(await this.gameService.getByRoomName(roomName))) {
+      return;
+    }
+    const pongGame = this.pongGames.get(roomName);
+
+    pongGame.addSpectator(client);
   }
 
   private roomNameFromClient(client: Socket): string {
