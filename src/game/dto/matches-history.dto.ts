@@ -15,6 +15,15 @@ export class MatchesHistoryDto {
   @Expose({ name: 'user_2' })
   user2: MatchesUserDto;
 
+  @Expose({ name: 'room_id' })
+  roomId: string;
+
+  @Expose({ name: 'status' })
+  status: number;
+
+  @Expose({ name: 'draw' })
+  draw: boolean;
+
   static toDto(matchHistoryEntity: MatchHistoryEntity): MatchesHistoryDto {
     const matchHistoryDto: MatchesHistoryDto = new MatchesHistoryDto();
 
@@ -28,6 +37,9 @@ export class MatchesHistoryDto {
       matchHistoryEntity,
       matchHistoryEntity.user2,
     );
+    matchHistoryDto.roomId = matchHistoryEntity.roomId;
+    matchHistoryDto.status = matchHistoryEntity.status;
+    matchHistoryDto.draw = matchHistoryEntity.winner == null;
     return matchHistoryDto;
   }
 

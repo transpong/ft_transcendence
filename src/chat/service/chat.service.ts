@@ -336,7 +336,16 @@ export class ChatService {
       );
     }
 
-    return MessageOutputDto.toMessageDtoList(channel.getSortedMessages(), user);
+    const channelMessagesFilteredByBlockedUsers = channel
+      .getSortedMessages()
+      .filter((message) => {
+        return message.user.id == user.id || !user.isBlocked(message.user);
+      });
+
+    return MessageOutputDto.toMessageDtoList(
+      channelMessagesFilteredByBlockedUsers,
+      user,
+    );
   }
 
   async getDirectMessages(
@@ -608,6 +617,7 @@ export class ChatService {
         'users_channels.user',
         'channel_messages',
         'channel_messages.user',
+        'channel_messages.user.blocks',
       ],
     });
 

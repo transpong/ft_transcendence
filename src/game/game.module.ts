@@ -9,5 +9,6 @@ import { UserModule } from '../user/user.module';
   imports: [TypeOrmModule.forFeature([MatchHistoryEntity]), UserModule],
   controllers: [GameController],
   providers: [GameService],
+  exports: [GameService],
 })
 export class GameModule {}

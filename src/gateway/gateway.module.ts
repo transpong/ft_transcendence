@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { GatewayService } from './service/gateway.service';
 import { JwtModule } from '@nestjs/jwt';
-import { UserModule } from '../user/user.module';
 import { PongService } from './service/pong.service';
+import { GameModule } from '../game/game.module';
 
 @Module({
   imports: [
@@ -10,7 +10,7 @@ import { PongService } from './service/pong.service';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '7d' },
     }),
-    UserModule,
+    GameModule,
   ],
   providers: [GatewayService, PongService],
 })

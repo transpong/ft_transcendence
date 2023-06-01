@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MatchHistoryEntity } from '../entity/game.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { UserService } from '../../user/service/user.service';
 import { MatchesHistoryDto } from '../dto/matches-history.dto';
 import { MatchesRakingDto } from '../dto/matches-raking.dto';
 import { UserEntity } from '../../user/entity/user.entity';
+import { MatchStatus } from '../enum/MatchStatus';
 
 @Injectable()
 export class GameService {
@@ -15,18 +16,19 @@ export class GameService {
     private readonly userService: UserService,
   ) {}
 
-  async getMatchesHistory(): Promise<MatchesHistoryDto[]> {
+  async getMatchesHistory(status?: number): Promise<MatchesHistoryDto[]> {
     const matchesHistoryList: MatchHistoryEntity[] =
-      await this.findAllMatchesHistory();
+      await this.findAllMatchesHistory(status);
 
     return MatchesHistoryDto.toDtoList(matchesHistoryList);
   }
 
   async getMatchesHistoryFromUser(
     nickname: string,
+    status?: number,
   ): Promise<MatchesHistoryDto[]> {
     const matchesHistoryList: MatchHistoryEntity[] =
-      await this.findMatchesHistoryFromUser(nickname);
+      await this.findMatchesHistoryFromUser(nickname, status);
 
     return MatchesHistoryDto.toDtoList(matchesHistoryList);
   }
@@ -53,9 +55,24 @@ export class GameService {
     const wins: number = this.getWins(matchesHistoryList, nickname);
     const losses: number = this.getLosses(matchesHistoryList, nickname);
     const score: number = this.getScore(matchesHistoryList, nickname);
+    const draws: number = this.getDraws(matchesHistoryList, nickname);
     const position: number = await this.getPositionFromUser(user);
 
-    return MatchesRakingDto.toDto(user, wins, losses, score, position);
+    return MatchesRakingDto.toDto(user, wins, losses, score, draws, position);
+  }
+
+  async createMatchHistory(user1: string, user2: string, roomName: string) {
+    const matchHistory = new MatchHistoryEntity();
+    const user1Entity: UserEntity = await this.userService.getUserByFtId(user1);
+    const user2Entity: UserEntity = await this.userService.getUserByFtId(user2);
+
+    matchHistory.user1 = user1Entity;
+    matchHistory.user2 = user2Entity;
+    matchHistory.user1IsReady = false;
+    matchHistory.user2IsReady = false;
+    matchHistory.roomId = roomName;
+    matchHistory.status = MatchStatus.IS_WAITING;
+    await this.matchHistoryRepository.save(matchHistory);
   }
 
   private async getPositionFromUser(user: UserEntity): Promise<number> {
@@ -88,11 +105,13 @@ export class GameService {
       const wins: number = this.getWins(matchesHistoryList, user.nickname);
       const losses: number = this.getLosses(matchesHistoryList, user.nickname);
       const score: number = this.getScore(matchesHistoryList, user.nickname);
+      const draws: number = this.getDraws(matchesHistoryList, user.nickname);
       const matchesRakingDto: MatchesRakingDto = MatchesRakingDto.toDto(
         user,
         wins,
         losses,
         score,
+        draws,
       );
 
       matchesRakingDtoList.push(matchesRakingDto);
@@ -136,7 +155,7 @@ export class GameService {
     let wins = 0;
 
     matchesHistoryList.forEach((matchHistory) => {
-      if (matchHistory.winner.nickname === nickname) {
+      if (matchHistory.winner && matchHistory.winner.nickname === nickname) {
         wins++;
       }
     });
@@ -150,11 +169,73 @@ export class GameService {
     let losses = 0;
 
     matchesHistoryList.forEach((matchHistory) => {
-      if (matchHistory.winner.nickname !== nickname) {
+      if (matchHistory.winner && matchHistory.winner.nickname !== nickname) {
         losses++;
       }
     });
     return losses;
+  }
+
+  getDraws(matchesHistoryList: MatchHistoryEntity[], nickname: string) {
+    let draws = 0;
+
+    // get draws when matchesHistoryList.winner == null and matchesHistoryList.user1.nickname == nickname || matchesHistoryList.user2.nickname == nickname
+    matchesHistoryList.forEach((matchHistory) => {
+      if (!matchHistory.winner) {
+        draws++;
+      }
+    });
+    return draws;
+  }
+
+  getByRoomName(roomName: string) {
+    return this.matchHistoryRepository.findOne({
+      where: { roomId: roomName },
+      relations: ['user1', 'user2', 'winner'],
+    });
+  }
+
+  async getRoomId(ftId: string) {
+    const matchHistory = await this.matchHistoryRepository.findOne({
+      where: [
+        { user1: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+        { user2: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+      ],
+
+      relations: ['user1', 'user2', 'winner'],
+    });
+
+    if (matchHistory) {
+      return matchHistory.roomId;
+    }
+
+    return null;
+  }
+
+  async updateMatch(matchHistory: MatchHistoryEntity) {
+    return this.matchHistoryRepository.save(matchHistory);
+  }
+
+  async isMatchHistoryExist(ftId: string) {
+    const matchHistory = await this.matchHistoryRepository.findOne({
+      where: [
+        { user1: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+        { user2: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+      ],
+      relations: ['user1', 'user2', 'winner'],
+    });
+
+    return matchHistory ? true : false;
+  }
+
+  async deleteMatchHistory(roomId: string) {
+    const matchHistory = await this.matchHistoryRepository.findOne({
+      where: { roomId: roomId },
+    });
+
+    if (matchHistory) {
+      await this.matchHistoryRepository.delete(matchHistory.id);
+    }
   }
 
   private getScore(matchesHistoryList: MatchHistoryEntity[], nickname: string) {
@@ -171,19 +252,23 @@ export class GameService {
     return score;
   }
 
-  private async findAllMatchesHistory() {
+  private async findAllMatchesHistory(status?: number) {
     return this.matchHistoryRepository.find({
       relations: ['user1', 'user2', 'winner'],
       order: { createdAt: 'DESC' },
+      where: {
+        status,
+      },
     });
   }
 
-  private async findMatchesHistoryFromUser(nickname: string) {
+  private async findMatchesHistoryFromUser(nickname: string, status?: number) {
     return this.matchHistoryRepository.find({
       relations: ['user1', 'user2', 'winner'],
       where: [
         { user1: { nickname: nickname } },
         { user2: { nickname: nickname } },
+        { status },
       ],
       order: { createdAt: 'DESC' },
     });

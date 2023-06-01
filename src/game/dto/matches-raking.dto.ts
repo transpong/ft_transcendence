@@ -20,6 +20,9 @@ export class MatchesRakingDto {
   @Expose({ name: 'loses' })
   loses: number;
 
+  @Expose({ name: 'draws' })
+  draws: number;
+
   @Expose({ name: 'matches' })
   matches: number;
 
@@ -31,6 +34,7 @@ export class MatchesRakingDto {
     wins: number,
     loses: number,
     score: number,
+    draw: number,
     position?: number,
   ): MatchesRakingDto {
     const matchHistoryDto: MatchesRakingDto = new MatchesRakingDto();
@@ -40,9 +44,10 @@ export class MatchesRakingDto {
     matchHistoryDto.avatar = userEntity.avatar;
     matchHistoryDto.wins = wins;
     matchHistoryDto.loses = loses;
-    matchHistoryDto.matches = wins + loses;
+    matchHistoryDto.matches = wins + loses + draw;
     matchHistoryDto.score = score;
     matchHistoryDto.position = position;
+    matchHistoryDto.draws = draw;
     return matchHistoryDto;
   }
 
