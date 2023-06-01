@@ -163,6 +163,7 @@ export default function Me() {
             wins={userRanking?.wins || 0}
             losses={userRanking?.loses || 0}
             avatar={me?.avatar || ""}
+            draws={userRanking?.draws || 0}
           />
 
           <Text

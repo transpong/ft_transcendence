@@ -15,10 +15,11 @@ interface Props {
   matches: number;
   wins: number;
   losses: number;
+  draws: number;
 }
 
 export default function RankingCard(props: Props) {
-  const { position, nickname, matches, wins, losses, avatar } = props;
+  const { position, nickname, matches, wins, losses, avatar, draws } = props;
   const navigate = useNavigate();
 
   return (
@@ -37,7 +38,11 @@ export default function RankingCard(props: Props) {
             {position}
           </Text>
         </VStack>
-        <Flex alignItems="center" onClick={() => navigate(`/home/profile/${nickname}`)} cursor="pointer">
+        <Flex
+          alignItems="center"
+          onClick={() => navigate(`/home/profile/${nickname}`)}
+          cursor="pointer"
+        >
           <Avatar src={avatarUrl(avatar)} />
           <Text ml="3" fontWeight="bold">
             {nickname}
@@ -61,6 +66,12 @@ export default function RankingCard(props: Props) {
           <Text fontSize="12">Derrotas:</Text>
           <Text fontWeight="bold" fontSize="20">
             {losses}
+          </Text>
+        </VStack>
+        <VStack alignItems="center" spacing="0">
+          <Text fontSize="12">Empates:</Text>
+          <Text fontWeight="bold" fontSize="20">
+            {draws}
           </Text>
         </VStack>
         <VStack alignItems="center" spacing="0">
