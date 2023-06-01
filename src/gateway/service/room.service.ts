@@ -23,9 +23,14 @@ export class RoomService {
       return;
     }
 
+    console.log('pushing user ' + client.id + ' to waiting room');
     this.waitingUsers.push(client);
     if (this.waitingUsers.length > 1) {
-      await this.createRoom(client, server);
+      try {
+        await this.createRoom(client, server);
+      } catch (error) {
+        console.log(error);
+      }
       return;
     }
   }
@@ -43,6 +48,12 @@ export class RoomService {
       player2: namePlayer2,
       roomName: roomName,
     };
+
+    // remove users from waiting room
+    console.log('remove users from waiting room');
+    this.waitingUsers = this.waitingUsers.filter(
+      (user) => user.id !== namePlayer1 && user.id !== namePlayer2,
+    );
 
     this.rooms.set(roomName, room);
 
@@ -75,11 +86,6 @@ export class RoomService {
 
     // emit game state to all users in room
     this.emitToRoom(server, roomName, 'toGame', pongGameState);
-
-    // remove users from waiting room
-    this.waitingUsers = this.waitingUsers.filter(
-      (user) => user.id !== namePlayer1 && user.id !== namePlayer2,
-    );
 
     // debug
     server.to(client.id).emit('message', 'partida encontrada');
@@ -134,11 +140,19 @@ export class RoomService {
 
   async endGame(client: Socket, server: any) {
     if (!(await this.gameService.isMatchHistoryExist(client.id))) {
+      // if user is in waiting room delete him
+      console.log('remove user ' + client.id + ' from waiting room');
+      if (this.waitingUsers.includes(client)) {
+        this.waitingUsers = this.waitingUsers.filter(
+          (user) => user.id !== client.id,
+        );
+      }
       return;
     }
     const roomName = this.roomNameFromClient(client);
     const pongGame = this.pongGames.get(roomName);
 
+    console.log('remove user ' + client.id + ' from room ' + roomName);
     if (pongGame) {
       await pongGame.stopGameLoop();
 
@@ -169,6 +183,23 @@ export class RoomService {
     const pongGame = this.pongGames.get(roomName);
 
     pongGame.addSpectator(client);
+  }
+
+  async debug() {
+    // print waiting users
+    console.log(
+      'waiting users: ',
+      this.waitingUsers.map((user) => user.id),
+    );
+    console.error('rooms: ', this.rooms);
+    console.error('pong games: ', this.pongGames);
+    console.error('room from player: ', this.roomFromPlayer);
+  }
+
+  private deleteSocketFromWaitingUsers(client: Socket) {
+    this.waitingUsers = this.waitingUsers.filter(
+      (user) => user.id !== client.id,
+    );
   }
 
   private roomNameFromClient(client: Socket): string {

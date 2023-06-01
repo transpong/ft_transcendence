@@ -22,6 +22,8 @@ export class GatewayService {
 
   async handleDisconnect(client: Socket) {
     await this.roomService.endGame(client, this.server);
+    console.log('User: ' + client.id + ' disconnected');
+    // await this.roomService.debug();
   }
 
   @SubscribeMessage('joinRoom')
