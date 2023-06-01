@@ -1,9 +1,8 @@
 import * as React from "react";
 import Sketch from "react-p5";
 import * as p5Types from "p5"; //Import this for typechecking and intellisense
-import { useOutletContext, useParams } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { useEffect } from "react";
 
 interface ComponentProps {
   // Your component props
@@ -151,27 +150,10 @@ class Ball {
 }
 
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
-  const { id } = useParams<{ id: string }>();
-
   const { ref, socketGame } = useOutletContext<{
     ref: React.RefObject<HTMLDivElement>;
     socketGame: Socket;
   }>();
-
-  useEffect(() => {
-    if (id) {
-      socketGame.emit("enterSpectator", id);
-      console.log("Entered spectator mode with id:", id);
-
-      game.start();
-
-      socketGame.on("pong", (message: BackendGame) => {
-        backendGame = message;
-        console.log("Received message 2:", message);
-      });
-    }
-  }, [id, socketGame]);
-
   type BackendGame = {
     ballX: number;
     ballY: number;
@@ -193,16 +175,11 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
   };
   // console.log('Conect Front');
   // Send 'joinRoom' message when the component mounts
-
   if (!socketGame.disconnected) {
     socketGame.disconnect();
   }
   socketGame.connect();
   socketGame.emit("joinRoom");
-
-  socketGame.on("roomName", (message: string) => {
-    socketGame.emit("enterRoom", message);
-  });
 
   socketGame.on("toGame", (message: BackendGame) => {
     socketGame.emit("startGame");
