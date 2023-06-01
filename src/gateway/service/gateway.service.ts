@@ -48,11 +48,18 @@ export class GatewayService {
 
   @SubscribeMessage('endGame')
   async handleEndGame(client: Socket) {
+    console.log('end game');
     await this.roomService.endGame(client, this.server);
   }
 
   @SubscribeMessage('enterSpectator')
   async handleEnterSpectator(client: Socket, roomName: string) {
     await this.roomService.enterSpectator(client, roomName);
+  }
+
+  @SubscribeMessage('test')
+  async handleTest(client: Socket, data: any) {
+    console.log('test');
+    console.log(data);
   }
 }

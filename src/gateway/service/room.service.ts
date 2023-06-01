@@ -20,6 +20,7 @@ export class RoomService {
     if (await this.gameService.isMatchHistoryExist(client.id)) {
       console.log('match already exists');
       server.to(client.id).emit('message', 'match already exists');
+
       return;
     }
 
@@ -163,6 +164,8 @@ export class RoomService {
         'message',
         'user ' + client.id + ' give up',
       );
+
+      this.roomFromPlayer.delete(pongGame.getOpponentName(client.id));
     }
 
     // remove room
@@ -173,7 +176,6 @@ export class RoomService {
 
     // remove room from roomFromPlayer
     this.roomFromPlayer.delete(client.id);
-    this.roomFromPlayer.delete(pongGame.getOpponentName(client.id));
   }
 
   async enterSpectator(client: Socket, roomName: string) {
