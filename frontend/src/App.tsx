@@ -1,17 +1,17 @@
-import { ChakraProvider } from '@chakra-ui/react'
-import LoginView from './scenes/Login/View/LoginView'
-import CreateNickNameLogin from './scenes/CreateNickNameLogin/View/CreateNickNameLoginView'
-import {BrowserRouter, Routes, Route } from 'react-router-dom'
-import TwoFactorAuthenticationLogin from './scenes/TwoFactorAuthenticationLogin/View/TwoFactorAuthenticationLogin';
-import HomeView from './scenes/Home/View/HomeView';
-import Ranking from './scenes/Ranking/View/Ranking';
-import './App.css'
-import MachesHistory from './scenes/MatchesHistory/View/MachesHistory';
-import Me from './scenes/Users/Me/View/Me';
-import MFA from './scenes/Users/MFA/View/MFA';
-import Profile from './scenes/Users/Profiles/View/Profiles';
-import Game from './scenes/Game/GameOnLine';
-import MachesLive from './scenes/MatchesLive/MachesLive';
+import { ChakraProvider } from "@chakra-ui/react";
+import LoginView from "./scenes/Login/View/LoginView";
+import CreateNickNameLogin from "./scenes/CreateNickNameLogin/View/CreateNickNameLoginView";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import TwoFactorAuthenticationLogin from "./scenes/TwoFactorAuthenticationLogin/View/TwoFactorAuthenticationLogin";
+import HomeView from "./scenes/Home/View/HomeView";
+import Ranking from "./scenes/Ranking/View/Ranking";
+import "./App.css";
+import MachesHistory from "./scenes/MatchesHistory/View/MachesHistory";
+import Me from "./scenes/Users/Me/View/Me";
+import MFA from "./scenes/Users/MFA/View/MFA";
+import Profile from "./scenes/Users/Profiles/View/Profiles";
+import Game from "./scenes/Game/GameOnLine";
+import MachesLive from "./scenes/MatchesLive/MachesLive";
 
 function App() {
   return (
@@ -31,6 +31,7 @@ function App() {
               </Route>
               <Route path="profile/:user" element={<Profile />} />
               <Route path="game" element={<Game />} />
+              <Route path="game/:id" element={<Game />} />
             </Route>
           </Routes>
         </BrowserRouter>
@@ -39,4 +40,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
