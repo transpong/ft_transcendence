@@ -176,6 +176,17 @@ export class PongService {
         }
         matchEntity.giveUp(clientName);
         await this.gameService.updateMatch(matchEntity);
+
+        this.serverTmp
+          .to(this.getOpponentName(clientName))
+          .emit('giveUp', 'usuario ' + clientName + ' desistiu');
+
+        for (let i = 0; i < this.spectators.length; i++) {
+          this.spectators[i].emit(
+            'giveUp',
+            'usuario ' + clientName + ' desistiu',
+          );
+        }
         return;
       }
 
@@ -190,7 +201,6 @@ export class PongService {
       matchEntity.setWinner();
 
       await this.gameService.updateMatch(matchEntity);
-
       this.serverTmp.to(this.roomNameTmp).emit('endGame', 'Acabouuuuu');
     }
   }

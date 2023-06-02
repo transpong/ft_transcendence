@@ -174,21 +174,12 @@ export class RoomService {
     const roomName = this.roomNameFromClient(client);
     const pongGame = this.pongGames.get(roomName);
 
-    console.log('remove user ' + client.id + ' from room ' + roomName);
     if (pongGame) {
       try {
         await pongGame.stopGameLoop(client.id);
       } catch (WsException) {
         console.log(WsException);
       }
-
-      // emit game state to all users in room
-      this.emitToRoom(
-        server,
-        roomName,
-        'message',
-        'user ' + client.id + ' give up',
-      );
     }
 
     // remove room
