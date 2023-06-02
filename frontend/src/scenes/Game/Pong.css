@@ -1,0 +1,25 @@
+.ClassicBackground{
+    background: "black";
+   
+}
+
+.SoccerBackground{
+    background: url("../../../docs/images/campo.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.BasketeBackground{
+    background: url("../../../docs/images/basquete2.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.TenisBackground{
+    background: url("../../../docs/images/tenis1.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}

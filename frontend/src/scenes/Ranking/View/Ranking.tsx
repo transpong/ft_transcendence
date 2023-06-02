@@ -33,6 +33,7 @@ export default function Ranking(){
               wins={ranking.wins}
               losses={ranking.loses}
               avatar={ranking.avatar}
+              draws={ranking.draws}
             />
           );
         })}

@@ -8,6 +8,7 @@ export interface IApiRanking {
   avatar: string;
   wins: number;
   loses: number;
+  draws: number;
   matches: number;
   score: number;
 }

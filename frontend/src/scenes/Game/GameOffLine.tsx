@@ -1,7 +1,7 @@
 import * as React from "react";
 import Sketch from "react-p5";
 import * as p5Types from "p5"; //Import this for typechecking and intellisense
-import { useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 
 interface ComponentProps {
   // Your component props
@@ -113,15 +113,19 @@ class Ball{
     speedX = 2;
     speedY = 2;
     diameterBall = ((windowWidth + windowHeight) / 2) * 0.023;
+    ballImage;
+    previousCollisionPlayer : 0 | 1 | 2;
     p5 ;
 
-    constructor(teste: p5Types) {
+    constructor(teste: p5Types, newBallImage: any) {
         this.positionX;
         this.positionY;
         this.speedX;
         this.speedY;
         this.diameterBall;
         this.p5 = teste
+        this.ballImage = newBallImage
+        this.previousCollisionPlayer = 0
     }
 
     responsiveBall(newHeight: number, oldHeight: number, newWidth: number, oldWidth: number){
@@ -137,7 +141,10 @@ class Ball{
     }
 
     printBall() {
-        this.p5.circle( this.positionX, this.positionY, this.diameterBall);
+        if(this.ballImage != null)
+            this.p5.image(this.ballImage, this.positionX, this.positionY, this.diameterBall, this.diameterBall)
+        else
+            this.p5.circle( this.positionX, this.positionY, this.diameterBall);
         this.positionX += this.speedX;
         this.positionY += this.speedY;
         return this.checkBorder();
@@ -166,15 +173,19 @@ class Ball{
         const yMaior = player.positionY + player.heightPlayer
         if(player.id == 1){
             const xReferencia = player.positionX + player.widthPlayer
-            if(this.positionX - (this.diameterBall / 2) <= xReferencia && this.positionX - (this.diameterBall / 2) > 0){
-                if(this.positionY >= yMenor && this.positionY <= yMaior)
+            if(this.previousCollisionPlayer != 1 && this.positionX - (this.diameterBall / 2) <= xReferencia && this.positionX - (this.diameterBall / 2) > 0){
+                if(this.positionY >= yMenor && this.positionY <= yMaior){
                     this.speedX *= -1;
+                    this.previousCollisionPlayer = 1
+                }
             }
         }else if(player.id == 2){
             const xReferencia = player.positionX
-            if(this.positionX + (this.diameterBall / 2) >= xReferencia && this.positionX  < windowWidth){
-                if(this.positionY >= yMenor && this.positionY <= yMaior)
+            if(this.previousCollisionPlayer != 2 && this.positionX + (this.diameterBall / 2) >= xReferencia && this.positionX  < windowWidth){
+                if(this.positionY >= yMenor && this.positionY <= yMaior){
                     this.speedX *= -1;
+                    this.previousCollisionPlayer = 2
+                }
             }
         }
     }
@@ -182,6 +193,7 @@ class Ball{
 
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
+    const {state} = useLocation()
 
     class Score {
         p5;
@@ -253,7 +265,20 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
 
     let buttonStart : ButtonStart | null = null
     let score : Score | null = null
+    let background: any
+    let ballImage: any
 
+
+    const preload = (p5: p5Types) =>{
+        if(state.field != "")
+            background = p5.loadImage(state.field)
+        else
+            background = 0
+        if(state.ball != "")
+            ballImage = p5.loadImage(state.ball)
+        else
+            ballImage = null
+    }
 
     const setup = (p5: p5Types, canvasParentRef: Element) => {
         parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParentRef.clientHeight) -  canvasParentRef.clientHeight
@@ -261,7 +286,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         windowWidth = ref.current ? ref.current.clientWidth - parentBorderWidth : canvasParentRef.clientWidth
         p5.createCanvas(windowWidth , windowHeight).parent(canvasParentRef);
         canvasParent = canvasParentRef
-        ball = new Ball(p5)
+        ball = new Ball(p5,  ballImage)
         player1 = new Player(p5, 1)
         player2 = new Player(p5, 2)
         game = new Game(ball)
@@ -270,7 +295,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     };
 
     const draw = (p5: p5Types) => {
-        p5.background(0);
+        p5.background(background);
         player1.printPlayer();
         player2.printPlayer();
         if(game.isRunning){
@@ -306,7 +331,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         p5.removeElements()
     }
 
-  return <Sketch setup={setup} draw={draw}  windowResized={windowResized}/>
+  return <Sketch setup={setup} draw={draw}  windowResized={windowResized} preload={preload}/>
 }
 
 

@@ -93,7 +93,9 @@ export default function Me(){
             matches={userRanking?.matches || 0}
             wins={userRanking?.wins || 0}
             losses={userRanking?.loses || 0}
-            avatar={profile?.avatar || ""}/>
+            avatar={profile?.avatar || ""}
+            draws={userRanking?.draws || 0}
+          />
 
           <Text
             fontSize={"25px"}
