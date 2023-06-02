@@ -8,25 +8,56 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import './Game.css'
+import { useNavigate, useOutletContext } from "react-router-dom";
+import GameOffline from "./GameOffLine"
+
 
 export default function Me(){
-  const [selectedField, setSelectedField] = useState('None')
+  const [selectedField, setSelectedField] = useState('Classico')
   const [selectedMode, setSelectedMode] = useState('Online')
   const [selectedNumberPlayers, setSelectedNumberPlayers] = useState('1')
+  const navigate = useNavigate();
+
+  const getFields = (type: string) =>{
+    if(type == "Tenis" || type == "Basquete" || type == "Futebol") return type;
+    else return "Classico"
+  } 
+
+  const fieldsPath = {
+    Classico: "",
+    Basquete: "../../../docs/images/basquete.jpg",
+    Futebol: "../../../docs/images/campo.jpg",
+    Tenis: "../../../docs/images/tenis1.jpg", 
+  }
+
+  const ballsPath = {
+    Classico: "",
+    Basquete: "../../../docs/images/bolabasquete4.png",
+    Futebol: "../../../docs/images/bolaFutebol1.png",
+    Tenis: "../../../docs/images/bolaTenis3.png", 
+  }
+
+  const fields = {
+    Classico: "",
+    Basquete: "BasketeBackground",
+    Futebol: "SoccerBackground",
+    Tenis: "TenisBackground", 
+  }
 
 
   return  (
     <>
-      <VStack h="100%" w={"100%"} borderRadius={"20px"} align={"center"} background={"black"}>
+      <VStack className={fields[getFields(selectedField)]} h="100%" w={"100%"} borderRadius={"20px"} align={"center"} background={getFields(selectedField) == "Classico" ? "black" : ""}>
         <Text
           fontSize={"70px"}
           fontWeight={"bold"}
-          textColor="white"
+          textColor={selectedField == "Classico" ? "white" : "black"}
           textAlign="center"
         >
             Pong
         </Text>
-        <HStack w={"100%"} h={"50%"} background={"red"} justify={"center"} >
+        <HStack w={"100%"} h={"50%"} justify={"center"} >
           <VStack background={"white"} border={"8px"} borderColor={"#805AD5"} borderTopRadius={"20px"} borderBottomRadius={"20px"}>
             <Text
               fontSize={"20px"}
@@ -71,10 +102,10 @@ export default function Me(){
             </Text>
             <RadioGroup onChange={setSelectedField} value={selectedField}>
               <Stack spacing={5}>
-                <Radio value='None' size={"lg"} fontWeight={"bold"}>None</Radio>
+                <Radio value='Classico' size={"lg"} fontWeight={"bold"}>Clássico</Radio>
                 <Radio value='Futebol' size={"lg"}>Futebol</Radio>
                 <Radio value='Basquete' size={"lg"}>Basquete</Radio>
-                <Radio value='Hoquei' size={"lg"}>Hoquei</Radio>
+                <Radio value='Tenis' size={"lg"}>Tenis</Radio>
               </Stack>
             </RadioGroup>
           </VStack>
@@ -84,7 +115,7 @@ export default function Me(){
         marginLeft="20px"
         paddingLeft="70px"
         paddingRight="70px"
-        onClick={() => console.log("foi!")}
+        onClick={() => navigate("/home/pong/gameoff", {state: {field: fieldsPath[getFields(selectedField)], ball: ballsPath[getFields(selectedField)]}})}
         >
         {selectedMode == "Online" ? "Pesquisar" : "Jogar"}
         </Button>
