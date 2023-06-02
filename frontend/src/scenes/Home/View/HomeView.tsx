@@ -58,7 +58,7 @@ export default function PageBase() {
   }, []);
 
   useEffect(() => {
-    if (oldPath.current === "/home/game" && path !== "/home/game") {
+    if (oldPath.current === "/home/pong/game" && path !== "/home/pong/game") {
       console.log("saiu da rota game");
       emitEndgame();
     }

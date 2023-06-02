@@ -1,8 +1,9 @@
 import * as React from "react";
 import Sketch from "react-p5";
 import * as p5Types from "p5"; //Import this for typechecking and intellisense
-import { useLocation, useOutletContext } from "react-router-dom";
+import {useLocation, useNavigate, useOutletContext} from "react-router-dom";
 import { Socket } from "socket.io-client";
+import {useToast} from "@chakra-ui/react";
 
 interface ComponentProps {
   // Your component props
@@ -153,6 +154,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         timer: number;
     }
 
+    const navigate = useNavigate();
+
     let backendGame: BackendGame = {
         ballX: 0,
         ballY: 0,
@@ -162,38 +165,54 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         player2Y: 0,
         timer: 0,
     }
+    const toast = useToast();
     // console.log('Conect Front');
     // Send 'joinRoom' message when the component mounts
-    if(!socketGame.disconnected) {
-        socketGame.disconnect() ;
+    if (socketGame != null) {
+        socketGame.emit("joinRoom");
+
+        socketGame.on("toGame", (message: BackendGame) => {
+            socketGame.emit("startGame");
+            backendGame = message;
+            game.start();
+            console.log("Game Startou", message);
+        });
+
+        // Listen for 'message' events and log the received messages
+        socketGame.on("message", (message: string) => {
+            console.log("Received message 1:", message);
+        });
+
+        socketGame.on("pong", (message: BackendGame) => {
+            backendGame = message;
+            console.log("Received message 2:", message);
+        });
+
+
+
+        socketGame.on("giveUp", (message: string) => {
+            toast({
+                title: "Game Over",
+                description: message,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+
+            console.log("Game Over:", message);
+
+            setTimeout(() => {
+                navigate('/home/matches');
+            }, 3000);
+        });
+
+        socketGame.on("gameOver", (message: string) => {
+            socketGame.emit("endGame");
+            game.stop();
+            console.log("Game Over:", message);
+        });
+
     }
-    socketGame.connect();
-    socketGame.emit('joinRoom');
-
-    socketGame.on('startGame', (message: BackendGame) => {
-        socketGame.emit('startGame');
-        backendGame = message;
-        game.start()
-        console.log('Game Startou', message);
-    });
-
-    // Listen for 'message' events and log the received messages
-    socketGame.on('message', (message: string) => {
-      console.log('Received message 1:', message);
-    });
-
-
-    socketGame.on('pong', (message: BackendGame) => {
-        backendGame = message;
-        console.log('Received message 2:', message);
-    });
-
-    socketGame.on('endGame', (message: string) => {
-        socketGame.emit('endGame');
-        game.stop();
-        console.log('Game Over:', message);
-        socketGame.disconnect();
-    });
 
     class Score {
         p5;
