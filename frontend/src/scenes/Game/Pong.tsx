@@ -8,10 +8,8 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import './Game.css'
-import { useNavigate, useOutletContext } from "react-router-dom";
-import GameOffline from "./GameOffLine"
-
+import './Pong.css'
+import { useNavigate } from "react-router-dom";
 
 export default function Me(){
   const [selectedField, setSelectedField] = useState('Classico')
@@ -26,7 +24,7 @@ export default function Me(){
 
   const fieldsPath = {
     Classico: "",
-    Basquete: "../../../docs/images/basquete.jpg",
+    Basquete: "../../../docs/images/basquete2.png",
     Futebol: "../../../docs/images/campo.jpg",
     Tenis: "../../../docs/images/tenis1.jpg", 
   }
@@ -116,7 +114,7 @@ export default function Me(){
         paddingLeft="70px"
         paddingRight="70px"
         onClick={() => {
-          const pathGame = selectedMode == "Online" ? "/home/pong/game" : "/home/pong/gameoff"
+          const pathGame = selectedMode == "Online" ? "/home/pong/game" : "/home/pong/gameoffline"
           navigate(pathGame, {state: {field: fieldsPath[getFields(selectedField)], ball: ballsPath[getFields(selectedField)]}})
         }}
         >
