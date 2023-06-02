@@ -30,7 +30,7 @@ export default function PageBase() {
 
   const path = useLocation().pathname;
   const [socketGame, setSocketGame] = useState<Socket | null>(null);
-  const [pathA, setPathA] = useState<string>("");
+  const pathA = useRef("");
 
   useEffect(() => {
     const socket = io("http://localhost:3001", {
@@ -54,17 +54,16 @@ export default function PageBase() {
   }, []);
 
   useEffect(() => {
-    if (pathA === "/home/game" && path !== "/home/game") {
+    if (pathA.current === "/home/game" && path !== "/home/game") {
       console.log("saiu da rota game");
       emitEndgame();
     }
-    setPathA(path);
+    pathA.current = path;
   }, [path, socketGame]);
 
   function emitEndgame() {
     console.log("emit endgame");
     if (socketGame) {
-      socketGame.emit("test");
       socketGame.emit("endGame");
     }
   }

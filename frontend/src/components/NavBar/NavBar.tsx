@@ -1,4 +1,11 @@
-import { ButtonGroup, Button, Avatar, HStack, Text, Flex} from "@chakra-ui/react";
+import {
+  ButtonGroup,
+  Button,
+  Avatar,
+  HStack,
+  Text,
+  Flex,
+} from "@chakra-ui/react";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { IoExit } from "react-icons/io5";
 import { useNavigate } from "react-router";
@@ -14,13 +21,14 @@ export default function NavBar() {
   useMemo(async () => {
     const myData = await userService.getMe();
 
+    if (!myData?.nickname) navigate("/nickname");
     setMe(myData);
   }, []);
 
-  async function handleLogoff () {
+  async function handleLogoff() {
     clearCookies();
-    await userService.logout()
-    navigate("/")
+    await userService.logout();
+    navigate("/");
   }
 
   return (
@@ -38,13 +46,22 @@ export default function NavBar() {
         <Button colorScheme={"purple"} onClick={() => navigate("/home/game")}>
           Jogar
         </Button>
-        <Button colorScheme={"purple"} onClick={() => navigate("/home/matches")}>
+        <Button
+          colorScheme={"purple"}
+          onClick={() => navigate("/home/matches")}
+        >
           Lista de Jogos
         </Button>
-        <Button colorScheme={"purple"} onClick={() => navigate("/home/matches/live")}>
+        <Button
+          colorScheme={"purple"}
+          onClick={() => navigate("/home/matches/live")}
+        >
           Jogos ao vivo
         </Button>
-        <Button colorScheme={"purple"} onClick={() => navigate("/home/ranking")}>
+        <Button
+          colorScheme={"purple"}
+          onClick={() => navigate("/home/ranking")}
+        >
           Ranking
         </Button>
       </ButtonGroup>
@@ -53,13 +70,35 @@ export default function NavBar() {
         backgroundColor={"#805AD5"}
         minWidth={"2.5rem"}
       >
-        <Flex marginRight={"1rem"} marginLeft={"1rem"} align={"center"} justify={"center"}>
+        <Flex
+          marginRight={"1rem"}
+          marginLeft={"1rem"}
+          align={"center"}
+          justify={"center"}
+        >
           <Avatar src={avatarUrl(me?.avatar)} />
-          <HStack marginRight={"2rem"} marginLeft={"2rem"} cursor={"pointer"} onClick={() => navigate("/home/me")}>
-            <Text fontSize={"1rem"} fontWeight={"bold"} color={"white"}>{me?.nickname}</Text>
-            <SettingsIcon fontSize={"2rem"} fontWeight={"bold"} color={"white"}/>
+          <HStack
+            marginRight={"2rem"}
+            marginLeft={"2rem"}
+            cursor={"pointer"}
+            onClick={() => navigate("/home/me")}
+          >
+            <Text fontSize={"1rem"} fontWeight={"bold"} color={"white"}>
+              {me?.nickname}
+            </Text>
+            <SettingsIcon
+              fontSize={"2rem"}
+              fontWeight={"bold"}
+              color={"white"}
+            />
           </HStack>
-          <IoExit cursor={"pointer"} fontSize={"2rem"} fontWeight={"bold"} color={"white"} onClick={handleLogoff}/>
+          <IoExit
+            cursor={"pointer"}
+            fontSize={"2rem"}
+            fontWeight={"bold"}
+            color={"white"}
+            onClick={handleLogoff}
+          />
         </Flex>
       </HStack>
     </HStack>

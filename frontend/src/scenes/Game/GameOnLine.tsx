@@ -175,8 +175,6 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
   };
   // console.log('Conect Front');
   // Send 'joinRoom' message when the component mounts
-  socketGame.emit("endGame");
-//   socketGame.connect();
   socketGame.emit("joinRoom");
 
   socketGame.on("toGame", (message: BackendGame) => {
