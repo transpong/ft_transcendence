@@ -169,6 +169,11 @@ export class GameService {
     let losses = 0;
 
     matchesHistoryList.forEach((matchHistory) => {
+      if (
+        matchHistory.user1?.nickname !== nickname &&
+        matchHistory.user2?.nickname !== nickname
+      )
+        return;
       if (matchHistory.winner && matchHistory.winner.nickname !== nickname) {
         losses++;
       }
@@ -182,9 +187,12 @@ export class GameService {
     // get draws when matchesHistoryList.winner == null and matchesHistoryList.user1.nickname == nickname || matchesHistoryList.user2.nickname == nickname
     matchesHistoryList.forEach((matchHistory) => {
       if (
-        !matchHistory.winner &&
-        matchHistory.status === MatchStatus.FINISHED
-      ) {
+        matchHistory.user1?.nickname !== nickname &&
+        matchHistory.user2?.nickname !== nickname
+      )
+        return;
+      if (matchHistory.status !== MatchStatus.FINISHED) return;
+      if (!matchHistory.winner) {
         draws++;
       }
     });
