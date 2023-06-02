@@ -10,8 +10,10 @@ import MachesHistory from './scenes/MatchesHistory/View/MachesHistory';
 import Me from './scenes/Users/Me/View/Me';
 import MFA from './scenes/Users/MFA/View/MFA';
 import Profile from './scenes/Users/Profiles/View/Profiles';
-import Game from './scenes/Game/GameOnLine';
 import MachesLive from './scenes/MatchesLive/MachesLive';
+import Pong from './scenes/Game/Pong';
+import GameOffline from './scenes/Game/GameOffLine';
+import GameOnline from './scenes/Game/GameOnLine';
 
 function App() {
   return (
@@ -30,7 +32,9 @@ function App() {
                 <Route path="mfa" element={<MFA />} />
               </Route>
               <Route path="profile/:user" element={<Profile />} />
-              <Route path="game" element={<Game />} />
+              <Route path="pong/" element={<Pong/>} />                
+              <Route path="pong/gameoffline" element={<GameOffline />} />
+              <Route path="pong/game" element={<GameOnline />} />
             </Route>
           </Routes>
         </BrowserRouter>
