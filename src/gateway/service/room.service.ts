@@ -39,8 +39,6 @@ export class RoomService {
       // delete room from player
       this.roomFromPlayer.delete(match.user1.ftId);
       this.roomFromPlayer.delete(match.user2.ftId);
-
-      return;
     }
 
     console.log('pushing user ' + client.id + ' to waiting room');
@@ -191,8 +189,6 @@ export class RoomService {
         'message',
         'user ' + client.id + ' give up',
       );
-
-      this.roomFromPlayer.delete(pongGame.getOpponentName(client.id));
     }
 
     // remove room
@@ -203,6 +199,9 @@ export class RoomService {
 
     // remove room from roomFromPlayer
     this.roomFromPlayer.delete(client.id);
+
+    // remove match from database
+    this.roomFromPlayer.delete(pongGame.getOpponentName(client.id));
   }
 
   async enterSpectator(client: Socket, roomName: string) {
