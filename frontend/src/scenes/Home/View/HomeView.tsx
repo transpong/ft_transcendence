@@ -42,7 +42,6 @@ export default function PageBase() {
 
     socket.on("connect", () => {
       console.log("Socket connected");
-      socket.emit("test");
     });
 
     setSocketGame(socket);

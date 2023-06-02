@@ -1,8 +1,9 @@
 import * as React from "react";
 import Sketch from "react-p5";
 import * as p5Types from "p5"; //Import this for typechecking and intellisense
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
+import { useToast } from "@chakra-ui/react";
 
 interface ComponentProps {
   // Your component props
@@ -164,6 +165,8 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     timer: number;
   };
 
+  const navigate = useNavigate();
+
   let backendGame: BackendGame = {
     ballX: 0,
     ballY: 0,
@@ -192,6 +195,24 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
   socketGame.on("pong", (message: BackendGame) => {
     backendGame = message;
     console.log("Received message 2:", message);
+  });
+
+  const toast = useToast();
+
+  socketGame.on("giveUp", (message: string) => {
+    toast({
+      title: "Game Over",
+      description: message,
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+
+    console.log("Game Over:", message);
+
+	setTimeout(() => {
+		navigate('/home/matches');
+	  }, 3000);
   });
 
   socketGame.on("endGame", (message: string) => {
