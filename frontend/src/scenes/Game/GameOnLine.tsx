@@ -216,11 +216,10 @@ const Pong: React.FC<ComponentProps> = () => {
       }, 3000);
     });
 
-    socketGame.on("endGame", (message: string) => {
+    socketGame.on("gameOver", (message: string) => {
       socketGame.emit("endGame");
       game.stop();
       console.log("Game Over:", message);
-      socketGame.disconnect();
     });
 
   }
