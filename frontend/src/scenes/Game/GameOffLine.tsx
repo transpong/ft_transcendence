@@ -194,7 +194,6 @@ class Ball{
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
     const {state} = useLocation()
-    console.log("bichao: ", state.field)
 
     class Score {
         p5;

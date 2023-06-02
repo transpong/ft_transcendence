@@ -115,7 +115,10 @@ export default function Me(){
         marginLeft="20px"
         paddingLeft="70px"
         paddingRight="70px"
-        onClick={() => navigate("/home/pong/gameoff", {state: {field: fieldsPath[getFields(selectedField)], ball: ballsPath[getFields(selectedField)]}})}
+        onClick={() => {
+          const pathGame = selectedMode == "Online" ? "/home/pong/game" : "/home/pong/gameoff"
+          navigate(pathGame, {state: {field: fieldsPath[getFields(selectedField)], ball: ballsPath[getFields(selectedField)]}})
+        }}
         >
         {selectedMode == "Online" ? "Pesquisar" : "Jogar"}
         </Button>

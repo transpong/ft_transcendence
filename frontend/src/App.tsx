@@ -12,6 +12,7 @@ import MFA from './scenes/Users/MFA/View/MFA';
 import Profile from './scenes/Users/Profiles/View/Profiles';
 import Game from './scenes/Game/Game';
 import GameOffline from './scenes/Game/GameOffLine';
+import GameOnline from './scenes/Game/GameOnLine';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="profile/:user" element={<Profile />} />
               <Route path="pong/" element={<Game />} />                
               <Route path="pong/gameoff" element={<GameOffline />} />
+              <Route path="pong/game" element={<GameOnline />} />
             </Route>
           </Routes>
         </BrowserRouter>

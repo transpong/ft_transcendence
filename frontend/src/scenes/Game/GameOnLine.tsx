@@ -1,7 +1,7 @@
 import * as React from "react";
 import Sketch from "react-p5";
 import * as p5Types from "p5"; //Import this for typechecking and intellisense
-import { useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 import { Socket } from "socket.io-client";
 
 interface ComponentProps {
@@ -111,15 +111,17 @@ class Ball{
     speedX = 2;
     speedY = 2;
     diameterBall = ((windowWidth + windowHeight) / 2) * 0.023;
+    ballImage;
     p5 ;
 
-    constructor(teste: p5Types) {
+    constructor(teste: p5Types, newBallImage: any) {
         this.positionX;
         this.positionY;
         this.speedX;
         this.speedY;
         this.diameterBall;
         this.p5 = teste
+        this.ballImage = newBallImage
     }
 
     responsiveBall(newHeight: number, oldHeight: number, newWidth: number, oldWidth: number){
@@ -130,12 +132,17 @@ class Ball{
     }
 
     printBall(positionX: number, positionY: number) {
-        this.p5.circle( positionX * fatorEscalaX, positionY * fatorEscalaY, this.diameterBall);
+        if(this.ballImage != null)
+            this.p5.image(this.ballImage, positionX * fatorEscalaX, positionY * fatorEscalaY, this.diameterBall, this.diameterBall)
+        else
+            this.p5.circle( positionX * fatorEscalaX, positionY * fatorEscalaY, this.diameterBall);
     }
 }
 
 const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     const { ref, socketGame } = useOutletContext<{ref: React.RefObject<HTMLDivElement>, socketGame: Socket}>();
+    const {state} = useLocation()
+
     type BackendGame = {
         ballX: number;
         ballY: number;
@@ -256,6 +263,21 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
 
     let buttonStart : ButtonStart | null = null
     let score : Score | null = null
+    let background: any
+    let ballImage: any
+
+
+    const preload = (p5: p5Types) =>{
+        if(state.field != "")
+            background = p5.loadImage(state.field)
+        else
+            background = 0
+        if(state.ball != "")
+            ballImage = p5.loadImage(state.ball)
+        else
+            ballImage = null
+    }
+
 
 
     const setup = (p5: p5Types, canvasParentRef: Element) => {
@@ -266,7 +288,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         fatorEscalaY = windowHeight / backendHeight
         p5.createCanvas(windowWidth , windowHeight).parent(canvasParentRef);
         canvasParent = canvasParentRef
-        ball = new Ball(p5)
+        ball = new Ball(p5, ballImage)
         player1 = new Player(p5, 1, socketGame)
         player2 = new Player(p5, 2, socketGame)
         game = new Game(ball,  p5)
@@ -275,7 +297,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     };
 
     const draw = (p5: p5Types) => {
-        p5.background(0);
+        p5.background(background);
         if(game.isRunning){
             player1.printPlayer(backendGame.player1Y);
             player2.printPlayer(backendGame.player2Y);
@@ -307,7 +329,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
         p5.removeElements()
     }
 
-  return <Sketch setup={setup} draw={draw}  windowResized={windowResized}/>
+  return <Sketch setup={setup} draw={draw}  windowResized={windowResized} preload={preload}/>
 }
 
 
