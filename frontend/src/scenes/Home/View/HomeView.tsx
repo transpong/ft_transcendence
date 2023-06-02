@@ -33,7 +33,7 @@ export default function PageBase() {
   const pathA = useRef("");
 
   useEffect(() => {
-    const socket = io("http://localhost:3001", {
+    const socket = io(import.meta.env.VITE_API_URL, {
       extraHeaders: {
         Authorization: `Bearer ${getCookie("token")}`,
         Custom: "true",
