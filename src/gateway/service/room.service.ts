@@ -21,6 +21,25 @@ export class RoomService {
       console.log('match already exists');
       server.to(client.id).emit('message', 'match already exists');
 
+      // get room name
+      const roomName = await this.gameService.getRoomId(client.id);
+
+      // get match
+      const match = await this.gameService.getByRoomName(roomName);
+
+      // delete match
+      await this.gameService.deleteMatchHistory(roomName);
+
+      // delete room
+      this.rooms.delete(roomName);
+
+      // delete pong game
+      this.pongGames.delete(roomName);
+
+      // delete room from player
+      this.roomFromPlayer.delete(match.user1.ftId);
+      this.roomFromPlayer.delete(match.user2.ftId);
+
       return;
     }
 
@@ -150,12 +169,20 @@ export class RoomService {
       }
       return;
     }
+    // exist room and match
+    if (!this.roomFromPlayer.has(client.id)) {
+      return;
+    }
     const roomName = this.roomNameFromClient(client);
     const pongGame = this.pongGames.get(roomName);
 
     console.log('remove user ' + client.id + ' from room ' + roomName);
     if (pongGame) {
-      await pongGame.stopGameLoop();
+      try {
+        await pongGame.stopGameLoop(client.id);
+      } catch (WsException) {
+        console.log(WsException);
+      }
 
       // emit game state to all users in room
       this.emitToRoom(

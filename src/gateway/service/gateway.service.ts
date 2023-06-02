@@ -60,6 +60,5 @@ export class GatewayService {
   @SubscribeMessage('test')
   async handleTest(client: Socket, data: any) {
     console.log('test');
-    console.log(data);
   }
 }

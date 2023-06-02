@@ -195,6 +195,10 @@ export class PongService {
     }
   }
 
+  gameIsOver(): boolean {
+    return this.timer <= 0;
+  }
+
   private updateGameState(): void {
     this.updateBallPosition();
 
