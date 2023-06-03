@@ -327,6 +327,70 @@ export class RoomService {
     );
   }
 
+  async declineInvite(client: Socket, server: any): Promise<void> {
+    // exist invite
+    if (!(await this.existInvite(client))) {
+      await this.emitErrorToast(client, server, 'Não existe convite');
+      return;
+    }
+
+    // get invite
+    const invite: InviteInterface = this.inviteUsers.find(
+      (invite) => invite.to === this.getNicknameFromClient(client),
+    );
+
+    // emit invite declined to user that sent invite
+    const userSocketId: string = await this.getSocketIdFromNickname(
+      server,
+      invite.from,
+    );
+
+    await this.emitDeclinedInviteToast(server, client, userSocketId);
+
+    // remove invite
+    this.inviteUsers = this.inviteUsers.filter(
+      (invite) => invite.to !== this.getNicknameFromClient(client),
+    );
+  }
+
+  async spectatorOut(client: Socket, server: any): Promise<void> {
+    await this.leaveAllRooms(server, client);
+  }
+
+  private async leaveAllRooms(server: any, client: Socket): Promise<void> {
+    const rooms: string[] = this.getAllRoomsFromSocket(server, client);
+
+    for (const room of rooms) {
+      client.leave(room);
+    }
+  }
+
+  private getAllRoomsFromSocket(server: any, client: Socket): string[] {
+    const rooms: string[] = [];
+    const roomsIterator = server.sockets.adapter.rooms.entries();
+
+    for (const room of roomsIterator) {
+      if (room[1].has(client.id)) {
+        rooms.push(room[0]);
+      }
+    }
+    return rooms;
+  }
+
+  private async emitDeclinedInviteToast(
+    server: any,
+    client: Socket,
+    socketId: string,
+  ): Promise<void> {
+    const toast: ToastInterface = await this.createToast(
+      'info',
+      'O usuário ' + client.id + ' recusou seu convite',
+      false,
+    );
+
+    server.to(socketId).emit('sendToast', toast);
+  }
+
   private async emitDuplicateInviteToast(
     server: any,
     client: Socket,

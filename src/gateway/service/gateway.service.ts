@@ -71,4 +71,14 @@ export class GatewayService {
   async handleAcceptInvite(client: Socket): Promise<void> {
     await this.roomService.acceptInvite(client, this.server);
   }
+
+  @SubscribeMessage('declineInvite')
+  async handleDeclineInvite(client: Socket): Promise<void> {
+    await this.roomService.declineInvite(client, this.server);
+  }
+
+  @SubscribeMessage('spectatorOut')
+  async handleSpectatorOut(client: Socket): Promise<void> {
+    await this.roomService.spectatorOut(client, this.server);
+  }
 }
