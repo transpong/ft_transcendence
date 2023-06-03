@@ -1,13 +1,10 @@
 import * as React from "react";
 import Sketch from "react-p5";
 import * as p5Types from "p5"; //Import this for typechecking and intellisense
-import {useLocation, useNavigate, useOutletContext} from "react-router-dom";
+import {useLocation, useNavigate, useOutletContext, useParams} from "react-router-dom";
 import { Socket } from "socket.io-client";
 import {useToast} from "@chakra-ui/react";
 
-interface ComponentProps {
-  // Your component props
-}
 
 let ball: Ball;
 let player1: Player;
@@ -17,8 +14,8 @@ let windowWidth = 0
 let windowHeight = 0
 let canvasParent: Element
 let parentBorderWidth = 0
-let backendWidth = 800
-let backendHeight = 600
+const backendWidth = 800
+const backendHeight = 600
 let fatorEscalaY = 0
 let fatorEscalaX = 0
 
@@ -50,7 +47,7 @@ class Game {
         }
     }
 
-    scorePlayer(player: number = 0){
+    scorePlayer(player = 0){
         if(player == 1)
             this.scoreP1 += 1
         else if(player == 2)
@@ -128,7 +125,7 @@ class Ball{
     responsiveBall(newHeight: number, oldHeight: number, newWidth: number, oldWidth: number){
         this.positionY = newHeight * (this.positionY / oldHeight)
         this.positionX = newWidth * (this.positionX / oldWidth)
-        this.diameterBall = ((newHeight + newWidth) / 2) * 0.015;;
+        this.diameterBall = ((newHeight + newWidth) / 2) * 0.015;
 
     }
 
@@ -140,7 +137,7 @@ class Ball{
     }
 }
 
-const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
+const Pong: React.FC = () => {
     const { ref, socketGame } = useOutletContext<{ref: React.RefObject<HTMLDivElement>, socketGame: Socket}>();
     const {state} = useLocation()
 
@@ -155,6 +152,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     }
 
     const navigate = useNavigate();
+    const params = useParams();
 
     let backendGame: BackendGame = {
         ballX: 0,
@@ -169,11 +167,57 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
     // console.log('Conect Front');
     // Send 'joinRoom' message when the component mounts
     if (socketGame != null) {
+      if (params.id) {
+      socketGame.emit("enterSpectator", params.id);
+
+
+      socketGame.on("pong", (message: BackendGame) => {
+        backendGame = message;
+        game.start();
+        console.log("Received message 2:", message);
+      });
+
+      socketGame.on("giveUp", (message: string) => {
+        toast({
+          title: "Game Over",
+          description: message,
+          status: "info",
+          duration: 5000,
+          isClosable: true,
+        });
+
+        console.log("Game Over:", message);
+
+        setTimeout(() => {
+          navigate("/home/matches");
+        }, 3000);
+      });
+
+      socketGame.on("gameOver", (message: string) => {
+        game.stop();
+        console.log("Game Over:", message);
+        toast({
+          title: "Game Over Finished",
+          description: message,
+          status: "info",
+          duration: 5000,
+          isClosable: true,
+        });
+
+        console.log("Game Over:", message);
+
+        setTimeout(() => {
+          navigate("/home/matches");
+        }, 3000);
+      });
+
+    } else {
         socketGame.emit("joinRoom");
 
         socketGame.on("toGame", (message: BackendGame) => {
             socketGame.emit("startGame");
             backendGame = message;
+            setTimeout(() => socketGame.emit("startGame"), 1000);
             game.start();
             console.log("Game Startou", message);
         });
@@ -185,6 +229,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
 
         socketGame.on("pong", (message: BackendGame) => {
             backendGame = message;
+            game.start();
             console.log("Received message 2:", message);
         });
 
@@ -211,7 +256,7 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
             game.stop();
             console.log("Game Over:", message);
         });
-
+      }
     }
 
     class Score {
