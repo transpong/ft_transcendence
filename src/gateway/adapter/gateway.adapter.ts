@@ -85,7 +85,9 @@ export class GatewayAdapter extends IoAdapter {
     const user: UserEntity = await this.userService.getUserByFtId(decoded.req);
 
     socket.id = decoded.req;
-    socket.handshake.query.nickname = user.nickname;
+    socket.handshake.query.nickname = user.nickname
+      ? user.nickname
+      : decoded.req;
     next();
   }
 }
