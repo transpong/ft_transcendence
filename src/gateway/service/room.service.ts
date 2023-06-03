@@ -4,6 +4,7 @@ import { PongService } from './pong.service';
 import { MatchStatus } from '../../game/enum/MatchStatus';
 import { InviteInterface } from '../interface/invite.interface';
 import { ToastInterface } from '../interface/toast.interface';
+import { MatchHistoryEntity } from '../../game/entity/game.entity';
 
 export class RoomService {
   waitingUsers: Array<Socket> = [];
@@ -13,7 +14,7 @@ export class RoomService {
 
   constructor(private readonly gameService: GameService) {}
 
-  async joinWaitingRoom(client: Socket, server: Server) {
+  async joinWaitingRoom(client: Socket, server: Server): Promise<void> {
     if (this.waitingUsers.includes(client)) {
       return;
     }
@@ -54,12 +55,12 @@ export class RoomService {
     }
   }
 
-  async createRoom(client: Socket, server: Server) {
-    const namePlayer1 = client.id;
+  async createRoom(client: Socket, server: Server): Promise<void> {
+    const namePlayer1: string = client.id;
     const socketPlayer2 = this.waitingUsers.find(
       (user) => user.id !== namePlayer1,
     );
-    const namePlayer2 = socketPlayer2.id;
+    const namePlayer2: string = socketPlayer2.id;
 
     const roomName: string = this.createRoomName(namePlayer1, namePlayer2);
 
@@ -84,7 +85,7 @@ export class RoomService {
     );
 
     // create pong game
-    const pongGame = new PongService(
+    const pongGame: PongService = new PongService(
       this.gameService,
       namePlayer1,
       namePlayer2,
@@ -103,10 +104,12 @@ export class RoomService {
     server.to(client.id).emit('message', 'partida encontrada');
   }
 
-  async startGame(client: Socket, server: Server) {
+  async startGame(client: Socket, server: Server): Promise<void> {
     if (await this.gameService.isMatchHistoryExist(client.id)) {
-      const roomName = await this.gameService.getRoomId(client.id);
-      const match = await this.gameService.getByRoomName(roomName);
+      const roomName: string = await this.gameService.getRoomId(client.id);
+      const match: MatchHistoryEntity = await this.gameService.getByRoomName(
+        roomName,
+      );
 
       // ready player client
       match.readyPlayer(client.id);
@@ -117,7 +120,7 @@ export class RoomService {
 
       if (match.isReady() && match.status === MatchStatus.IS_WAITING) {
         // start game
-        const pongGame = this.pongGames.get(roomName);
+        const pongGame: PongService = this.pongGames.get(roomName);
         pongGame.startGameLoop(roomName, server);
 
         // update match
@@ -132,21 +135,21 @@ export class RoomService {
     }
   }
 
-  async moveUp(client: Socket) {
-    const roomName = this.roomNameFromClient(client);
-    const pongGame = this.pongGames.get(roomName);
+  async moveUp(client: Socket): Promise<void> {
+    const roomName: string = this.roomNameFromClient(client);
+    const pongGame: PongService = this.pongGames.get(roomName);
 
     pongGame.moveUp(client.id);
   }
 
-  async moveDown(client: Socket) {
-    const roomName = this.roomNameFromClient(client);
-    const pongGame = this.pongGames.get(roomName);
+  async moveDown(client: Socket): Promise<void> {
+    const roomName: string = this.roomNameFromClient(client);
+    const pongGame: PongService = this.pongGames.get(roomName);
 
     pongGame.moveDown(client.id);
   }
 
-  async endGame(client: Socket, server: Server) {
+  async endGame(client: Socket, server: Server): Promise<void> {
     // if user is in waiting room delete him
     console.log('remove user ' + client.id + ' from waiting room');
     if (this.waitingUsers.includes(client)) {
@@ -164,8 +167,8 @@ export class RoomService {
       return;
     }
 
-    const roomName = this.roomNameFromClient(client);
-    const pongGame = this.pongGames.get(roomName);
+    const roomName: string = this.roomNameFromClient(client);
+    const pongGame: PongService = this.pongGames.get(roomName);
 
     if (pongGame) {
       try {
@@ -196,7 +199,7 @@ export class RoomService {
     client.join(roomName);
   }
 
-  async debug() {
+  async debug(): Promise<void> {
     // print waiting users
     console.log(
       'waiting users: ',
@@ -264,7 +267,7 @@ export class RoomService {
     }
 
     // get invite
-    const invite = this.inviteUsers.find(
+    const invite: InviteInterface = this.inviteUsers.find(
       (invite) => invite.to === this.getNicknameFromClient(client),
     );
 
@@ -277,7 +280,7 @@ export class RoomService {
     await this.emitAcceptedInviteToast(server, client, userSocketId);
 
     // create room name
-    const roomName = this.createRoomName(client.id, userSocketId);
+    const roomName: string = this.createRoomName(client.id, userSocketId);
 
     // create match
     await this.gameService.createMatchHistory(
@@ -295,7 +298,11 @@ export class RoomService {
     userSocket.join(roomName);
 
     // create pong game
-    const pongGame = new PongService(this.gameService, client.id, userSocketId);
+    const pongGame: PongService = new PongService(
+      this.gameService,
+      client.id,
+      userSocketId,
+    );
 
     // asign pong game to room
     this.pongGames.set(roomName, pongGame);
