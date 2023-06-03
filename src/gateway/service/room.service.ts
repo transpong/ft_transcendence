@@ -1,4 +1,3 @@
-import { RoomInterface } from '../interface/room.interface';
 import { Socket } from 'socket.io';
 import { GameService } from '../../game/service/game.service';
 import { PongService } from './pong.service';
@@ -6,7 +5,6 @@ import { MatchStatus } from '../../game/enum/MatchStatus';
 
 export class RoomService {
   waitingUsers: Array<Socket> = [];
-  rooms: Map<string, RoomInterface> = new Map();
   pongGames: Map<string, PongService> = new Map();
   roomFromPlayer: Map<string, string> = new Map();
 
@@ -30,8 +28,8 @@ export class RoomService {
       // delete match
       await this.gameService.deleteMatchHistory(roomName);
 
-      // delete room
-      this.rooms.delete(roomName);
+      // remove clients from room
+      server.in(roomName).socketsLeave(roomName);
 
       // delete pong game
       this.pongGames.delete(roomName);
@@ -61,19 +59,12 @@ export class RoomService {
     const namePlayer2 = socketPlayer2.id;
 
     const roomName: string = this.createRoomName(namePlayer1, namePlayer2);
-    const room: RoomInterface = {
-      player1: namePlayer1,
-      player2: namePlayer2,
-      roomName: roomName,
-    };
 
     // remove users from waiting room
     console.log('remove users from waiting room');
     this.waitingUsers = this.waitingUsers.filter(
       (user) => user.id !== namePlayer1 && user.id !== namePlayer2,
     );
-
-    this.rooms.set(roomName, room);
 
     client.join(roomName);
     socketPlayer2.join(roomName);
@@ -103,7 +94,7 @@ export class RoomService {
     const pongGameState = pongGame.getGameState();
 
     // emit game state to all users in room
-    this.emitToRoom(server, roomName, 'toGame', pongGameState);
+    server.to(roomName).emit('toGame', pongGameState);
 
     // debug
     server.to(client.id).emit('message', 'partida encontrada');
@@ -116,12 +107,7 @@ export class RoomService {
 
       // ready player client
       match.readyPlayer(client.id);
-      this.emitToRoom(
-        server,
-        roomName,
-        'message',
-        'player ' + client.id + ' ready',
-      );
+      server.to(roomName).emit('message', `player ${client.id} ready`);
 
       // update match
       await this.gameService.updateMatch(match);
@@ -136,7 +122,8 @@ export class RoomService {
         await this.gameService.updateMatch(match);
 
         // emit game state to all users in room
-        this.emitToRoom(server, roomName, 'message', 'game started');
+        server.to(roomName).emit('message', 'game started');
+
         return;
       }
     }
@@ -182,8 +169,8 @@ export class RoomService {
       }
     }
 
-    // remove room
-    this.rooms.delete(roomName);
+    // remove clients from room
+    server.in(roomName).socketsLeave(roomName);
 
     // remove pong game
     this.pongGames.delete(roomName);
@@ -199,9 +186,8 @@ export class RoomService {
     if (!(await this.gameService.getByRoomName(roomName))) {
       return;
     }
-    const pongGame = this.pongGames.get(roomName);
 
-    pongGame.addSpectator(client);
+    client.join(roomName);
   }
 
   async debug() {
@@ -210,7 +196,6 @@ export class RoomService {
       'waiting users: ',
       this.waitingUsers.map((user) => user.id),
     );
-    console.error('rooms: ', this.rooms);
     console.error('pong games: ', this.pongGames);
     console.error('room from player: ', this.roomFromPlayer);
   }
@@ -223,13 +208,6 @@ export class RoomService {
 
   private roomNameFromClient(client: Socket): string {
     return this.roomFromPlayer.get(client.id);
-  }
-
-  private emitToRoom(server: any, roomName: string, event: string, data: any) {
-    const room = this.rooms.get(roomName);
-
-    server.to(room.player2).emit(event, data);
-    server.to(room.player1).emit(event, data);
   }
 
   private createRoomName(user1: string, user2: string): string {
