@@ -173,6 +173,13 @@ export class PongService {
         matchEntity.giveUp(clientName);
         await this.gameService.updateMatch(matchEntity);
 
+        // get clientName nickname
+        if (this.players.player1ftId == clientName) {
+          clientName = this.players.player1Nickname;
+        } else if (this.players.player2ftId == clientName) {
+          clientName = this.players.player2Nickname;
+        }
+
         this.serverTmp
           .to(this.roomNameTmp)
           .emit('giveUp', `usuario ${clientName} desistiu`);

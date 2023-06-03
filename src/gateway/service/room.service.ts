@@ -118,7 +118,9 @@ export class RoomService {
 
       // ready player client
       match.readyPlayer(client.id);
-      server.to(roomName).emit('message', `player ${client.id} ready`);
+      server
+        .to(roomName)
+        .emit('message', `player ${client.handshake.query.nickname} ready`);
 
       // update match
       await this.gameService.updateMatch(match);
@@ -156,7 +158,6 @@ export class RoomService {
 
   async endGame(client: Socket, server: Server): Promise<void> {
     // if user is in waiting room delete him
-    console.log('remove user ' + client.id + ' from waiting room');
     if (this.waitingUsers.includes(client)) {
       this.waitingUsers = this.waitingUsers.filter(
         (user) => user.id !== client.id,

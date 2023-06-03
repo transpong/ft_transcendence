@@ -48,7 +48,7 @@ export class GatewayService {
 
   @SubscribeMessage('endGame')
   async handleEndGame(client: Socket): Promise<void> {
-    console.log('end game');
+    console.log('end game called');
     await this.roomService.endGame(client, this.server);
   }
 
