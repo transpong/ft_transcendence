@@ -60,37 +60,20 @@ class Game {
 }
 
 class Player{
-    id = 0
-    positionX = 0;
-    positionY = 0;
-    heightPlayer = 0;
-    widthPlayer = 0;
-    speedY = 2;
+    id;
     p5;
     socket;
-    constructor(p5Origin: p5Types, idPlayer: number, newSocket: Socket, private isSpectator: boolean) {
-        this.widthPlayer = 10 * fatorEscalaX;
-        this.heightPlayer = 80 * fatorEscalaY;
+    constructor(p5Origin: p5Types, idPlayer: 1 | 2, newSocket: Socket, private isSpectator: boolean) {
         this.id = idPlayer;
-        if(idPlayer == 1){
-            this.positionX = 0;
-        }else if (idPlayer == 2){
-            this.positionX = windowWidth - this.widthPlayer;
-        }
-        this.positionY = (windowHeight / 2) - (this.heightPlayer / 2);
-        this.speedY = 2;
         this.p5 = p5Origin
         this.socket = newSocket
     }
 
-    responsivePlayer(newWidth: number, newFatorEscalaX: number, newFatorEscalaY: number){
-        this.heightPlayer = 80 * newFatorEscalaY;
-        this.widthPlayer = 10 * newFatorEscalaX;
-        this.positionX = this.positionX == 0 ? 0 : newWidth - this.widthPlayer
-    }
-
-    printPlayer(newPositionY: number) {
-        this.p5.rect( this.positionX, newPositionY * fatorEscalaY, this.widthPlayer, this.heightPlayer);
+    printPlayer(newPositionY: number, widthPlayerBackend: number, heightPlayerBackend: number) {
+        const widthPlayer = widthPlayerBackend * fatorEscalaX
+        const heightPlayer = heightPlayerBackend * fatorEscalaY
+        const positionX = this.id == 1 ? 0 : windowWidth - widthPlayer
+        this.p5.rect( positionX, newPositionY * fatorEscalaY, widthPlayer, heightPlayer);
     }
 
     movePlayer(){
@@ -104,36 +87,20 @@ class Player{
 }
 
 class Ball{
-    positionX = windowWidth / 2;
-    positionY = windowHeight / 2;
-    speedX = 2;
-    speedY = 2;
-    diameterBall = ((windowWidth + windowHeight) / 2) * 0.023;
     ballImage;
     p5 ;
 
     constructor(teste: p5Types, newBallImage: any) {
-        this.positionX;
-        this.positionY;
-        this.speedX;
-        this.speedY;
-        this.diameterBall;
         this.p5 = teste
         this.ballImage = newBallImage
     }
 
-    responsiveBall(newHeight: number, oldHeight: number, newWidth: number, oldWidth: number){
-        this.positionY = newHeight * (this.positionY / oldHeight)
-        this.positionX = newWidth * (this.positionX / oldWidth)
-        this.diameterBall = ((newHeight + newWidth) / 2) * 0.015;
-
-    }
-
-    printBall(positionX: number, positionY: number) {
+    printBall(positionX: number, positionY: number, diameterBallBackend: number) {
+        const diameterBall = diameterBallBackend * (fatorEscalaY < fatorEscalaX ? fatorEscalaY : fatorEscalaX)
         if(this.ballImage != null)
-            this.p5.image(this.ballImage, positionX * fatorEscalaX, positionY * fatorEscalaY, this.diameterBall, this.diameterBall)
+            this.p5.image(this.ballImage, positionX * fatorEscalaX, positionY * fatorEscalaY, diameterBall, diameterBall)
         else
-            this.p5.circle( positionX * fatorEscalaX, positionY * fatorEscalaY, this.diameterBall);
+            this.p5.circle( positionX * fatorEscalaX, positionY * fatorEscalaY, diameterBall);
     }
 }
 
@@ -144,11 +111,16 @@ const Pong: React.FC = () => {
     type BackendGame = {
         ballX: number;
         ballY: number;
+        diameterBall: number;
+        heightPlayer: number;
+        player1Name: string;
         player1Score: number;
         player1Y: number;
+        player2Name: string;
         player2Score: number;
         player2Y: number;
         timer: number;
+        widthPlayer: number;
     }
 
     const navigate = useNavigate();
@@ -157,11 +129,16 @@ const Pong: React.FC = () => {
     let backendGame: BackendGame = {
         ballX: 0,
         ballY: 0,
+        diameterBall: 0,
+        heightPlayer: 0,
+        player1Name: "",
         player1Score: 0,
         player1Y: 0,
+        player2Name: "",
         player2Score: 0,
         player2Y: 0,
         timer: 0,
+        widthPlayer: 0,
     }
     const toast = useToast();
     const isSpectator = !!params.id;
@@ -360,11 +337,11 @@ const Pong: React.FC = () => {
     const draw = (p5: p5Types) => {
         p5.background(background);
         if(game.isRunning){
-            player1.printPlayer(backendGame.player1Y);
-            player2.printPlayer(backendGame.player2Y);
+            player1.printPlayer(backendGame.player1Y, backendGame.widthPlayer, backendGame.heightPlayer);
+            player2.printPlayer(backendGame.player2Y, backendGame.widthPlayer, backendGame.heightPlayer);
             buttonStart?.destroy()
             score?.destroy()
-            ball.printBall(backendGame.ballX, backendGame.ballY);
+            ball.printBall(backendGame.ballX, backendGame.ballY, backendGame.diameterBall);
             player1.movePlayer();
         }else{
             score?.show(backendGame.player1Score, backendGame.player2Score)
@@ -378,9 +355,6 @@ const Pong: React.FC = () => {
         const newWindowWidth = ref.current ? ref.current.clientWidth - parentBorderWidth : canvasParent.clientWidth
         fatorEscalaY = newWindowHeight / backendHeight
         fatorEscalaX = newWindowWidth / backendWidth
-        player1.responsivePlayer(newWindowWidth, fatorEscalaX, fatorEscalaY)
-        player2.responsivePlayer(newWindowWidth,  fatorEscalaX, fatorEscalaY)
-        ball.responsiveBall(newWindowHeight, windowHeight, newWindowWidth, windowWidth)
         p5.createCanvas(newWindowWidth , newWindowHeight).parent(canvasParent)
         windowWidth = newWindowWidth
         windowHeight = newWindowHeight
