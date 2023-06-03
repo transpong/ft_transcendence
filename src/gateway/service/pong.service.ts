@@ -1,6 +1,6 @@
 import { GameService } from '../../game/service/game.service';
 import { MatchStatus } from '../../game/enum/MatchStatus';
-import { Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { MatchHistoryEntity } from '../../game/entity/game.entity';
 
 export class PongService {
@@ -23,12 +23,10 @@ export class PongService {
   private player2Score = 0; // Player 2's score
   private gameLoopInterval: NodeJS.Timeout | null = null;
   private timerInterval: NodeJS.Timeout | null = null;
-  private timerDuration = 5; // Duration of the game in seconds
+  private timerDuration = 50; // Duration of the game in seconds
   private timer = this.timerDuration; // Current value of the timer
   private roomNameTmp;
-  private serverTmp;
-
-  private spectators: Array<Socket> = [];
+  private serverTmp: Server;
 
   constructor(
     private readonly gameService: GameService,
@@ -131,7 +129,7 @@ export class PongService {
     this.ballSpeedY = this.ballSpeed;
   }
 
-  startGameLoop(roomName: string, server: any): void {
+  startGameLoop(roomName: string, server: Server): void {
     if (!this.gameLoopInterval) {
       this.roomNameTmp = roomName;
       this.serverTmp = server;
@@ -139,17 +137,8 @@ export class PongService {
       this.gameLoopInterval = setInterval(() => {
         // if conexao off emit endGame
         this.updateGameState();
-        const gameState = this.getGameState();
         // console.log(this.roomNameTmp);
         // this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
-        this.serverTmp.to(this.namePlayer1).emit('pong', gameState);
-        this.serverTmp.to(this.namePlayer2).emit('pong', gameState);
-
-        if (this.spectators.length > 0) {
-          this.spectators.forEach((spectator) => {
-            spectator.emit('pong', gameState);
-          });
-        }
       }, 1000 / 60); // Update the game state approximately 60 times per second
       // Start the timer
       this.startTimer();
@@ -168,6 +157,8 @@ export class PongService {
       const matchEntity: MatchHistoryEntity =
         await this.gameService.getByRoomName(this.roomNameTmp);
 
+      if (!matchEntity) return;
+
       if (clientName) {
         if (
           matchEntity.user1.ftId == clientName ||
@@ -178,15 +169,9 @@ export class PongService {
         await this.gameService.updateMatch(matchEntity);
 
         this.serverTmp
-          .to(this.getOpponentName(clientName))
-          .emit('giveUp', 'usuario ' + clientName + ' desistiu');
+          .to(this.roomNameTmp)
+          .emit('giveUp', `usuario ${clientName} desistiu`);
 
-        for (let i = 0; i < this.spectators.length; i++) {
-          this.spectators[i].emit(
-            'giveUp',
-            'usuario ' + clientName + ' desistiu',
-          );
-        }
         return;
       }
 
@@ -213,10 +198,10 @@ export class PongService {
     this.updateBallPosition();
 
     // Check if the game is over
-    if (this.timer <= 0) {
-      const gameState = this.getGameState();
+    const gameState = this.getGameState();
 
-      this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
+    this.serverTmp.to(this.roomNameTmp).emit('pong', gameState);
+    if (this.timer <= 0) {
       this.stopGameLoop();
     }
   }
@@ -267,15 +252,5 @@ export class PongService {
       player1Name: this.namePlayer1,
       player2Name: this.namePlayer2,
     };
-  }
-
-  addSpectator(clientName: Socket): void {
-    if (
-      !this.spectators.includes(clientName) &&
-      this.namePlayer1 != clientName.id &&
-      this.namePlayer2 != clientName.id
-    ) {
-      this.spectators.push(clientName);
-    }
   }
 }

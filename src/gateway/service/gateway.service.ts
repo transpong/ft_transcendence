@@ -3,7 +3,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { GameService } from '../../game/service/game.service';
 import { RoomService } from './room.service';
 
@@ -12,7 +12,7 @@ export class GatewayService {
   constructor(private readonly gameService: GameService) {}
 
   @WebSocketServer()
-  server: any;
+  server: Server;
 
   private readonly roomService = new RoomService(this.gameService);
 
