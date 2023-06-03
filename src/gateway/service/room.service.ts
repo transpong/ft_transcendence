@@ -147,20 +147,23 @@ export class RoomService {
   }
 
   async endGame(client: Socket, server: Server) {
+    // if user is in waiting room delete him
+    console.log('remove user ' + client.id + ' from waiting room');
+    if (this.waitingUsers.includes(client)) {
+      this.waitingUsers = this.waitingUsers.filter(
+        (user) => user.id !== client.id,
+      );
+    }
+
     if (!(await this.gameService.isMatchHistoryExist(client.id))) {
-      // if user is in waiting room delete him
-      console.log('remove user ' + client.id + ' from waiting room');
-      if (this.waitingUsers.includes(client)) {
-        this.waitingUsers = this.waitingUsers.filter(
-          (user) => user.id !== client.id,
-        );
-      }
+      this.removeClientFromAllSocketRooms(client);
       return;
     }
     // exist room and match
     if (!this.roomFromPlayer.has(client.id)) {
       return;
     }
+
     const roomName = this.roomNameFromClient(client);
     const pongGame = this.pongGames.get(roomName);
 
@@ -455,5 +458,11 @@ export class RoomService {
 
   private createRoomName(user1: string, user2: string): string {
     return `${user1}-${user2}-${Date.now()}`;
+  }
+
+  private removeClientFromAllSocketRooms(client: Socket): void {
+    for (const room of client.rooms) {
+      if (room !== 'client.id') client.leave(room);
+    }
   }
 }
