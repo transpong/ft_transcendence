@@ -23,7 +23,7 @@ export class PongService {
   private player2Score = 0; // Player 2's score
   private gameLoopInterval: NodeJS.Timeout | null = null;
   private timerInterval: NodeJS.Timeout | null = null;
-  private timerDuration = 5; // Duration of the game in seconds
+  private timerDuration = 500; // Duration of the game in seconds
   private timer = this.timerDuration; // Current value of the timer
   private roomNameTmp;
   private serverTmp;

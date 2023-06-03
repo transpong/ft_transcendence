@@ -3,12 +3,15 @@ import { Socket } from 'socket.io';
 import { GameService } from '../../game/service/game.service';
 import { PongService } from './pong.service';
 import { MatchStatus } from '../../game/enum/MatchStatus';
+import { InviteInterface } from '../interface/invite.interface';
 
 export class RoomService {
   waitingUsers: Array<Socket> = [];
   rooms: Map<string, RoomInterface> = new Map();
   pongGames: Map<string, PongService> = new Map();
   roomFromPlayer: Map<string, string> = new Map();
+
+  inviteUsers: Array<InviteInterface> = [];
 
   constructor(private readonly gameService: GameService) {}
 
@@ -213,6 +216,68 @@ export class RoomService {
     console.error('rooms: ', this.rooms);
     console.error('pong games: ', this.pongGames);
     console.error('room from player: ', this.roomFromPlayer);
+  }
+
+  // inviteError
+  // incomingInvite
+
+  async inviteUser(client: Socket, server: any, userNickname: string) {
+    if (!userNickname) {
+      server.emit(
+        'inviteError',
+        JSON.stringify({ error: 'Usuário não pode ser vazio', code: 0 }),
+      );
+
+      return;
+    }
+    // check if user is in match
+    if (await this.gameService.isMatchHistoryExist(client.id)) {
+      server.emit(
+        'inviteError',
+        JSON.stringify({ error: 'Você já está em uma partida', code: 1 }),
+      );
+      return;
+    }
+
+    // check if userNickname is in match
+    if (await this.gameService.isMatchHistoryExistByNickname(userNickname)) {
+      server.emit(
+        'inviteError',
+        JSON.stringify({
+          error: `Usuário ${userNickname} já está em uma partida`,
+          code: 2,
+        }),
+      );
+      return;
+    }
+
+    // check if socket with userNickname ha id exists in server
+    server.sockets.sockets.forEach((socket) => {
+      if (socket.handshake.query.nickname === userNickname) {
+        // emit invite to userNickname
+        server.emit('incomingInvite', userNickname, client.id);
+        return;
+      }
+    });
+
+    // create a Invite interface
+    const invite: InviteInterface = {
+      from: this.getNicknameFromClient(client),
+      to: userNickname,
+      status: false,
+    };
+
+    // add invite to invites
+    this.inviteUsers.push(invite);
+
+    // emit invite to userNickname
+    server.emit('incomingInvite', userNickname, client.id);
+  }
+
+  private getNicknameFromClient(client: Socket): string {
+    const nickname: string = client.handshake.query.nickname.toString();
+
+    return nickname ? nickname : client.id;
   }
 
   private deleteSocketFromWaitingUsers(client: Socket) {

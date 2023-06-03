@@ -17,12 +17,12 @@ export class GatewayService {
   private readonly roomService = new RoomService(this.gameService);
 
   async handleConnection(client: Socket) {
-    console.log('User: ' + client.id + ' connected');
+    console.log('User: ' + client.handshake.query.nickname + ' connected');
   }
 
   async handleDisconnect(client: Socket) {
     await this.roomService.endGame(client, this.server);
-    console.log('User: ' + client.id + ' disconnected');
+    console.log('User: ' + client.handshake.query.nickname + ' disconnected');
     // await this.roomService.debug();
   }
 
@@ -60,5 +60,10 @@ export class GatewayService {
   @SubscribeMessage('test')
   async handleTest(client: Socket, data: any) {
     console.log('test');
+  }
+
+  @SubscribeMessage('invite')
+  async handleInvite(client: Socket, userNickname: string) {
+    await this.roomService.inviteUser(client, this.server, userNickname);
   }
 }

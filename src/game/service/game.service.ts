@@ -220,15 +220,29 @@ export class GameService {
   }
 
   async isMatchHistoryExist(ftId: string) {
-    const matchHistory = await this.matchHistoryRepository.findOne({
-      where: [
-        { user1: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
-        { user2: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
-      ],
-      relations: ['user1', 'user2', 'winner'],
-    });
+    const matchHistory: MatchHistoryEntity =
+      await this.matchHistoryRepository.findOne({
+        where: [
+          { user1: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+          { user2: { ftId: ftId }, status: Not(MatchStatus.FINISHED) },
+        ],
+        relations: ['user1', 'user2', 'winner'],
+      });
 
-    return matchHistory ? true : false;
+    return !!matchHistory;
+  }
+
+  async isMatchHistoryExistByNickname(nickname: string) {
+    const matchHistory: MatchHistoryEntity =
+      await this.matchHistoryRepository.findOne({
+        where: [
+          { user1: { nickname: nickname }, status: Not(MatchStatus.FINISHED) },
+          { user2: { nickname: nickname }, status: Not(MatchStatus.FINISHED) },
+        ],
+        relations: ['user1', 'user2', 'winner'],
+      });
+
+    return !!matchHistory;
   }
 
   async deleteMatchHistory(roomId: string) {
