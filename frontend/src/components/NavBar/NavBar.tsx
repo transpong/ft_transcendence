@@ -2,10 +2,9 @@ import {ReactNode, useMemo, useState} from 'react';
 import {Avatar, Box, Flex, HStack, IconButton, Link, Stack, useColorModeValue, useDisclosure,} from '@chakra-ui/react';
 import {Link as RouteLink, useNavigate} from "react-router-dom";
 import {avatarUrl} from "../../helpers/avatar-url";
-import {CloseIcon, HamburgerIcon} from '@chakra-ui/icons';
+import {CloseIcon, HamburgerIcon, SettingsIcon} from '@chakra-ui/icons';
 import {IApiUserMe, userService} from "../../services/users-service.ts";
-import { SettingsIcon } from "@chakra-ui/icons";
-import { IoExit } from "react-icons/io5";
+import {IoExit} from "react-icons/io5";
 import {clearCookies} from "../../helpers/clear-cookies.ts";
 
 const Links: string[] = ['Jogar', 'Lista de Jogos', 'Jogos ao vivo', 'Ranking'];
@@ -46,9 +45,9 @@ export default function Simple() {
     }, []);
 
     async function handleLogoff() {
-      clearCookies();
-      await userService.logout();
-      navigate("/");
+        clearCookies();
+        await userService.logout();
+        navigate("/");
     }
 
     return (
@@ -63,9 +62,7 @@ export default function Simple() {
                         onClick={isOpen ? onClose : onOpen}
                     />
                     <HStack spacing={8} alignItems={'center'}>
-                        <RouteLink to={"/home"}>
-                            <NavLink key={"Transpong"} route={"/home"}>Transpong</NavLink>
-                        </RouteLink>
+                        <NavLink key={"Transpong"} route={"/home"}>Transpong</NavLink>
                         <HStack
                             as={'nav'}
                             spacing={5}
@@ -76,30 +73,30 @@ export default function Simple() {
                             ))}
                         </HStack>
                     </HStack>
-                  <Flex alignItems="center" gap='2'>
-                    <RouteLink to={"/home/me"}>
+                    <Flex alignItems="center" gap='2'>
+                        <RouteLink to={"/home/me"}>
 
-                        <Flex alignItems="center" gap='2'>
-                            <Avatar
-                                size={'sm'}
-                                src={avatarUrl(me?.avatar)}
-                            />
-                            <Box ml={2} fontWeight={"600"}>{me?.nickname}</Box>
-                          <SettingsIcon
-                              fontSize={"2rem"}
-                              fontWeight={"bold"}
-                              color={"white"}
-                          />
-                        </Flex>
-                    </RouteLink>
-                  <IoExit
-                      cursor={"pointer"}
-                      fontSize={"2rem"}
-                      fontWeight={"bold"}
-                      color={"white"}
-                      onClick={handleLogoff}
-                  />
-                  </Flex>
+                            <Flex alignItems="center" gap='2'>
+                                <Avatar
+                                    size={'sm'}
+                                    src={avatarUrl(me?.avatar)}
+                                />
+                                <Box ml={2} fontWeight={"600"}>{me?.nickname}</Box>
+                                <SettingsIcon
+                                    fontSize={"2rem"}
+                                    fontWeight={"bold"}
+                                    color={"white"}
+                                />
+                            </Flex>
+                        </RouteLink>
+                        <IoExit
+                            cursor={"pointer"}
+                            fontSize={"2rem"}
+                            fontWeight={"bold"}
+                            color={"white"}
+                            onClick={handleLogoff}
+                        />
+                    </Flex>
                 </Flex>
 
                 {isOpen ? (
