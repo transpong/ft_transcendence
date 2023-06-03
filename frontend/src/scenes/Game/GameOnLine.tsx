@@ -287,11 +287,11 @@ const Pong: React.FC<ComponentProps> = (props: ComponentProps) => {
 
 
     const preload = (p5: p5Types) =>{
-        if(state.field != "")
+        if(state && state.field != "")
             background = p5.loadImage(state.field)
         else
             background = 0
-        if(state.ball != "")
+        if(state && state.ball != "")
             ballImage = p5.loadImage(state.ball)
         else
             ballImage = null

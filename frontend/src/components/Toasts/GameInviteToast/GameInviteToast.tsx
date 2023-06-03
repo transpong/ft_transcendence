@@ -29,7 +29,7 @@ export const GameInviteToast = ({ nickname, navigate, toast }: Props) => {
             borderRadius: "16px",
           }}
           onClick={() => {
-            navigate("/home/game");
+            navigate("/home/pong/game");
             toast.close(nickname);
           }}
         >

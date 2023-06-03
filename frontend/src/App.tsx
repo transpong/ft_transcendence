@@ -32,9 +32,10 @@ function App() {
                 <Route path="mfa" element={<MFA />} />
               </Route>
               <Route path="profile/:user" element={<Profile />} />
-              <Route path="pong/" element={<Pong/>} />                
+              <Route path="pong/" element={<Pong />} />
               <Route path="pong/gameoffline" element={<GameOffline />} />
               <Route path="pong/game" element={<GameOnline />} />
+              <Route path="pong/game/:id" element={<GameOnline />} />
             </Route>
           </Routes>
         </BrowserRouter>
