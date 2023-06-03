@@ -68,7 +68,7 @@ class Player{
     speedY = 2;
     p5;
     socket;
-    constructor(p5Origin: p5Types, idPlayer: number, newSocket: Socket) {
+    constructor(p5Origin: p5Types, idPlayer: number, newSocket: Socket, private isSpectator: boolean) {
         this.widthPlayer = 10 * fatorEscalaX;
         this.heightPlayer = 80 * fatorEscalaY;
         this.id = idPlayer;
@@ -94,10 +94,10 @@ class Player{
     }
 
     movePlayer(){
-        if(this.p5.keyIsDown(this.p5.UP_ARROW)){
-            this.socket.emit('moveUp')
+        if (this.p5.keyIsDown(this.p5.UP_ARROW) && !this.isSpectator) {
+          this.socket.emit("moveUp");
         }
-        if(this.p5.keyIsDown(this.p5.DOWN_ARROW)){
+        if(this.p5.keyIsDown(this.p5.DOWN_ARROW) && !this.isSpectator){
             this.socket.emit('moveDown')
         }
     }
@@ -164,97 +164,94 @@ const Pong: React.FC = () => {
         timer: 0,
     }
     const toast = useToast();
+    const isSpectator = !!params.id;
     // console.log('Conect Front');
     // Send 'joinRoom' message when the component mounts
     if (socketGame != null) {
-      if (params.id) {
-      socketGame.emit("enterSpectator", params.id);
+      if (isSpectator) {
+        socketGame.emit("enterSpectator", params.id);
 
-
-      socketGame.on("pong", (message: BackendGame) => {
-        backendGame = message;
-        game.start();
-        console.log("Received message 2:", message);
-      });
-
-      socketGame.on("giveUp", (message: string) => {
-        toast({
-          title: "Game Over",
-          description: message,
-          status: "info",
-          duration: 5000,
-          isClosable: true,
+        socketGame.on("pong", (message: BackendGame) => {
+          backendGame = message;
+          game.start();
+          console.log("Received message 2:", message);
         });
 
-        console.log("Game Over:", message);
+        socketGame.on("giveUp", (message: string) => {
+          toast({
+            title: "Game Over",
+            description: message,
+            status: "info",
+            duration: 5000,
+            isClosable: true,
+          });
 
-        setTimeout(() => {
-          navigate("/home/matches");
-        }, 3000);
-      });
+          console.log("Game Over:", message);
 
-      socketGame.on("gameOver", (message: string) => {
-        game.stop();
-        console.log("Game Over:", message);
-        toast({
-          title: "Game Over Finished",
-          description: message,
-          status: "info",
-          duration: 5000,
-          isClosable: true,
+          setTimeout(() => {
+            navigate("/home/matches");
+          }, 3000);
         });
 
-        console.log("Game Over:", message);
+        socketGame.on("gameOver", (message: string) => {
+          game.stop();
+          console.log("Game Over:", message);
+          toast({
+            title: "Game Over Finished",
+            description: message,
+            status: "info",
+            duration: 5000,
+            isClosable: true,
+          });
 
-        setTimeout(() => {
-          navigate("/home/matches");
-        }, 3000);
-      });
+          console.log("Game Over:", message);
 
-    } else {
+          setTimeout(() => {
+            navigate("/home/matches");
+          }, 3000);
+        });
+      } else {
         socketGame.emit("joinRoom");
 
         socketGame.on("toGame", (message: BackendGame) => {
-            socketGame.emit("startGame");
-            backendGame = message;
-            setTimeout(() => socketGame.emit("startGame"), 1000);
-            game.start();
-            console.log("Game Startou", message);
+          socketGame.emit("startGame");
+          backendGame = message;
+          setTimeout(() => socketGame.emit("startGame"), 1000);
+          game.start();
+          console.log("Game Startou", message);
         });
 
         // Listen for 'message' events and log the received messages
         socketGame.on("message", (message: string) => {
-            console.log("Received message 1:", message);
+          console.log("Received message 1:", message);
         });
 
         socketGame.on("pong", (message: BackendGame) => {
-            backendGame = message;
-            game.start();
-            console.log("Received message 2:", message);
+          backendGame = message;
+          game.start();
+          console.log("Received message 2:", message);
         });
 
-
-
         socketGame.on("giveUp", (message: string) => {
-            toast({
-                title: "Game Over",
-                description: message,
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-            });
+          toast({
+            title: "Game Over",
+            description: message,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
 
-            console.log("Game Over:", message);
+          console.log("Game Over:", message);
 
-            setTimeout(() => {
-                navigate('/home/matches');
-            }, 3000);
+          setTimeout(() => {
+            navigate("/home/matches");
+          }, 3000);
         });
 
         socketGame.on("gameOver", (message: string) => {
-            socketGame.emit("endGame");
-            game.stop();
-            console.log("Game Over:", message);
+          socketGame.emit("endGame");
+          game.stop();
+          console.log("Game Over:", message);
         });
       }
     }
@@ -353,8 +350,8 @@ const Pong: React.FC = () => {
         p5.createCanvas(windowWidth , windowHeight).parent(canvasParentRef);
         canvasParent = canvasParentRef
         ball = new Ball(p5, ballImage)
-        player1 = new Player(p5, 1, socketGame)
-        player2 = new Player(p5, 2, socketGame)
+        player1 = new Player(p5, 1, socketGame, isSpectator);
+        player2 = new Player(p5, 2, socketGame, isSpectator);
         game = new Game(ball,  p5)
         buttonStart = new ButtonStart(p5)
         score = new Score(p5)

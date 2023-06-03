@@ -58,8 +58,15 @@ export default function PageBase() {
   }, []);
 
   useEffect(() => {
-    if (oldPath.current === "/home/pong/game" && path !== "/home/pong/game") {
+    if (oldPath.current.includes("/home/pong/game") && !path.includes("/home/pong/game")) {
       console.log("saiu da rota game");
+      if (socketGame) {
+        socketGame.removeListener("pong");
+        socketGame.removeListener("giveUp");
+        socketGame.removeListener("gameOver");
+        socketGame.removeListener("toGame");
+        socketGame.removeListener("message");
+      }
       emitEndgame();
     }
     oldPath.current = path;
