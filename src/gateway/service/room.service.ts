@@ -1,21 +1,17 @@
-import { RoomInterface } from '../interface/room.interface';
 import { Socket } from 'socket.io';
 import { GameService } from '../../game/service/game.service';
 import { PongService } from './pong.service';
 import { MatchStatus } from '../../game/enum/MatchStatus';
-import { InviteInterface } from '../interface/invite.interface';
+import { Server } from 'socket.io';
 
 export class RoomService {
   waitingUsers: Array<Socket> = [];
-  rooms: Map<string, RoomInterface> = new Map();
   pongGames: Map<string, PongService> = new Map();
   roomFromPlayer: Map<string, string> = new Map();
 
-  inviteUsers: Array<InviteInterface> = [];
-
   constructor(private readonly gameService: GameService) {}
 
-  async joinWaitingRoom(client: Socket, server: any) {
+  async joinWaitingRoom(client: Socket, server: Server) {
     if (this.waitingUsers.includes(client)) {
       return;
     }
@@ -33,8 +29,8 @@ export class RoomService {
       // delete match
       await this.gameService.deleteMatchHistory(roomName);
 
-      // delete room
-      this.rooms.delete(roomName);
+      // remove clients from room
+      server.in(roomName).socketsLeave(roomName);
 
       // delete pong game
       this.pongGames.delete(roomName);
@@ -56,7 +52,7 @@ export class RoomService {
     }
   }
 
-  async createRoom(client: Socket, server: any) {
+  async createRoom(client: Socket, server: Server) {
     const namePlayer1 = client.id;
     const socketPlayer2 = this.waitingUsers.find(
       (user) => user.id !== namePlayer1,
@@ -64,19 +60,12 @@ export class RoomService {
     const namePlayer2 = socketPlayer2.id;
 
     const roomName: string = this.createRoomName(namePlayer1, namePlayer2);
-    const room: RoomInterface = {
-      player1: namePlayer1,
-      player2: namePlayer2,
-      roomName: roomName,
-    };
 
     // remove users from waiting room
     console.log('remove users from waiting room');
     this.waitingUsers = this.waitingUsers.filter(
       (user) => user.id !== namePlayer1 && user.id !== namePlayer2,
     );
-
-    this.rooms.set(roomName, room);
 
     client.join(roomName);
     socketPlayer2.join(roomName);
@@ -106,25 +95,20 @@ export class RoomService {
     const pongGameState = pongGame.getGameState();
 
     // emit game state to all users in room
-    this.emitToRoom(server, roomName, 'toGame', pongGameState);
+    server.to(roomName).emit('toGame', pongGameState);
 
     // debug
     server.to(client.id).emit('message', 'partida encontrada');
   }
 
-  async startGame(client: Socket, server: any) {
+  async startGame(client: Socket, server: Server) {
     if (await this.gameService.isMatchHistoryExist(client.id)) {
       const roomName = await this.gameService.getRoomId(client.id);
       const match = await this.gameService.getByRoomName(roomName);
 
       // ready player client
       match.readyPlayer(client.id);
-      this.emitToRoom(
-        server,
-        roomName,
-        'message',
-        'player ' + client.id + ' ready',
-      );
+      server.to(roomName).emit('message', `player ${client.id} ready`);
 
       // update match
       await this.gameService.updateMatch(match);
@@ -139,7 +123,8 @@ export class RoomService {
         await this.gameService.updateMatch(match);
 
         // emit game state to all users in room
-        this.emitToRoom(server, roomName, 'message', 'game started');
+        server.to(roomName).emit('message', 'game started');
+
         return;
       }
     }
@@ -159,7 +144,7 @@ export class RoomService {
     pongGame.moveDown(client.id);
   }
 
-  async endGame(client: Socket, server: any) {
+  async endGame(client: Socket, server: Server) {
     if (!(await this.gameService.isMatchHistoryExist(client.id))) {
       // if user is in waiting room delete him
       console.log('remove user ' + client.id + ' from waiting room');
@@ -185,8 +170,8 @@ export class RoomService {
       }
     }
 
-    // remove room
-    this.rooms.delete(roomName);
+    // remove clients from room
+    server.in(roomName).socketsLeave(roomName);
 
     // remove pong game
     this.pongGames.delete(roomName);
@@ -202,9 +187,8 @@ export class RoomService {
     if (!(await this.gameService.getByRoomName(roomName))) {
       return;
     }
-    const pongGame = this.pongGames.get(roomName);
 
-    pongGame.addSpectator(client);
+    client.join(roomName);
   }
 
   async debug() {
@@ -213,71 +197,8 @@ export class RoomService {
       'waiting users: ',
       this.waitingUsers.map((user) => user.id),
     );
-    console.error('rooms: ', this.rooms);
     console.error('pong games: ', this.pongGames);
     console.error('room from player: ', this.roomFromPlayer);
-  }
-
-  // inviteError
-  // incomingInvite
-
-  async inviteUser(client: Socket, server: any, userNickname: string) {
-    if (!userNickname) {
-      server.emit(
-        'inviteError',
-        JSON.stringify({ error: 'Usuário não pode ser vazio', code: 0 }),
-      );
-
-      return;
-    }
-    // check if user is in match
-    if (await this.gameService.isMatchHistoryExist(client.id)) {
-      server.emit(
-        'inviteError',
-        JSON.stringify({ error: 'Você já está em uma partida', code: 1 }),
-      );
-      return;
-    }
-
-    // check if userNickname is in match
-    if (await this.gameService.isMatchHistoryExistByNickname(userNickname)) {
-      server.emit(
-        'inviteError',
-        JSON.stringify({
-          error: `Usuário ${userNickname} já está em uma partida`,
-          code: 2,
-        }),
-      );
-      return;
-    }
-
-    // check if socket with userNickname ha id exists in server
-    server.sockets.sockets.forEach((socket) => {
-      if (socket.handshake.query.nickname === userNickname) {
-        // emit invite to userNickname
-        server.emit('incomingInvite', userNickname, client.id);
-        return;
-      }
-    });
-
-    // create a Invite interface
-    const invite: InviteInterface = {
-      from: this.getNicknameFromClient(client),
-      to: userNickname,
-      status: false,
-    };
-
-    // add invite to invites
-    this.inviteUsers.push(invite);
-
-    // emit invite to userNickname
-    server.emit('incomingInvite', userNickname, client.id);
-  }
-
-  private getNicknameFromClient(client: Socket): string {
-    const nickname: string = client.handshake.query.nickname.toString();
-
-    return nickname ? nickname : client.id;
   }
 
   private deleteSocketFromWaitingUsers(client: Socket) {
@@ -288,13 +209,6 @@ export class RoomService {
 
   private roomNameFromClient(client: Socket): string {
     return this.roomFromPlayer.get(client.id);
-  }
-
-  private emitToRoom(server: any, roomName: string, event: string, data: any) {
-    const room = this.rooms.get(roomName);
-
-    server.to(room.player2).emit(event, data);
-    server.to(room.player1).emit(event, data);
   }
 
   private createRoomName(user1: string, user2: string): string {
