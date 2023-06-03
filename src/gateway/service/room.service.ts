@@ -5,6 +5,7 @@ import { MatchStatus } from '../../game/enum/MatchStatus';
 import { InviteInterface } from '../interface/invite.interface';
 import { ToastInterface } from '../interface/toast.interface';
 import { MatchHistoryEntity } from '../../game/entity/game.entity';
+import { PlayersInterface } from '../interface/players.interface';
 
 export class RoomService {
   waitingUsers: Array<Socket> = [];
@@ -84,12 +85,16 @@ export class RoomService {
       roomName,
     );
 
+    // create players interface
+    const players: PlayersInterface = {
+      player1ftId: namePlayer1,
+      player2ftId: namePlayer2,
+      player1Nickname: this.getNicknameFromClient(client),
+      player2Nickname: this.getNicknameFromClient(socketPlayer2),
+    };
+
     // create pong game
-    const pongGame: PongService = new PongService(
-      this.gameService,
-      namePlayer1,
-      namePlayer2,
-    );
+    const pongGame: PongService = new PongService(this.gameService, players);
 
     // asign pong game to room
     this.pongGames.set(roomName, pongGame);
@@ -297,12 +302,15 @@ export class RoomService {
     client.join(roomName);
     userSocket.join(roomName);
 
+    const players: PlayersInterface = {
+      player1ftId: client.id,
+      player2ftId: userSocketId,
+      player1Nickname: this.getNicknameFromClient(client),
+      player2Nickname: this.getNicknameFromClient(userSocket),
+    };
+
     // create pong game
-    const pongGame: PongService = new PongService(
-      this.gameService,
-      client.id,
-      userSocketId,
-    );
+    const pongGame: PongService = new PongService(this.gameService, players);
 
     // asign pong game to room
     this.pongGames.set(roomName, pongGame);
