@@ -2,6 +2,7 @@ import { GameService } from '../../game/service/game.service';
 import { MatchStatus } from '../../game/enum/MatchStatus';
 import { Server } from 'socket.io';
 import { MatchHistoryEntity } from '../../game/entity/game.entity';
+import { PlayersInterface } from '../interface/players.interface';
 
 export class PongService {
   private readonly canvasWidth = 800; // Width of the game canvas
@@ -27,12 +28,16 @@ export class PongService {
   private timer = this.timerDuration; // Current value of the timer
   private roomNameTmp;
   private serverTmp: Server;
+  private readonly namePlayer1: string;
+  private readonly namePlayer2: string;
 
   constructor(
     private readonly gameService: GameService,
-    private namePlayer1: string,
-    private namePlayer2: string,
-  ) {}
+    private readonly players: PlayersInterface,
+  ) {
+    this.namePlayer1 = players.player1ftId;
+    this.namePlayer2 = players.player2ftId;
+  }
 
   moveUp(player: string): void {
     if (player == this.namePlayer1) {
@@ -168,6 +173,13 @@ export class PongService {
         matchEntity.giveUp(clientName);
         await this.gameService.updateMatch(matchEntity);
 
+        // get clientName nickname
+        if (this.players.player1ftId == clientName) {
+          clientName = this.players.player1Nickname;
+        } else if (this.players.player2ftId == clientName) {
+          clientName = this.players.player2Nickname;
+        }
+
         this.serverTmp
           .to(this.roomNameTmp)
           .emit('giveUp', `usuario ${clientName} desistiu`);
@@ -249,8 +261,7 @@ export class PongService {
       player1Score: this.player1Score,
       player2Score: this.player2Score,
       timer: this.timer,
-      player1Name: this.namePlayer1,
-      player2Name: this.namePlayer2,
+      players: this.players,
     };
   }
 }

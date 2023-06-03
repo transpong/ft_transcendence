@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/service/user.service';
 import { UserEnum } from '../../user/enum/user.enum';
+import { UserEntity } from '../../user/entity/user.entity';
 
 @Injectable()
 export class GatewayAdapter extends IoAdapter {
@@ -81,7 +82,12 @@ export class GatewayAdapter extends IoAdapter {
     if (!(await this.userService.userExists(decoded.req))) {
       return next(new Error('User not found'));
     }
+    const user: UserEntity = await this.userService.getUserByFtId(decoded.req);
+
     socket.id = decoded.req;
+    socket.handshake.query.nickname = user.nickname
+      ? user.nickname
+      : decoded.req;
     next();
   }
 }

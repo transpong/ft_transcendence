@@ -3,7 +3,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { GameService } from '../../game/service/game.service';
 import { RoomService } from './room.service';
 
@@ -14,51 +14,71 @@ export class GatewayService {
   @WebSocketServer()
   server: Server;
 
-  private readonly roomService = new RoomService(this.gameService);
+  private readonly roomService: RoomService = new RoomService(this.gameService);
 
-  async handleConnection(client: Socket) {
-    console.log('User: ' + client.id + ' connected');
+  async handleConnection(client: Socket): Promise<void> {
+    console.log('User: ' + client.handshake.query.nickname + ' connected');
   }
 
-  async handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket): Promise<void> {
     await this.roomService.endGame(client, this.server);
-    console.log('User: ' + client.id + ' disconnected');
+    console.log('User: ' + client.handshake.query.nickname + ' disconnected');
     // await this.roomService.debug();
   }
 
   @SubscribeMessage('joinRoom')
-  async handleRoom(client: Socket) {
+  async handleRoom(client: Socket): Promise<void> {
     await this.roomService.joinWaitingRoom(client, this.server);
   }
 
   @SubscribeMessage('startGame')
-  async handleStartGame(client: Socket) {
+  async handleStartGame(client: Socket): Promise<void> {
     await this.roomService.startGame(client, this.server);
   }
 
   @SubscribeMessage('moveUp')
-  async handleMoveUp(client: Socket) {
+  async handleMoveUp(client: Socket): Promise<void> {
     await this.roomService.moveUp(client);
   }
 
   @SubscribeMessage('moveDown')
-  async handleMoveDown(client: Socket) {
+  async handleMoveDown(client: Socket): Promise<void> {
     await this.roomService.moveDown(client);
   }
 
   @SubscribeMessage('endGame')
-  async handleEndGame(client: Socket) {
-    console.log('end game');
+  async handleEndGame(client: Socket): Promise<void> {
+    console.log('end game called');
     await this.roomService.endGame(client, this.server);
   }
 
   @SubscribeMessage('enterSpectator')
-  async handleEnterSpectator(client: Socket, roomName: string) {
+  async handleEnterSpectator(client: Socket, roomName: string): Promise<void> {
     await this.roomService.enterSpectator(client, roomName);
   }
 
   @SubscribeMessage('test')
-  async handleTest(client: Socket, data: any) {
+  async handleTest(client: Socket, data: any): Promise<void> {
     console.log('test');
+  }
+
+  @SubscribeMessage('invite')
+  async handleInvite(client: Socket, userNickname: string): Promise<void> {
+    await this.roomService.inviteUser(client, this.server, userNickname);
+  }
+
+  @SubscribeMessage('acceptInvite')
+  async handleAcceptInvite(client: Socket): Promise<void> {
+    await this.roomService.acceptInvite(client, this.server);
+  }
+
+  @SubscribeMessage('declineInvite')
+  async handleDeclineInvite(client: Socket): Promise<void> {
+    await this.roomService.declineInvite(client, this.server);
+  }
+
+  @SubscribeMessage('spectatorOut')
+  async handleSpectatorOut(client: Socket): Promise<void> {
+    await this.roomService.spectatorOut(client, this.server);
   }
 }
