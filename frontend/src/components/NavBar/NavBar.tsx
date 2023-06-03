@@ -3,9 +3,9 @@ import {Avatar, Box, Flex, HStack, IconButton, Link, Stack, useColorModeValue, u
 import {Link as RouteLink, useNavigate} from "react-router-dom";
 import {avatarUrl} from "../../helpers/avatar-url";
 import {CloseIcon, HamburgerIcon, SettingsIcon} from '@chakra-ui/icons';
-import {IApiUserMe, userService} from "../../services/users-service.ts";
+import {IApiUserMe, userService} from "../../services/users-service";
 import {IoExit} from "react-icons/io5";
-import {clearCookies} from "../../helpers/clear-cookies.ts";
+import {clearCookies} from "../../helpers/clear-cookies";
 
 const Links: string[] = ['Jogar', 'Lista de Jogos', 'Jogos ao vivo', 'Ranking'];
 const Redirects: string[] = ['/home/pong', '/home/matches', '/home/matches/live', '/home/ranking'];
@@ -42,7 +42,7 @@ export default function Simple() {
 
         if (!myData?.nickname) navigate("/nickname");
         setMe(myData);
-    }, []);
+    }, [navigate]);
 
     async function handleLogoff() {
         clearCookies();
@@ -51,7 +51,7 @@ export default function Simple() {
     }
 
     return (
-        <>
+        <Box mb="36px">
             <Box bg={useColorModeValue('#805AD5', '#805AD5')} px={4}>
                 <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
                     <IconButton
@@ -109,6 +109,6 @@ export default function Simple() {
                     </Box>
                 ) : null}
             </Box>
-        </>
+        </Box>
     );
 }
