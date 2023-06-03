@@ -2,6 +2,7 @@ import { Socket } from 'socket.io';
 import { GameService } from '../../game/service/game.service';
 import { PongService } from './pong.service';
 import { MatchStatus } from '../../game/enum/MatchStatus';
+import { Server } from 'socket.io';
 
 export class RoomService {
   waitingUsers: Array<Socket> = [];
@@ -10,7 +11,7 @@ export class RoomService {
 
   constructor(private readonly gameService: GameService) {}
 
-  async joinWaitingRoom(client: Socket, server: any) {
+  async joinWaitingRoom(client: Socket, server: Server) {
     if (this.waitingUsers.includes(client)) {
       return;
     }
@@ -51,7 +52,7 @@ export class RoomService {
     }
   }
 
-  async createRoom(client: Socket, server: any) {
+  async createRoom(client: Socket, server: Server) {
     const namePlayer1 = client.id;
     const socketPlayer2 = this.waitingUsers.find(
       (user) => user.id !== namePlayer1,
@@ -100,7 +101,7 @@ export class RoomService {
     server.to(client.id).emit('message', 'partida encontrada');
   }
 
-  async startGame(client: Socket, server: any) {
+  async startGame(client: Socket, server: Server) {
     if (await this.gameService.isMatchHistoryExist(client.id)) {
       const roomName = await this.gameService.getRoomId(client.id);
       const match = await this.gameService.getByRoomName(roomName);
@@ -143,7 +144,7 @@ export class RoomService {
     pongGame.moveDown(client.id);
   }
 
-  async endGame(client: Socket, server: any) {
+  async endGame(client: Socket, server: Server) {
     if (!(await this.gameService.isMatchHistoryExist(client.id))) {
       // if user is in waiting room delete him
       console.log('remove user ' + client.id + ' from waiting room');

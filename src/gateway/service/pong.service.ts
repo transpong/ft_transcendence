@@ -1,6 +1,6 @@
 import { GameService } from '../../game/service/game.service';
 import { MatchStatus } from '../../game/enum/MatchStatus';
-import { Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { MatchHistoryEntity } from '../../game/entity/game.entity';
 
 export class PongService {
@@ -26,7 +26,7 @@ export class PongService {
   private timerDuration = 50; // Duration of the game in seconds
   private timer = this.timerDuration; // Current value of the timer
   private roomNameTmp;
-  private serverTmp;
+  private serverTmp: Server;
 
   constructor(
     private readonly gameService: GameService,
@@ -129,7 +129,7 @@ export class PongService {
     this.ballSpeedY = this.ballSpeed;
   }
 
-  startGameLoop(roomName: string, server: any): void {
+  startGameLoop(roomName: string, server: Server): void {
     if (!this.gameLoopInterval) {
       this.roomNameTmp = roomName;
       this.serverTmp = server;
