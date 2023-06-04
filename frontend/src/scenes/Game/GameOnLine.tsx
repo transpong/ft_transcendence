@@ -210,6 +210,41 @@ const Pong: React.FC = () => {
             navigate("/home/matches");
           }, 3000);
         });
+      } else if (state?.fromInvite) {
+        socketGame.emit("startGame");
+
+        // Listen for 'message' events and log the received messages
+        socketGame.on("message", (message: string) => {
+          console.log("Received message 1:", message);
+        });
+
+        socketGame.on("pong", (message: BackendGame) => {
+          backendGame = message;
+          game.start();
+          console.log("Received message 2:", message);
+        });
+
+        socketGame.on("giveUp", (message: string) => {
+          toast({
+            title: "Game Over",
+            description: message,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+
+          console.log("Game Over:", message);
+
+          setTimeout(() => {
+            navigate("/home/matches");
+          }, 3000);
+        });
+
+        socketGame.on("gameOver", (message: string) => {
+          socketGame.emit("endGame");
+          game.stop();
+          console.log("Game Over:", message);
+        });
       } else {
         socketGame.emit("joinRoom");
 
