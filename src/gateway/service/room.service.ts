@@ -205,7 +205,7 @@ export class RoomService {
     client.join(roomName);
   }
 
-  async debug(): Promise<void> {
+  debug(): void {
     // print waiting users
     console.log(
       'waiting users: ',
@@ -218,35 +218,31 @@ export class RoomService {
   async inviteUser(client: Socket, server: Server, userNickname: string) {
     // check if userNickname is empty
     if (!userNickname) {
-      await this.emitErrorToast(client, server, 'Usuário não pode ser vazio');
+      this.emitErrorToast(client, server, 'Usuário não pode ser vazio');
       return;
     }
 
     // check if user is inviting himself
     if (userNickname === client.handshake.query.nickname) {
-      await this.emitErrorToast(client, server, 'Você não pode se convidar');
+      this.emitErrorToast(client, server, 'Você não pode se convidar');
       return;
     }
 
     // check if user is in match
     if (await this.gameService.isMatchHistoryExist(client.id)) {
-      await this.emitErrorToast(client, server, 'Você já está em uma partida');
+      this.emitErrorToast(client, server, 'Você já está em uma partida');
       return;
     }
 
     // check if userNickname is in match
     if (await this.gameService.isMatchHistoryExistByNickname(userNickname)) {
-      await this.emitErrorToast(
-        client,
-        server,
-        'Usuário já está em uma partida',
-      );
+      this.emitErrorToast(client, server, 'Usuário já está em uma partida');
       return;
     }
 
     // check if socket with userNickname has id exists in server
-    if (!(await this.socketIsConnected(server, userNickname))) {
-      await this.emitErrorToast(client, server, 'Usuário está offline');
+    if (!this.socketIsConnected(server, userNickname)) {
+      this.emitErrorToast(client, server, 'Usuário está offline');
       return;
     }
 
@@ -257,34 +253,39 @@ export class RoomService {
     };
 
     // emit invite to userNickname
-    if (await this.inviteDuplicated(client, userNickname)) {
-      await this.emitDuplicateInviteToast(server, client, userNickname);
+    if (this.inviteDuplicated(client, userNickname)) {
+      this.emitDuplicateInviteToast(server, client, userNickname);
       return;
     }
     this.inviteUsers.push(invite);
-    await this.emitInviteToast(server, client, userNickname, invite);
+    this.emitInviteToast(server, client, userNickname, invite);
   }
 
-  async acceptInvite(client: Socket, server: Server): Promise<void> {
+  async acceptInvite(
+    client: Socket,
+    server: Server,
+    userNickname: string,
+  ): Promise<void> {
     // exist invite
-    if (!(await this.existInvite(client))) {
-      await this.emitErrorToast(client, server, 'Não existe convite');
+    if (!this.existInvite(client, userNickname)) {
+      this.emitErrorToast(client, server, 'Não existe convite');
       return;
     }
 
     // get invite
     const invite: InviteInterface = this.inviteUsers.find(
-      // TODO: user will have only 1 invite?
-      (invite) => invite.to === this.getNicknameFromClient(client),
+      (invite) =>
+        invite.to === this.getNicknameFromClient(client) &&
+        invite.from === userNickname,
     );
 
     // emit invite accepted to user that sent invite
-    const userSocketId: string = await this.getSocketIdFromNickname(
+    const userSocketId: string = this.getSocketIdFromNickname(
       server,
       invite.from,
     );
 
-    await this.emitAcceptedInviteToast(server, client, userSocketId);
+    this.emitAcceptedInviteToast(server, client, userSocketId);
 
     // create room name
     const roomName: string = this.createRoomName(client.id, userSocketId);
@@ -325,44 +326,51 @@ export class RoomService {
 
     // remove invite
     this.inviteUsers = this.inviteUsers.filter(
-      // TODO: threat when have multiple invites
-      (invite) => invite.to !== this.getNicknameFromClient(client),
+      (invite) =>
+        invite.to !== this.getNicknameFromClient(client) ||
+        invite.from !== userNickname,
     );
   }
 
-  async declineInvite(client: Socket, server: Server): Promise<void> {
+  async declineInvite(
+    client: Socket,
+    server: Server,
+    userNickname: string,
+  ): Promise<void> {
     // exist invite
-    if (!(await this.existInvite(client))) {
-      await this.emitErrorToast(client, server, 'Não existe convite');
+    if (!this.existInvite(client, userNickname)) {
+      this.emitErrorToast(client, server, 'Não existe convite');
       return;
     }
 
     // get invite
     const invite: InviteInterface = this.inviteUsers.find(
-      // TODO: threat when have multiple invites
-      (invite) => invite.to === this.getNicknameFromClient(client),
+      (invite) =>
+        invite.to === this.getNicknameFromClient(client) &&
+        invite.from === userNickname,
     );
 
     // emit invite declined to user that sent invite
-    const userSocketId: string = await this.getSocketIdFromNickname(
+    const userSocketId: string = this.getSocketIdFromNickname(
       server,
       invite.from,
     );
 
-    await this.emitDeclinedInviteToast(server, client, userSocketId);
+    this.emitDeclinedInviteToast(server, client, userSocketId);
 
     // remove invite
     this.inviteUsers = this.inviteUsers.filter(
-      // TODO: threat when have multiple invites
-      (invite) => invite.to !== this.getNicknameFromClient(client),
+      (invite) =>
+        invite.to !== this.getNicknameFromClient(client) ||
+        invite.from !== userNickname,
     );
   }
 
-  async spectatorOut(client: Socket, server: Server): Promise<void> {
-    await this.leaveAllRooms(server, client);
+  spectatorOut(client: Socket, server: Server): void {
+    this.leaveAllRooms(server, client);
   }
 
-  private async leaveAllRooms(server: Server, client: Socket): Promise<void> {
+  private leaveAllRooms(server: Server, client: Socket): void {
     const rooms: string[] = this.getAllRoomsFromSocket(server, client);
 
     for (const room of rooms) {
@@ -382,12 +390,12 @@ export class RoomService {
     return rooms;
   }
 
-  private async emitDeclinedInviteToast(
+  private emitDeclinedInviteToast(
     server: Server,
     client: Socket,
     socketId: string,
-  ): Promise<void> {
-    const toast: ToastInterface = await this.createToast(
+  ): void {
+    const toast: ToastInterface = this.createToast(
       'info',
       'O usuário ' + client.id + ' recusou seu convite',
       false,
@@ -396,12 +404,12 @@ export class RoomService {
     server.to(socketId).emit('sendToast', toast);
   }
 
-  private async emitDuplicateInviteToast(
+  private emitDuplicateInviteToast(
     server: Server,
     client: Socket,
     userNickname: string,
-  ): Promise<void> {
-    const toast: ToastInterface = await this.createToast(
+  ): void {
+    const toast: ToastInterface = this.createToast(
       'warning',
       'Você já convidou o usuário ' + userNickname,
       false,
@@ -410,12 +418,12 @@ export class RoomService {
     server.to(client.id).emit('sendToast', toast);
   }
 
-  private async emitAcceptedInviteToast(
+  private emitAcceptedInviteToast(
     server: Server,
     client: Socket,
     socketId: string,
-  ): Promise<void> {
-    const toast: ToastInterface = await this.createToast(
+  ): void {
+    const toast: ToastInterface = this.createToast(
       'info',
       'O usuário ' + client.id + ' aceitou seu convite',
       false,
@@ -426,19 +434,19 @@ export class RoomService {
     server.to(socketId).emit('sendToast', toast);
   }
 
-  private async existInvite(client: Socket): Promise<boolean> {
+  private existInvite(client: Socket, userNickname: string): boolean {
     for (const invite of this.inviteUsers) {
-      if (invite.to === this.getNicknameFromClient(client)) {
+      if (
+        invite.to === this.getNicknameFromClient(client) &&
+        invite.from === userNickname
+      ) {
         return true;
       }
     }
     return false;
   }
 
-  private async inviteDuplicated(
-    client: Socket,
-    userNickname: string,
-  ): Promise<boolean> {
+  private inviteDuplicated(client: Socket, userNickname: string): boolean {
     for (const invite of this.inviteUsers) {
       if (
         invite.from === this.getNicknameFromClient(client) &&
@@ -450,10 +458,7 @@ export class RoomService {
     return false;
   }
 
-  private async socketIsConnected(
-    server: Server,
-    nickname: string,
-  ): Promise<boolean> {
+  private socketIsConnected(server: Server, nickname: string): boolean {
     let isConnected = false;
 
     server.sockets.sockets.forEach((socket) => {
@@ -465,7 +470,7 @@ export class RoomService {
     return isConnected;
   }
 
-  private async createToast(
+  private createToast(
     info: string,
     message: string,
     isInvite: boolean,
@@ -473,7 +478,7 @@ export class RoomService {
       [key: string]: string;
     },
     is_invite_accepted?: boolean,
-  ): Promise<ToastInterface> {
+  ): ToastInterface {
     return {
       info: info,
       message: message,
@@ -483,32 +488,25 @@ export class RoomService {
     };
   }
 
-  private async emitErrorToast(
+  private emitErrorToast(
     socket: Socket,
     server: Server,
     message: string,
-  ): Promise<void> {
-    const toast: ToastInterface = await this.createToast(
-      'error',
-      message,
-      false,
-    );
+  ): void {
+    const toast: ToastInterface = this.createToast('error', message, false);
 
     server.to(socket.id).emit('sendToast', toast);
   }
 
-  private async emitInviteToast(
+  private emitInviteToast(
     server: Server,
     client: Socket,
     nickname: string,
     data: InviteInterface,
-  ): Promise<void> {
+  ): void {
     const socketNickname: string = this.getNicknameFromClient(client);
-    const socketId: string = await this.getSocketIdFromNickname(
-      server,
-      nickname,
-    );
-    const toast: ToastInterface = await this.createToast(
+    const socketId: string = this.getSocketIdFromNickname(server, nickname);
+    const toast: ToastInterface = this.createToast(
       'info',
       'Usuário ' + socketNickname + ' enviou um convite para partida',
       true,
@@ -519,10 +517,7 @@ export class RoomService {
     server.to(socketId).emit('sendToast', toast);
   }
 
-  private async getSocketIdFromNickname(
-    server: Server,
-    nickname: string,
-  ): Promise<string> {
+  private getSocketIdFromNickname(server: Server, nickname: string): string {
     let socketID = '';
 
     server.sockets.sockets.forEach((socket) => {
