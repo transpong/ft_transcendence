@@ -9,38 +9,39 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import './Pong.css'
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Me(){
   const [selectedField, setSelectedField] = useState('Classico')
   const [selectedMode, setSelectedMode] = useState('Online')
   const [selectedNumberPlayers, setSelectedNumberPlayers] = useState('1')
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   const getFields = (type: string) =>{
     if(type == "Tenis" || type == "Basquete" || type == "Futebol") return type;
     else return "Classico"
-  } 
+  }
 
   const fieldsPath = {
     Classico: "",
     Basquete: "../../../docs/images/basquete2.png",
     Futebol: "../../../docs/images/campo.jpg",
-    Tenis: "../../../docs/images/tenis1.jpg", 
+    Tenis: "../../../docs/images/tenis1.jpg",
   }
 
   const ballsPath = {
     Classico: "",
     Basquete: "../../../docs/images/bolabasquete4.png",
     Futebol: "../../../docs/images/bolaFutebol1.png",
-    Tenis: "../../../docs/images/bolaTenis3.png", 
+    Tenis: "../../../docs/images/bolaTenis3.png",
   }
 
   const fields = {
     Classico: "",
     Basquete: "BasketeBackground",
     Futebol: "SoccerBackground",
-    Tenis: "TenisBackground", 
+    Tenis: "TenisBackground",
   }
 
 
@@ -115,7 +116,13 @@ export default function Me(){
         paddingRight="70px"
         onClick={() => {
           const pathGame = selectedMode == "Online" ? "/home/pong/game" : "/home/pong/gameoffline"
-          navigate(pathGame, {state: {field: fieldsPath[getFields(selectedField)], ball: ballsPath[getFields(selectedField)]}})
+          navigate(pathGame, {
+            state: {
+              field: fieldsPath[getFields(selectedField)],
+              ball: ballsPath[getFields(selectedField)],
+              fromInvite: state?.fromInvite,
+            },
+          });
         }}
         >
         {selectedMode == "Online" ? "Pesquisar" : "Jogar"}

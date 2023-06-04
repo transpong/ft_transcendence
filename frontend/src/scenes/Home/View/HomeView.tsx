@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, useToast } from "@chakra-ui/react";
 import NavBar from "../../../components/NavBar/NavBar";
 import FriendsList from "../../../components/FriendsList/FriendsList";
 import { ReactElement, useEffect, useRef, useState, useCallback } from "react";
@@ -7,11 +7,14 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 import { getCookie } from "../../../helpers/get-cookie";
 import { useNavigate } from "react-router-dom";
+import { GameInviteToast } from "../../../components/Toasts/GameInviteToast/GameInviteToast";
 
 export default function PageBase() {
   const [listChats, setListChats] = useState<ReactElement | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const toast = useToast();
+
 
   const addChatList = (newChat: ReactElement): void => {
     setListChats(newChat);
@@ -49,6 +52,37 @@ export default function PageBase() {
       console.log("Socket connected");
     });
 
+    socket.on("sendToast", (message: any) => {
+      if (message.is_invite) {
+        !toast.isActive(message.data.from) &&
+          toast({
+            id: message.data.from,
+            render: () => (
+              <GameInviteToast
+                nickname={message.data.from}
+                toast={toast}
+                navigate={navigate}
+                socketGame={socket}
+              />
+            ),
+            duration: null,
+          });
+      } else {
+        !toast.isActive(message.message) &&
+          toast({
+            id: message.message,
+            status: message.type,
+            description: message.message
+          });
+        if (message.is_invite_accepted)
+          navigate("/home/pong", {
+            state: {
+              fromInvite: true,
+            },
+          });
+      }
+    });
+
     setSocketGame(socket);
 
     return (): void => {
@@ -78,7 +112,7 @@ export default function PageBase() {
         <Flex h={"85%"} flexDirection={"row-reverse"}>
           <Flex position={"fixed"} align={"end"} bottom={"0px"}>
             {listChats}
-            <FriendsList addChat={addChatList} deleteChat={deleteChatList} />
+            <FriendsList addChat={addChatList} deleteChat={deleteChatList} socketGame={socketGame} />
           </Flex>
           <Flex ref={ref} className="MainView">
             <Outlet context={{ ref, socketGame }} />

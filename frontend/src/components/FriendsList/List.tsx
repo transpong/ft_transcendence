@@ -1,32 +1,27 @@
-import { Avatar, Divider, Flex, Text, useToast, IconButton } from "@chakra-ui/react";
+import { Avatar, Divider, Flex, Text, IconButton } from "@chakra-ui/react";
 import { RiSpyFill, RiTeamFill, RiUserFill  } from 'react-icons/ri'
 import Chat from "../Chat/Chat";
-import { useNavigate } from "react-router";
+import { useNavigate, useOutletContext } from "react-router";
 import { IChatList } from "../../services/chat-service";
 import { avatarUrl } from "../../helpers/avatar-url";
 import UserBadageStatus from "../UserStatus/UserBadgeStatus";
 import ChannelTypeIcon from "../ChannelTypeIcon/ChannelTypeIcon";
 import { Icon } from "@chakra-ui/icons";
 import { GiGamepad } from "react-icons/gi";
-import { GameInviteToast } from "../Toasts/GameInviteToast/GameInviteToast";
+import { Socket } from "socket.io-client";
 
 type Props = {
   list: IChatList;
-  addChat: (chat : React.ReactElement) => void;
+  addChat: (chat: React.ReactElement) => void;
   deleteChat: () => void;
-}
+  socketGame?: Socket | null;
+};
 
 const List = (props: Props) => {
   const navigate = useNavigate();
-  const toast = useToast();
 
   async function handleGameInvite(nickname: string) {
-    // TODO this should happens for user that received invitation - the user who invites probably will be automatically redirect to game
-    !toast.isActive(nickname) &&
-      toast({
-        id: nickname,
-        render: () => ( <GameInviteToast nickname={nickname} toast={toast} navigate={navigate} />),
-      });
+    props.socketGame?.emit("invite", nickname)
   }
 
   return (
