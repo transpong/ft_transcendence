@@ -128,6 +128,7 @@ export class RoomService {
       if (match.isReady() && match.status === MatchStatus.IS_WAITING) {
         // start game
         const pongGame: PongService = this.pongGames.get(roomName);
+        if (!pongGame) return;
         pongGame.startGameLoop(roomName, server);
 
         // update match
@@ -164,10 +165,16 @@ export class RoomService {
       );
     }
 
-    if (!(await this.gameService.isMatchHistoryExist(client.id))) {
+    const matchHistory = await this.gameService.existingMatchHistory(client.id);
+
+    if (!matchHistory) {
       this.removeClientFromAllSocketRooms(client);
       return;
     }
+
+    if (matchHistory.status === MatchStatus.IS_WAITING)
+      this.gameService.deleteMatchHistory(matchHistory.roomId);
+
     // exist room and match
     if (!this.roomFromPlayer.has(client.id)) {
       return;
