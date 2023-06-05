@@ -122,29 +122,19 @@ export class GameService {
   private sortRankingList(matchesRakingDtoList: MatchesRakingDto[]) {
     matchesRakingDtoList
       .sort((a, b) => {
-        if (a.wins > b.wins) {
+        if (a.wins - a.loses > b.wins - b.loses) {
           return -1;
         }
-        if (a.wins < b.wins) {
+        if (a.wins - a.loses < b.wins - b.loses) {
           return 1;
         }
-        if (a.wins === b.wins) {
-          if (a.score > b.score) {
-            return -1;
-          }
-          if (a.score < b.score) {
-            return 1;
-          }
+        if (a.score > b.score) {
+          return -1;
         }
-        if (a.wins === b.wins && a.score === b.score) {
-          if (a.loses < b.loses) {
-            return -1;
-          }
-          if (a.loses > b.loses) {
-            return 1;
-          }
+        if (a.score < b.score) {
+          return 1;
         }
-        return 0;
+        return -1;
       })
       .forEach((matchRakingDto, index) => {
         matchRakingDto.position = index + 1;
