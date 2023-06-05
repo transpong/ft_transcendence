@@ -307,6 +307,7 @@ export class UserService {
   }
 
   private async validNickname(nickname: string): Promise<boolean> {
+    if (nickname.length > 10) return false;
     if (this.nicknameWithSpecialCharacters(nickname)) return false;
     if (nickname === '' || nickname === null) return false;
     const userEntity: UserEntity = await this.userRepository.findOneBy({
@@ -317,6 +318,6 @@ export class UserService {
   }
 
   private nicknameWithSpecialCharacters(nickname: string): boolean {
-    return !nickname.match(/^[a-zA-Z0-9]+$/);
+    return !nickname.match(/^[A-Za-z0-9_-]+$/);
   }
 }
