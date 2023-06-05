@@ -98,8 +98,29 @@ export class UserService {
   }
 
   async updateNickname(ftId: string, nickname: string): Promise<void> {
+    if (this.nicknameWithSpecialCharacters(nickname)) {
+      throw new HttpException(
+        'Nickname must not contain special characters',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (nickname.length > 10) {
+      throw new HttpException(
+        'Nickname must be less than 10 characters',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (nickname === '' || nickname === null) {
+      throw new HttpException(
+        'Nickname must not be empty',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     if (!(await this.validNickname(nickname))) {
-      throw new HttpException('Invalid nickname', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'This nickname is already taken',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
 
@@ -307,9 +328,6 @@ export class UserService {
   }
 
   private async validNickname(nickname: string): Promise<boolean> {
-    if (nickname.length > 10) return false;
-    if (this.nicknameWithSpecialCharacters(nickname)) return false;
-    if (nickname === '' || nickname === null) return false;
     const userEntity: UserEntity = await this.userRepository.findOneBy({
       nickname: nickname,
     });
