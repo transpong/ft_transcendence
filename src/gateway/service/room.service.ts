@@ -6,14 +6,21 @@ import { InviteInterface } from '../interface/invite.interface';
 import { ToastInterface } from '../interface/toast.interface';
 import { MatchHistoryEntity } from '../../game/entity/game.entity';
 import { PlayersInterface } from '../interface/players.interface';
+import { UserService } from 'src/user/service/user.service';
+import { UserEnum } from 'src/user/enum/user.enum';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class RoomService {
   waitingUsers: Array<Socket> = [];
   pongGames: Map<string, PongService> = new Map();
   roomFromPlayer: Map<string, string> = new Map();
   inviteUsers: Array<InviteInterface> = [];
 
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly userService: UserService,
+  ) {}
 
   async joinWaitingRoom(client: Socket, server: Server): Promise<void> {
     if (this.waitingUsers.includes(client)) {
@@ -118,6 +125,7 @@ export class RoomService {
 
       // ready player client
       match.readyPlayer(client.id);
+      await this.userService.updateStatus(client.id, UserEnum.ONGAME);
       server
         .to(roomName)
         .emit('message', `player ${client.handshake.query.nickname} ready`);
@@ -164,6 +172,8 @@ export class RoomService {
         (user) => user.id !== client.id,
       );
     }
+
+    await this.userService.updateStatus(client.id, UserEnum.ONLINE);
 
     const matchHistory = await this.gameService.existingMatchHistory(client.id);
 

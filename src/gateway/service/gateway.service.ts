@@ -4,17 +4,19 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService } from '../../game/service/game.service';
+import { UserEnum } from 'src/user/enum/user.enum';
+import { UserService } from 'src/user/service/user.service';
 import { RoomService } from './room.service';
 
 @WebSocketGateway({ cors: true })
 export class GatewayService {
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly roomService: RoomService,
+  ) {}
 
   @WebSocketServer()
   server: Server;
-
-  private readonly roomService: RoomService = new RoomService(this.gameService);
 
   async handleConnection(client: Socket): Promise<void> {
     console.log('User: ' + client.handshake.query.nickname + ' connected');
@@ -23,6 +25,7 @@ export class GatewayService {
   async handleDisconnect(client: Socket): Promise<void> {
     await this.roomService.endGame(client, this.server);
     console.log('User: ' + client.handshake.query.nickname + ' disconnected');
+    await this.userService.updateStatus(client.id, UserEnum.OFFLINE);
     // await this.roomService.debug();
   }
 
