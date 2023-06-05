@@ -4,6 +4,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { GatewayAdapter } from './gateway/adapter/gateway.adapter';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from './user/service/user.service';
+import { GameService } from './game/service/game.service';
 
 async function bootstrap(): Promise<void> {
   const app: INestApplication = await NestFactory.create(AppModule);
@@ -19,6 +20,9 @@ async function bootstrap(): Promise<void> {
   app.useWebSocketAdapter(
     new GatewayAdapter(app.get(JwtService), app.get(UserService), app),
   );
+
+  const gameService = app.get(GameService);
+  await gameService.cleanupUnfinishedMatches();
 
   await app.listen(process.env.PORT || 3000);
 }

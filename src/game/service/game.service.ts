@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MatchHistoryEntity } from '../entity/game.entity';
-import { Not, Repository } from 'typeorm';
+import { DeleteResult, Not, Repository } from 'typeorm';
 import { UserService } from '../../user/service/user.service';
 import { MatchesHistoryDto } from '../dto/matches-history.dto';
 import { MatchesRakingDto } from '../dto/matches-raking.dto';
@@ -274,6 +274,12 @@ export class GameService {
     if (matchHistory) {
       await this.matchHistoryRepository.delete(matchHistory.id);
     }
+  }
+
+  cleanupUnfinishedMatches(): Promise<DeleteResult> {
+    return this.matchHistoryRepository.delete({
+      status: Not(MatchStatus.FINISHED),
+    });
   }
 
   private getScore(matchesHistoryList: MatchHistoryEntity[], nickname: string) {
