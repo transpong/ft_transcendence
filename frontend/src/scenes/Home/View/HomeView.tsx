@@ -92,7 +92,7 @@ export default function PageBase() {
   }, []);
 
   useEffect(() => {
-    if (oldPath.current.includes("/home/pong/game") && !path.includes("/home/pong/game")) {
+    if (oldPath.current.includes("home/pong") && !path.includes("home/pong")) {
       console.log("saiu da rota game");
       if (socketGame) {
         socketGame.removeListener("pong");
