@@ -221,6 +221,10 @@ const Pong: React.FC = () => {
           socketGame.emit("endGame");
           game.stop();
           console.log("Game Over:", message);
+
+          setTimeout(() => {
+            navigate("/home/matches");
+          }, 3000);
         });
       } else {
         socketGame.emit("joinRoom");
@@ -264,6 +268,10 @@ const Pong: React.FC = () => {
           socketGame.emit("endGame");
           game.stop();
           console.log("Game Over:", message);
+
+          setTimeout(() => {
+            navigate("/home/matches");
+          }, 3000);
         });
       }
     }
