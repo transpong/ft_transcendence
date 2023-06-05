@@ -1,0 +1,8 @@
+.MFABackground{
+    display: flex;
+    flex-direction: column;
+    background: url("../../../../../docs/images/qrcode.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
