@@ -21,7 +21,6 @@ export class UserService {
     const user: UserEntity = AuthDto.toUserEntity(authDto);
 
     await this.userRepository.save(user);
-    console.log(`User ${user.ftId} created!`); // TODO: remove this debug log
   }
 
   async userExists(ftId: string): Promise<boolean> {
@@ -308,11 +307,16 @@ export class UserService {
   }
 
   private async validNickname(nickname: string): Promise<boolean> {
+    if (this.nicknameWithSpecialCharacters(nickname)) return false;
     if (nickname === '' || nickname === null) return false;
     const userEntity: UserEntity = await this.userRepository.findOneBy({
       nickname: nickname,
     });
 
     return !userEntity;
+  }
+
+  private nicknameWithSpecialCharacters(nickname: string): boolean {
+    return !nickname.match(/^[a-zA-Z0-9]+$/);
   }
 }

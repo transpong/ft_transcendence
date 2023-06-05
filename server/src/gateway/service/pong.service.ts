@@ -24,7 +24,7 @@ export class PongService {
   private player2Score = 0; // Player 2's score
   private gameLoopInterval: NodeJS.Timeout | null = null;
   private timerInterval: NodeJS.Timeout | null = null;
-  private timerDuration = 50; // Duration of the game in seconds
+  private timerDuration = 60; // Duration of the game in seconds
   private timer = this.timerDuration; // Current value of the timer
   private roomNameTmp;
   private serverTmp: Server;
@@ -114,12 +114,12 @@ export class PongService {
       // Player 2 scores a point
       this.resetBallPosition(2); // Reset ball position
       // Increment player 2 score or perform other actions
-      this.player1Score++;
+      this.player2Score++;
     } else if (this.ballX > this.canvasWidth) {
       // Player 1 scores a point
       this.resetBallPosition(1); // Reset ball position
       // Increment player 1 score or perform other actions
-      this.player2Score++;
+      this.player1Score++;
     }
   }
 
@@ -187,12 +187,7 @@ export class PongService {
         return;
       }
 
-      matchEntity.setScore(
-        this.namePlayer1,
-        this.namePlayer1,
-        gameState.player1Score,
-        gameState.player2Score,
-      );
+      matchEntity.setScore(gameState.player1Score, gameState.player2Score);
 
       matchEntity.status = MatchStatus.FINISHED;
       matchEntity.setWinner();

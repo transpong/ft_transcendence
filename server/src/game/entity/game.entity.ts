@@ -73,18 +73,11 @@ export class MatchHistoryEntity {
   }
 
   setScore(
-    player1: string,
-    player2: string,
-    score1: number,
-    score2: number,
+      score1: number,
+      score2: number,
   ): void {
-    if (player1 === this.user1.ftId) {
-      this.user1Score = score2;
-      this.user2Score = score1;
-    } else if (player1 === this.user2.ftId) {
-      this.user1Score = score1;
-      this.user2Score = score2;
-    }
+    this.user1Score = score1;
+    this.user2Score = score2;
   }
 
   giveUp(player: string): void {
