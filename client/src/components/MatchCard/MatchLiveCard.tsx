@@ -20,7 +20,7 @@ export default function MatchLiveCard(props: Props) {
       border="1px"
       borderRadius="10"
       backgroundColor="rgba(255,255,255, 0.9)"
-      onClick={() => navigate(`/home/pong/game/${match.room_id}`)}
+      onClick={() => navigate(`/home/pong/game/watch/${match.room_id}`)}
       cursor="pointer"
     >
       <Flex align="center">
