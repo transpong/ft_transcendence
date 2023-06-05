@@ -1,0 +1,2 @@
+# ignore all js files in github linguist
+*.js linguist-generated
