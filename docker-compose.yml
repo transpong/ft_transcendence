@@ -10,15 +10,27 @@ services:
     networks:
       - transpong
 
-  api:
+  server:
     build:
-      context: . # TODO reset
+      context: ./server
     depends_on:
       - postgres
     env_file:
       - .env
     ports:
       - 3001:3001
+    networks:
+      - transpong
+
+  client:
+    build:
+      context: ./client
+    depends_on:
+      - server
+    env_file:
+      - .env
+    ports:
+      - 5173:5173
     networks:
       - transpong
 

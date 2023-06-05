@@ -1,7 +1,7 @@
 import { Avatar, Divider, Flex, Text, IconButton } from "@chakra-ui/react";
 import { RiSpyFill, RiTeamFill, RiUserFill  } from 'react-icons/ri'
 import Chat from "../Chat/Chat";
-import { useNavigate, useOutletContext } from "react-router";
+import { useNavigate } from "react-router";
 import { IChatList } from "../../services/chat-service";
 import { avatarUrl } from "../../helpers/avatar-url";
 import UserBadageStatus from "../UserStatus/UserBadgeStatus";

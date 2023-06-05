@@ -10,6 +10,12 @@ import {
 import { useState } from "react";
 import './Pong.css'
 import { useNavigate, useLocation } from "react-router-dom";
+import BasqueteImg from "../../../docs/images/basquete2.png";
+import FutebolImg from "../../../docs/images/campo.jpg";
+import TenisImg from "../../../docs/images/tenis1.jpg";
+import BasqueteBallImg from "../../../docs/images/bolabasquete4.png";
+import FutebolBallImg from "../../../docs/images/bolaFutebol1.png";
+import TenisBallImg from "../../../docs/images/bolaTenis3.png";
 
 export default function Me(){
   const [selectedField, setSelectedField] = useState('Classico')
@@ -25,16 +31,16 @@ export default function Me(){
 
   const fieldsPath = {
     Classico: "",
-    Basquete: "../../../docs/images/basquete2.png",
-    Futebol: "../../../docs/images/campo.jpg",
-    Tenis: "../../../docs/images/tenis1.jpg",
-  }
+    Basquete: BasqueteImg,
+    Futebol: FutebolImg,
+    Tenis: TenisImg,
+  };
 
   const ballsPath = {
     Classico: "",
-    Basquete: "../../../docs/images/bolabasquete4.png",
-    Futebol: "../../../docs/images/bolaFutebol1.png",
-    Tenis: "../../../docs/images/bolaTenis3.png",
+    Basquete: BasqueteBallImg,
+    Futebol: FutebolBallImg,
+    Tenis: TenisBallImg,
   }
 
   const fields = {
