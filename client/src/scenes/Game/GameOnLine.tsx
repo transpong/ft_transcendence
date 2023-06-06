@@ -109,37 +109,46 @@ const Pong: React.FC = () => {
     const {state} = useLocation()
 
     type BackendGame = {
-        ballX: number;
-        ballY: number;
-        diameterBall: number;
-        heightPlayer: number;
-        player1Name: string;
-        player1Score: number;
-        player1Y: number;
-        player2Name: string;
-        player2Score: number;
-        player2Y: number;
-        timer: number;
-        widthPlayer: number;
-    }
+      ballX: number;
+      ballY: number;
+      diameterBall: number;
+      heightPlayer: number;
+      player1Score: number;
+      player1Y: number;
+      players: {
+          player1Nickname: string;
+          player1ftId: string
+          player2Nickname: string
+          player2ftId: string
+      };
+      player2Score: number;
+      player2Y: number;
+      timer: number;
+      widthPlayer: number;
+  }
+
 
     const navigate = useNavigate();
     const params = useParams();
 
     let backendGame: BackendGame = {
-        ballX: 0,
-        ballY: 0,
-        diameterBall: 0,
-        heightPlayer: 0,
-        player1Name: "",
-        player1Score: 0,
-        player1Y: 0,
-        player2Name: "",
-        player2Score: 0,
-        player2Y: 0,
-        timer: 0,
-        widthPlayer: 0,
-    }
+      ballX: 0,
+      ballY: 0,
+      diameterBall: 0,
+      heightPlayer: 0,
+      player1Score: 0,
+      player1Y: 0,
+      players: {
+          player1Nickname: "",
+          player1ftId: "",
+          player2Nickname: "",
+          player2ftId: "",
+      },
+      player2Score: 0,
+      player2Y: 0,
+      timer: 0,
+      widthPlayer: 0,
+  }
     const toast = useToast();
     const isSpectator = !!params.id;
     // console.log('Conect Front');
@@ -276,76 +285,119 @@ const Pong: React.FC = () => {
       }
     }
 
+    class Timer {
+      p5;
+      timer;
+      score : p5Types.Element | null = null;
+      scoreP1;
+      scoreP2;
+      constructor(p5New: p5Types){
+          this.p5 = p5New
+          this.timer = 0
+          this.scoreP1 = 0
+          this.scoreP2 = 0
+      }
+      show(newTimer: number, player1Score: number, player2Score: number, fontColor: string){
+          if(this.timer != newTimer || this.scoreP2 != player2Score || this.scoreP1 != player1Score){
+              this.timer = newTimer
+              this.scoreP1 = player1Score
+              this.scoreP2 = player2Score
+              this.p5.removeElements()
+              this.score = null
+          }
+          if(this.score ===  null){
+              const seconds = this.timer % 60
+              const minutes = Math.floor(newTimer / 60)
+              this.score = this.p5.createButton(`[${player1Score}] \t [${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}] \t [${player2Score}]`);
+              this.score.style("color", fontColor)
+              this.score.style("cursor", "default")
+              this.score.style("font-size", `${(windowHeight < windowWidth ? windowHeight : windowWidth) * 0.10}px`)
+              const size = Object.entries(this.score.size()).reduce<Record<string, number>>((acc, item) => {
+                  acc[item[0]] = item[1]
+                  return acc
+              }, {})
+              this.score.position(((windowWidth / 2) - (size["width"] / 2)), windowHeight * 0.20 + parentBorderWidth)
+          }
+      }
+      destroy(){
+          if(this.score !== null)
+              this.score = null
+      }
+  }
+
     class Score {
-        p5;
-        scoreP1;
-        scoreP2;
-        score : p5Types.Element | null = null;
+      p5;
+      scoreP1;
+      scoreP2;
+      score : p5Types.Element | null = null;
 
-        constructor(p5New: p5Types){
-            this.p5 = p5New
-            this.scoreP1 = 0
-            this.scoreP2 = 0
-        }
-        show(newScoreP1: number, newScoreP2: number){
-            if(this.scoreP1 != newScoreP1 || this.scoreP2 != newScoreP2){
-                this.scoreP1 = newScoreP1
-                this.scoreP2 = newScoreP2
-                this.p5.removeElements()
-                this.score = null
-            }
-            if(this.score ===  null){
-                this.score = this.p5.createButton(`${this.scoreP2} X ${this.scoreP1}`);
-                this.score.style("color", "white")
-                this.score.style("cursor", "default")
-                this.score.style("font-size", `${(windowHeight < windowWidth ? windowHeight : windowWidth) * 0.10}px`)
-                const size = Object.entries(this.score.size()).reduce<Record<string, number>>((acc, item) => {
-                    acc[item[0]] = item[1]
-                    return acc
-                }, {})
-                this.score.position(((windowWidth / 2) - (size["width"] / 2)), windowHeight * 0.20 + parentBorderWidth)
-            }
-        }
-        destroy(){
-            if(this.score !== null)
-                this.score = null
-        }
+      constructor(p5New: p5Types){
+          this.p5 = p5New
+          this.scoreP1 = 0
+          this.scoreP2 = 0
+      }
+      show(newScoreP1: number, playerName1: string, newScoreP2: number, playerName2: string){
+          if(this.scoreP1 != newScoreP1 || this.scoreP2 != newScoreP2){
+              this.scoreP1 = newScoreP1
+              this.scoreP2 = newScoreP2
+              this.p5.removeElements()
+              this.score = null
+          }
+          if(this.score ===  null){
+              this.score = this.p5.createButton(`[${this.scoreP1}] ${playerName1} X ${playerName2} [${this.scoreP2}]`);
+              this.score.style("color", "black")
+              this.score.style("background", "white")
+              this.score.style("cursor", "default")
+              this.score.style("border-radius", "20px")
+              this.score.style("font-size", `${(windowHeight < windowWidth ? windowHeight : windowWidth) * 0.10}px`)
+              const size = Object.entries(this.score.size()).reduce<Record<string, number>>((acc, item) => {
+                  acc[item[0]] = item[1]
+                  return acc
+              }, {})
+              this.score.position(((windowWidth / 2) - (size["width"] / 2)), windowHeight * 0.20 + parentBorderWidth)
+          }
+      }
+      destroy(){
+          if(this.score !== null)
+              this.score = null
+      }
     }
 
 
-    class ButtonStart{
-        p5;
-        button : p5Types.Element | null = null;
-        constructor(p5New: p5Types){
-            this.p5 = p5New
-        }
+    class LabelGame{
+      p5;
+      button : p5Types.Element | null = null;
+      constructor(p5New: p5Types){
+          this.p5 = p5New
+      }
 
-        createButton(){
-            if(this.button ===  null) {
-                this.button = this.p5.createButton("Aguardando...");
-                this.button.style("background", "white")
-                this.button.style("cursor", "default")
-                this.button.style("border-radius", "20px")
-                this.button.style("font-size", `${(windowHeight < windowWidth ? windowHeight : windowWidth) * 0.08}px`)
-                const size = Object.entries(this.button.size()).reduce<Record<string, number>>((acc, item) => {
-                    acc[item[0]] = item[1]
-                    return acc
-                }, {})
-                this.button.position(((windowWidth / 2) - (size["width"] / 2)), (windowHeight / 2) + (size["height"] / 2) + parentBorderWidth)
-            }
-        }
-        destroy(){
-            if(this.button !== null)
-                this.button = null
-        }
-
+      show(isEndGame: boolean){
+          if(this.button ===  null) {
+              this.button = this.p5.createButton(isEndGame ? "Fim de Jogo!" : "Aguardando...");
+              this.button.style("background", "white")
+              this.button.style("cursor", "default")
+              this.button.style("border-radius", "20px")
+              this.button.style("font-size", `${(windowHeight < windowWidth ? windowHeight : windowWidth) * 0.08}px`)
+              const size = Object.entries(this.button.size()).reduce<Record<string, number>>((acc, item) => {
+                  acc[item[0]] = item[1]
+                  return acc
+              }, {})
+              this.button.position(((windowWidth / 2) - (size["width"] / 2)), (windowHeight / 2) + (size["height"] / 2) + parentBorderWidth)
+          }
+      }
+      destroy(){
+          if(this.button !== null)
+              this.button = null
+      }
     }
 
 
-    let buttonStart : ButtonStart | null = null
+    let labelGame : LabelGame | null = null
     let score : Score | null = null
+    let timer : Timer | null = null
     let background: any
     let ballImage: any
+    let isEndGame = false
 
 
     const preload = (p5: p5Types) =>{
@@ -373,22 +425,26 @@ const Pong: React.FC = () => {
         player1 = new Player(p5, 1, socketGame, isSpectator);
         player2 = new Player(p5, 2, socketGame, isSpectator);
         game = new Game(ball,  p5)
-        buttonStart = new ButtonStart(p5)
+        labelGame = new LabelGame(p5)
         score = new Score(p5)
+        timer = new Timer(p5)
     };
 
     const draw = (p5: p5Types) => {
         p5.background(background);
         if(game.isRunning){
+            isEndGame = true;
+            timer?.show(backendGame.timer, backendGame.player1Score, backendGame.player2Score, background === 0 ? "rgba(f, f, f, 0.8)": "rgba(0, 0, 0, 0.8)")
             player1.printPlayer(backendGame.player1Y, backendGame.widthPlayer, backendGame.heightPlayer);
             player2.printPlayer(backendGame.player2Y, backendGame.widthPlayer, backendGame.heightPlayer);
-            buttonStart?.destroy()
+            labelGame?.destroy()
             score?.destroy()
             ball.printBall(backendGame.ballX, backendGame.ballY, backendGame.diameterBall);
             player1.movePlayer();
         }else{
-            score?.show(backendGame.player1Score, backendGame.player2Score)
-            buttonStart?.createButton()
+            timer?.destroy()
+            score?.show(backendGame.player1Score, backendGame.players.player1Nickname, backendGame.player2Score, backendGame.players.player2Nickname)
+            labelGame?.show(isEndGame)
         }
     };
 
@@ -402,7 +458,7 @@ const Pong: React.FC = () => {
         windowWidth = newWindowWidth
         windowHeight = newWindowHeight
 
-        buttonStart?.destroy()
+        labelGame?.destroy()
         score?.destroy()
         p5.removeElements()
     }
