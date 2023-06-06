@@ -104,9 +104,28 @@ class Ball{
     }
 }
 
-const Pong: React.FC = () => {
+const Pong: React.FC | null = () => {
+  const navigate = useNavigate();
+  const {state} = useLocation()
+  
+  const validateOperation = () => {
+    const toast = useToast();
+    if(state === null) {
+      navigate("/home")
+      toast({
+        title: "Não autorizado",
+        description: "Operação não autorizada",
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+      });
+      return true
+    }
+    return false
+  }
+    if (validateOperation()) return null
+
     const { ref, socketGame } = useOutletContext<{ref: React.RefObject<HTMLDivElement>, socketGame: Socket}>();
-    const {state} = useLocation()
 
     type BackendGame = {
       ballX: number;
@@ -128,7 +147,7 @@ const Pong: React.FC = () => {
   }
 
 
-    const navigate = useNavigate();
+    
     const params = useParams();
 
     let backendGame: BackendGame = {
