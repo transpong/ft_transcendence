@@ -93,7 +93,7 @@ export default function PageBase() {
     useEffect(() => {
         if (
             oldPath.current.includes("home/pong") &&
-            (!path.includes("home/pong/game") || oldPath.current.includes("watch"))
+            (!path.includes("home/pong") || oldPath.current.includes("watch"))
         ) {
             console.log("saiu da rota game");
             if (socketGame) {
