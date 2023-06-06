@@ -11,8 +11,8 @@ export default function MatchCard(props: Props) {
 
   return (
     match.status === MatchStatus.FINISHED ?
-      <MatchFinishedCard match={match} /> :
+      <MatchFinishedCard key={match.id} match={match} /> :
       (match.status === MatchStatus.IS_PLAYING ?
-        <MatchLiveCard match={match} /> : null)
+        <MatchLiveCard key={match.id} match={match} /> : null)
   );
 }
