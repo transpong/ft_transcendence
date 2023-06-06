@@ -54,8 +54,8 @@ const List = (props: Props) => {
         </Text>
       </Flex>
       {props.list.friends.map((element, index) =>
-        <Flex>
-          <Flex key={"friend" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.nickname} key={element.nickname} type='individual' deleteChat={props.deleteChat} directInfo={element}/>)}
+        <Flex key={"friend" + index}>
+          <Flex w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.nickname} key={element.nickname} type='individual' deleteChat={props.deleteChat} directInfo={element}/>)}
           _hover={{
             backgroundColor: "#805AD5",
             textColor: "white",
@@ -93,8 +93,8 @@ const List = (props: Props) => {
         </Text>
       </Flex>
       {props.list.other_users.map((element,  index) =>
-        <Flex>
-          <Flex key={"other" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() => navigate(`/home/profile/${element.nickname}`)}
+        <Flex key={"other" + index}>
+          <Flex w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() => navigate(`/home/profile/${element.nickname}`)}
           _hover={{
             backgroundColor: "#805AD5",
             textColor: "white",
@@ -131,7 +131,7 @@ const List = (props: Props) => {
         </Text>
       </Flex>
       {props.list.other_channels.map((element,  index) =>
-        <Flex key={"other" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.name} key={element.id} type='group' group_type={element.type} deleteChat={props.deleteChat} channelInfo={element}/>)}
+        <Flex key={"otherGrouops" + index} w={"100%"} marginBottom={"1vh"} align={"center"} cursor={"pointer"} onClick={() =>  props.addChat(<Chat name={element.name} key={element.id} type='group' group_type={element.type} deleteChat={props.deleteChat} channelInfo={element}/>)}
         _hover={{
           backgroundColor: "#805AD5",
           textColor: "white",
