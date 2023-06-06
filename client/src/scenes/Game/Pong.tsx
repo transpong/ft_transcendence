@@ -91,8 +91,8 @@ export default function Me(){
               </Text>
               <RadioGroup onChange={setSelectedNumberPlayers} value={selectedNumberPlayers}>
                 <Stack spacing={5}>
-                  <Radio value='1' size={"lg"}>1 Player</Radio>
-                  <Radio value='2' size={"lg"}>2 Players</Radio>
+                  <Radio value='1' size={"lg"}>Player vs Bot</Radio>
+                  <Radio value='2' size={"lg"}>Player vs Player</Radio>
                 </Stack>
               </RadioGroup>
             </VStack>) : null}
@@ -126,6 +126,7 @@ export default function Me(){
             state: {
               field: fieldsPath[getFields(selectedField)],
               ball: ballsPath[getFields(selectedField)],
+              players: selectedNumberPlayers,
               fromInvite: state?.fromInvite,
             },
           });
