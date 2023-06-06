@@ -98,6 +98,12 @@ export class UserService {
   }
 
   async updateNickname(ftId: string, nickname: string): Promise<void> {
+    if (nickname === '' || nickname === null) {
+      throw new HttpException(
+        'Nickname must not be empty',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     if (this.nicknameWithSpecialCharacters(nickname)) {
       throw new HttpException(
         'Nickname must not contain special characters',
@@ -107,12 +113,6 @@ export class UserService {
     if (nickname.length > 10) {
       throw new HttpException(
         'Nickname must be less than 10 characters',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    if (nickname === '' || nickname === null) {
-      throw new HttpException(
-        'Nickname must not be empty',
         HttpStatus.BAD_REQUEST,
       );
     }
