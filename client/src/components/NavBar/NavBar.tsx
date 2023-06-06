@@ -17,7 +17,7 @@ const NavLink = ({children, route}: { children: ReactNode, route: string }) => (
             py={1}
             rounded={'md'}
             _hover={{
-                color: '#5e3caa',
+                color: '#402d6a',
                 textDecoration: 'none',
                 bg: useColorModeValue('gray.200', 'white'),
             }}
