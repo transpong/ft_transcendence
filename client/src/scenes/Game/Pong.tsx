@@ -10,7 +10,7 @@ import {
 import { useState } from "react";
 import './Pong.css'
 import { useNavigate, useLocation } from "react-router-dom";
-import BasqueteImg from "../../../docs/images/basquete3.png";
+import BasqueteImg from "../../../docs/images/basquete2.png";
 import FutebolImg from "../../../docs/images/campo.jpg";
 import TenisImg from "../../../docs/images/tenis1.jpg";
 import BasqueteBallImg from "../../../docs/images/bolabasquete4.png";
