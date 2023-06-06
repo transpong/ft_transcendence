@@ -1,5 +1,15 @@
 import {ReactNode, useMemo, useState} from 'react';
-import {Avatar, Box, Flex, HStack, IconButton, Link, Stack, useColorModeValue, useDisclosure,} from '@chakra-ui/react';
+import {
+    Avatar,
+    Box,
+    Flex,
+    HStack,
+    IconButton,
+    Link as ChakraLink,
+    Stack,
+    useColorModeValue,
+    useDisclosure,
+} from '@chakra-ui/react';
 import {Link as RouteLink, useNavigate} from "react-router-dom";
 import {avatarUrl} from "../../helpers/avatar-url";
 import {CloseIcon, HamburgerIcon, SettingsIcon} from '@chakra-ui/icons';
@@ -11,23 +21,22 @@ const Links: string[] = ['Jogar', 'Lista de Jogos', 'Jogos ao vivo', 'Ranking'];
 const Redirects: string[] = ['/home/pong', '/home/matches', '/home/matches/live', '/home/ranking'];
 
 const NavLink = ({children, route}: { children: ReactNode, route: string }) => (
-    <RouteLink to={route}>
-        <Link
-            px={2}
-            py={1}
-            rounded={'md'}
-            _hover={{
-                color: '#5e3caa',
-                textDecoration: 'none',
-                bg: useColorModeValue('gray.200', 'white'),
-            }}
-            color={'white'}
-            as={Link}
-            fontWeight={1000}
-        >
-            {children}
-        </Link>
-    </RouteLink>
+    <ChakraLink
+        as={RouteLink}
+        to={route}
+        px={2}
+        py={1}
+        rounded="md"
+        _hover={{
+            color: '#5e3caa',
+            textDecoration: 'none',
+            bg: useColorModeValue('gray.200', 'white'),
+        }}
+        color="white"
+        fontWeight={1000}
+    >
+        {children}
+    </ChakraLink>
 );
 
 
