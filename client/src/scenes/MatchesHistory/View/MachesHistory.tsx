@@ -26,7 +26,7 @@ export default function MachesHistory(){
       </Text>
       <Box>
         {matchesList.map((match) => {
-          return <MatchCard key={match.id} match={match} />;
+          return <MatchCard match={match} />;
         })}
       </Box>
     </Box>
