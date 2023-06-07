@@ -15,7 +15,6 @@ let windowHeight = 0
 let canvasParent: Element
 let parentBorderWidth = 0
 
-
 class Game {
     isRunning;
     scoreP1;
@@ -49,8 +48,7 @@ class Game {
     }
 }
 
-
-class Bot{
+class Pawn {
     id = 0
     positionX = 0;
     positionY = 0;
@@ -58,9 +56,6 @@ class Bot{
     widthPlayer = 0;
     speedY = 10 * (windowHeight / 600) * (800 / windowWidth);
     p5;
-    previousTime = Date.now();
-    elapsedTime = 0;
-    randomMove = 0;
 
     constructor(p5Origin: p5Types, idPlayer: number) {
         this.widthPlayer = (windowWidth / 800) * 20;
@@ -72,11 +67,8 @@ class Bot{
             this.positionX = windowWidth - this.widthPlayer;
         }
         this.positionY = (windowHeight / 2) - (this.heightPlayer / 2);
-        this.speedY = (windowHeight / 600) * (800 / windowWidth) * 6;
+        this.speedY = (windowHeight / 600) * (800 / windowWidth) * 10;
         this.p5 = p5Origin
-        this.previousTime;
-        this.elapsedTime;
-        this.randomMove;
     }
 
     responsivePlayer(newHeight: number, oldHeight: number, newWidth: number){
@@ -91,6 +83,40 @@ class Bot{
     printPlayer() {
         this.p5.rect( this.positionX, this.positionY, this.widthPlayer, this.heightPlayer);
     }
+    movePlayer() {
+      throw new Error("Move method not implemented.");
+    }
+  }
+
+  class Player extends Pawn {
+    movePlayer(){
+        if(this.id == 1){
+            if(this.p5.keyIsDown(this.p5.UP_ARROW)){
+                this.positionY -= this.speedY
+                if(this.positionY < 0) this.positionY = 0
+            }
+            if(this.p5.keyIsDown(this.p5.DOWN_ARROW)){
+                this.positionY += this.speedY
+                if(this.positionY + this.heightPlayer > windowHeight)this.positionY = windowHeight - this.heightPlayer
+            }
+        }
+        else if (this.id === 2) {
+            if(this.p5.keyIsDown(this.p5.SHIFT)){
+                this.positionY -= this.speedY
+                if(this.positionY < 0) this.positionY = 0
+            }
+            if(this.p5.keyIsDown(this.p5.CONTROL)){
+                this.positionY += this.speedY
+                if(this.positionY + this.heightPlayer > windowHeight)this.positionY = windowHeight - this.heightPlayer
+            }
+        }
+    }
+  }
+
+  class Bot extends Pawn {
+    randomMove = 0;
+    previousTime = Date.now();
+    elapsedTime = 0;
 
     private moveBotToBall() {
         // Ball is moving towards the bot
@@ -177,73 +203,7 @@ class Bot{
             this.moveBot();
         }
     }
-}
-
-class Player{
-    id = 0
-    positionX = 0;
-    positionY = 0;
-    heightPlayer = 0;
-    widthPlayer = 0;
-    speedY = 10 * (windowHeight / 600) * (800 / windowWidth);
-    p5;
-    previousTime = Date.now();
-    elapsedTime = 0;
-    randomMove = 0;
-
-    constructor(p5Origin: p5Types, idPlayer: number) {
-        this.widthPlayer = (windowWidth / 800) * 20;
-        this.heightPlayer = (windowHeight / 600) * 80;
-        this.id = idPlayer;
-        if(idPlayer == 1){
-            this.positionX = 0;
-        }else if (idPlayer == 2){
-            this.positionX = windowWidth - this.widthPlayer;
-        }
-        this.positionY = (windowHeight / 2) - (this.heightPlayer / 2);
-        this.speedY = (windowHeight / 600) * (800 / windowWidth) * 6;
-        this.p5 = p5Origin
-        this.previousTime;
-        this.elapsedTime;
-        this.randomMove;
-    }
-
-    responsivePlayer(newHeight: number, oldHeight: number, newWidth: number){
-        this.heightPlayer = (newHeight / 600) * 80
-        this.widthPlayer = (newWidth / 800) * 20
-        this.positionY =  this.positionY * (newHeight / oldHeight)
-        this.positionX = this.id === 1 ? 0 : newWidth - this.widthPlayer;
-
-        this.speedY = (newHeight / 600) * (800 / newWidth ) * 10;
-    }
-
-    printPlayer() {
-        this.p5.rect( this.positionX, this.positionY, this.widthPlayer, this.heightPlayer);
-    }
-
-    movePlayer(){
-        if(this.id == 1){
-            if(this.p5.keyIsDown(this.p5.UP_ARROW)){
-                this.positionY -= this.speedY
-                if(this.positionY < 0) this.positionY = 0
-            }
-            if(this.p5.keyIsDown(this.p5.DOWN_ARROW)){
-                this.positionY += this.speedY
-                if(this.positionY + this.heightPlayer > windowHeight)this.positionY = windowHeight - this.heightPlayer
-            }
-        }
-        else if (this.id === 2) {
-            if(this.p5.keyIsDown(this.p5.SHIFT)){
-                this.positionY -= this.speedY
-                if(this.positionY < 0) this.positionY = 0
-            }
-            if(this.p5.keyIsDown(this.p5.CONTROL)){
-                this.positionY += this.speedY
-                if(this.positionY + this.heightPlayer > windowHeight)this.positionY = windowHeight - this.heightPlayer
-            }
-        }
-    }
-}
+  }
 
 class Ball{
     positionX = windowWidth / 2;
