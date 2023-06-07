@@ -108,7 +108,7 @@ export default function Me(){
           <Box h="98%" w={"100%"} overflowY="scroll">
             <Box>
               {matchesList.map((match) => {
-                return <MatchCard match={match} />;
+                return <MatchCard match={match} key={match.id} />;
               })}
             </Box>
           </Box>

@@ -42,6 +42,7 @@ const ListChannelUsersView = ({ setScreenNavigation, user_access_type, channelIn
           channelInfo={channelInfo}
           setScreenNavigation={setScreenNavigation}
           updateUsers={updateUsers}
+          key={user.id}
         />
       ))}
     </Box>
