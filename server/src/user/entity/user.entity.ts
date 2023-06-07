@@ -85,7 +85,10 @@ export class UserEntity {
   matchHistoryWinner: MatchHistoryEntity[];
 
   twoFactorValid(): boolean {
-    return !(this.tokenMFA !== null && this.validatedAtMFA === null);
+    if (this.tokenMFA) {
+      return this.validatedAtMFA !== null;
+    }
+    return true;
   }
 
   getSortedMessagesFrom(friend: UserEntity): DirectMessagesEntity[] {

@@ -1,9 +1,8 @@
 import * as React from "react";
 import Sketch from "react-p5";
-import * as p5Types from "p5"; //Import this for typechecking and intellisense
-import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import * as p5Types from "p5";
+import {useLocation, useNavigate, useOutletContext} from "react-router-dom";
 import { useToast } from "@chakra-ui/react";
-import { useEffect } from "react";
 
 let ball: Ball;
 let player1: Player;
@@ -189,17 +188,17 @@ class Ball{
     }
 }
 
-const Pong: React.FC | null = () => {
+const Pong: React.FC = () => {
     const {state} = useLocation()
     const validateOperation = () => {
         const navigate = useNavigate()
         const toast = useToast();
-        if(state === null) {
-          navigate("/home")
-          toast({
-            title: "Não autorizado",
-            description: "Operação não autorizada",
-            status: "info",
+        if (state === null) {
+            navigate("/home")
+            toast({
+                title: "Não autorizado",
+                description: "Operação não autorizada",
+                status: "info",
             duration: 5000,
             isClosable: true,
           });

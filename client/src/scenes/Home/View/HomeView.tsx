@@ -93,7 +93,7 @@ export default function PageBase() {
     useEffect(() => {
         if (
             oldPath.current.includes("home/pong") &&
-            (!path.includes("home/pong") || oldPath.current.includes("watch"))
+            (!path.includes("home/pong/game") || oldPath.current.includes("watch"))
         ) {
             console.log("saiu da rota game");
             if (socketGame) {
@@ -109,16 +109,23 @@ export default function PageBase() {
     }, [emitEndgame, path, socketGame]);
 
     const showWelcomeText: boolean = path === "/home";
+    const isGameRoute: boolean = path.includes("/home/pong");
 
     return (
         <Flex className="MainBackground" h={"100vh"}>
             <NavBar></NavBar>
             <Flex h={"85%"} flexDirection={"row-reverse"}>
                 <Flex position={"fixed"} align={"end"} bottom={"0px"}>
-                    {listChats}
-                    <FriendsList addChat={addChatList} deleteChat={deleteChatList} socketGame={socketGame}/>
+
+                    {!isGameRoute && (
+                        <>
+                            {listChats}
+                            <FriendsList addChat={addChatList} deleteChat={deleteChatList} socketGame={socketGame}/>
+                        </>
+
+                    )}
                 </Flex>
-                <Flex ref={ref} className="MainView">
+                <Flex ref={ref} className={!isGameRoute ? "MainView" : "GameView"}>
                     {showWelcomeText && (
                         <Center w="100%" p={4}>
                             <Text fontSize={{base: "lg", md: "xl", lg: "2xl"}}

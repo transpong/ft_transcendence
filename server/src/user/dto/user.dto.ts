@@ -37,7 +37,7 @@ export class UserDto {
       userEntity.ftId,
       userEntity.nickname,
       userEntity.avatar,
-      userEntity.tokenMFA !== null,
+      !!userEntity.tokenMFA,
     );
   }
 
