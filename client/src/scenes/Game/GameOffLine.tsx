@@ -317,6 +317,7 @@ const Pong: React.FC = () => {
     };
 
     const draw = (p5: p5Types) => {
+        if(!state.fromPong) return
         p5.background(background);
         player1.printPlayer();
         player2.printPlayer();

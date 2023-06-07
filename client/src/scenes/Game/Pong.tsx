@@ -127,6 +127,7 @@ export default function Me(){
               field: fieldsPath[getFields(selectedField)],
               ball: ballsPath[getFields(selectedField)],
               fromInvite: state?.fromInvite,
+              fromPong: true,
             },
           });
         }}
