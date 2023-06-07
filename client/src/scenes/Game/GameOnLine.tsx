@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import * as React from "react";
 import Sketch from "react-p5";
 import * as p5Types from "p5"; //Import this for typechecking and intellisense
 import {useLocation, useNavigate, useOutletContext, useParams} from "react-router-dom";
 import {Socket} from "socket.io-client";
 import {useToast} from "@chakra-ui/react";
+import { useEffect } from "react";
 
 
 let ball: Ball;
@@ -111,11 +113,10 @@ const Pong: React.FC = () => {
     const {state} = useLocation()
     const params = useParams();
     const isSpectator = !!params.id;
+    const toast = useToast();
 
     const validateOperation = () => {
-        const toast = useToast();
         if (state === null && !isSpectator) {
-            navigate("/home")
             toast({
                 title: "Não autorizado",
                 description: "Operação não autorizada",
@@ -127,7 +128,12 @@ const Pong: React.FC = () => {
         }
         return false
     }
-    if (validateOperation()) return null
+    if (validateOperation()) {
+      useEffect(() => {
+        navigate("/home");
+      }, []);
+      return null
+    }
 
     const {ref, socketGame} = useOutletContext<{ ref: React.RefObject<HTMLDivElement>, socketGame: Socket }>();
 
@@ -168,7 +174,6 @@ const Pong: React.FC = () => {
         timer: 0,
         widthPlayer: 0,
     }
-    const toast = useToast();
 
     // console.log('Conect Front');
     // Send 'joinRoom' message when the component mounts
