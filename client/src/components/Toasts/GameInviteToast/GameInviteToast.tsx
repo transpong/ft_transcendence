@@ -19,7 +19,7 @@ export const GameInviteToast = ({ nickname, navigate, toast, socketGame }: Props
   }
 
   function handleAcceptInvite() {
-    if (window.location.pathname === '/home/pong/game') return;
+    if (window.location.pathname.includes('home/pong')) return;
     socketGame.emit("acceptInvite", nickname);
 
     setTimeout(() => {

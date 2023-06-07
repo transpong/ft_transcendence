@@ -343,9 +343,7 @@ export class RoomService {
 
     // remove invite
     this.inviteUsers = this.inviteUsers.filter(
-      (invite) =>
-        invite.to !== this.getNicknameFromClient(client) ||
-        invite.from !== userNickname,
+      (invite) => invite.from !== userNickname,
     );
   }
 
