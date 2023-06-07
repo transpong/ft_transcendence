@@ -1,8 +1,10 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import * as React from "react";
 import Sketch from "react-p5";
 import * as p5Types from "p5";
 import {useLocation, useNavigate, useOutletContext} from "react-router-dom";
 import { useToast } from "@chakra-ui/react";
+import { useEffect } from "react";
 
 let ball: Ball;
 let player1: Player;
@@ -190,11 +192,11 @@ class Ball{
 
 const Pong: React.FC = () => {
     const {state} = useLocation()
+    const navigate = useNavigate()
+    const toast = useToast();
+
     const validateOperation = () => {
-        const navigate = useNavigate()
-        const toast = useToast();
         if (state === null) {
-            navigate("/home")
             toast({
                 title: "Não autorizado",
                 description: "Operação não autorizada",
@@ -206,7 +208,12 @@ const Pong: React.FC = () => {
         }
         return false
       }
-    if (validateOperation()) return null
+    if (validateOperation()) {
+      useEffect(() => {
+        navigate("/home");
+      }, []);
+      return null;
+    }
 
     const { ref } = useOutletContext<{ref: React.RefObject<HTMLDivElement>}>();
 
