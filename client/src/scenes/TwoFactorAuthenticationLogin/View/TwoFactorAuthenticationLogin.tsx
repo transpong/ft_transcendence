@@ -28,7 +28,7 @@ export default function TwoFactorAuthenticationLogin(){
       }
     }
     return(
-        <Flex h={"100vh"} align={"center"} justify={"center"}>
+        <Flex className='TwoFactorAuthenticationLogin' h={"100vh"} align={"center"} justify={"center"}>
             <Flex
                 className={'loginBox'}
                 direction={"column"}

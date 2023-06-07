@@ -64,7 +64,7 @@ export class UserService {
     const mfaSecret = await generateSecret(userEntity.ftId, 'Transpong');
 
     userEntity.tokenMFA = mfaSecret.secret;
-    userEntity.validatedAtMFA = null;
+    userEntity.validatedAtMFA = new Date();
     await this.userRepository.save(userEntity);
     return {
       secret: mfaSecret.secret,

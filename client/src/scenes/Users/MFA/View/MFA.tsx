@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/layout";
-import { Button, Input, Image } from "@chakra-ui/react";
+import { Button, Input, Image, Text, Tooltip, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { userService } from "../../../../services/users-service";
@@ -38,7 +38,7 @@ export default function Me(){
             marginTop={"50px"}
             marginBottom={"50px"}
             w={"60%"}
-            placeholder="Type Something..."
+            placeholder="Digite o código gerado..."
             border="none"
             borderRadius="20px"
             _focus={{
@@ -52,9 +52,15 @@ export default function Me(){
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
           />
+          <Tooltip label={<Stack>
+                  <Text >Valide aqui o código MFA usando o Google Authenticatior - esse é o único contato que você terá com o secret</Text>
+                  <Text >Caso não consiga validar, volte a tela anterior e desative</Text>
+                  <Text >Caso perca o segredo, não irá mais conseguir fazer login</Text>
+               </Stack>} placement='left' defaultIsOpen backgroundColor="red">
             <Button size={"lg"} colorScheme={"purple"} onClick={handleMfaValidation} isLoading={isUploading}>
               Validar
-            </Button> :
+            </Button>
+          </Tooltip> :
         </Flex>
       </Flex>
     </>
