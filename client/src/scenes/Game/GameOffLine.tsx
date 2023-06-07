@@ -8,13 +8,12 @@ import { useEffect } from "react";
 
 let ball: Ball;
 let player1: Player;
-let player2: Player;
+let player2: Player | Bot;
 let game: Game;
 let windowWidth = 0
 let windowHeight = 0
 let canvasParent: Element
 let parentBorderWidth = 0
-
 
 class Game {
     isRunning;
@@ -49,17 +48,18 @@ class Game {
     }
 }
 
-class Player{
+class Pawn {
     id = 0
     positionX = 0;
     positionY = 0;
     heightPlayer = 0;
     widthPlayer = 0;
-    speedY = 2;
+    speedY = 10 * (windowHeight / 600) * (800 / windowWidth);
     p5;
+
     constructor(p5Origin: p5Types, idPlayer: number) {
-        this.widthPlayer = 20;
-        this.heightPlayer = windowHeight * 0.1;
+        this.widthPlayer = (windowWidth / 800) * 20;
+        this.heightPlayer = (windowHeight / 600) * 80;
         this.id = idPlayer;
         if(idPlayer == 1){
             this.positionX = 0;
@@ -67,22 +67,40 @@ class Player{
             this.positionX = windowWidth - this.widthPlayer;
         }
         this.positionY = (windowHeight / 2) - (this.heightPlayer / 2);
-        this.speedY = 2;
+        this.speedY = (windowHeight / 600) * (800 / windowWidth) * 10;
         this.p5 = p5Origin
     }
 
     responsivePlayer(newHeight: number, oldHeight: number, newWidth: number){
-        this.heightPlayer = newHeight * 0.1
-        this.positionY = newHeight * (this.positionY / oldHeight)
-        this.positionX = this.positionX == 0 ? 0 : newWidth - this.widthPlayer
+        this.heightPlayer = (newHeight / 600) * 80
+        this.widthPlayer = (newWidth / 800) * 20
+        this.positionY =  this.positionY * (newHeight / oldHeight)
+        this.positionX = this.id === 1 ? 0 : newWidth - this.widthPlayer;
+
+        this.speedY = (newHeight / 600) * (800 / newWidth ) * 10;
     }
 
     printPlayer() {
         this.p5.rect( this.positionX, this.positionY, this.widthPlayer, this.heightPlayer);
     }
+    movePlayer() {
+      throw new Error("Move method not implemented.");
+    }
+  }
 
+  class Player extends Pawn {
     movePlayer(){
         if(this.id == 1){
+            if(this.p5.keyIsDown(this.p5.UP_ARROW)){
+                this.positionY -= this.speedY
+                if(this.positionY < 0) this.positionY = 0
+            }
+            if(this.p5.keyIsDown(this.p5.DOWN_ARROW)){
+                this.positionY += this.speedY
+                if(this.positionY + this.heightPlayer > windowHeight)this.positionY = windowHeight - this.heightPlayer
+            }
+        }
+        else if (this.id === 2) {
             if(this.p5.keyIsDown(this.p5.SHIFT)){
                 this.positionY -= this.speedY
                 if(this.positionY < 0) this.positionY = 0
@@ -92,26 +110,107 @@ class Player{
                 if(this.positionY + this.heightPlayer > windowHeight)this.positionY = windowHeight - this.heightPlayer
             }
         }
+    }
+  }
 
-        if(this.id == 2){
+  class Bot extends Pawn {
+    randomMove = 0;
+    previousTime = Date.now();
+    elapsedTime = 0;
+
+    private moveBotToBall() {
+        // Ball is moving towards the bot
+        const targetY = ball.positionY + ball.diameterBall / 2;
+
+        if (targetY < this.positionY + this.heightPlayer / 2) {
+            // Ball is above the bot, move up
+            const newY = Math.max(this.positionY - this.speedY, targetY - this.heightPlayer / 2);
+            this.positionY = newY;
+            if (this.positionY < 0)
+                this.positionY = 0;
+        } else if (targetY > this.positionY + this.heightPlayer / 2) {
+            // Ball is below the bot, move down
+            const newY = Math.min(this.positionY + this.speedY, targetY - this.heightPlayer / 2);
+            this.positionY = newY;
+            if (this.positionY + this.heightPlayer > windowHeight)
+                this.positionY = windowHeight - this.heightPlayer;
+        }
+        this.elapsedTime = 0;
+    }
+
+    private moveBotRandom() {
+        const currentTime = Date.now();
+        this.elapsedTime += currentTime - this.previousTime;
+        this.previousTime = currentTime;
+        if (this.elapsedTime >= 1000) {
+            this.elapsedTime = 0;
+            // Ball is not coming towards the bot, perform small random moves
+            const randomMove = Math.random();
+
+            if (randomMove < 0.5) {
+                // Move up
+                this.positionY -= this.speedY;
+                if (this.positionY < 0)
+                    this.positionY = 0;
+            } else if (randomMove >= 0.5) {
+                // Move down
+                this.positionY += this.speedY;
+                if (this.positionY + this.heightPlayer > windowHeight)
+                    this.positionY = windowHeight - this.heightPlayer;
+            }
+            this.randomMove = randomMove;
+        }
+        else {
+            // Continue moving in the same direction
+            if (this.randomMove < 0.5) {
+                // Move up
+                this.positionY -= this.speedY;
+                if (this.positionY < 0) {
+                    this.positionY = 0;
+                    this.randomMove = 1;
+                }
+            } else {
+                // Move down
+                this.positionY += this.speedY;
+                if (this.positionY + this.heightPlayer > windowHeight) {
+                    this.positionY = windowHeight - this.heightPlayer;
+                    this.randomMove = 0.1;
+                }
+            }
+        }
+    }
+
+    private moveBot() {
+        if (ball.speedX > 0 && ball.positionX > windowWidth / 2) {
+            this.moveBotToBall();
+        } else {
+            this.moveBotRandom();
+        }
+    }
+
+    movePlayer(){
+        if(this.id == 1){
             if(this.p5.keyIsDown(this.p5.UP_ARROW)){
                 this.positionY -= this.speedY
                 if(this.positionY < 0) this.positionY = 0
             }
             if(this.p5.keyIsDown(this.p5.DOWN_ARROW)){
                 this.positionY += this.speedY
-                if(this.positionY + this.heightPlayer > windowHeight) this.positionY = windowHeight - this.heightPlayer
+                if(this.positionY + this.heightPlayer > windowHeight)this.positionY = windowHeight - this.heightPlayer
             }
         }
+        else if (this.id === 2) {
+            this.moveBot();
+        }
     }
-}
+  }
 
 class Ball{
     positionX = windowWidth / 2;
     positionY = windowHeight / 2;
-    speedX = 2;
-    speedY = 2;
-    diameterBall = ((windowWidth + windowHeight) / 2) * 0.023;
+    speedX = 4 * windowWidth / 800;
+    speedY = 4 * windowHeight / 600;
+    diameterBall = ((windowWidth + windowHeight) / 2) * 0.02;
     ballImage;
     previousCollisionPlayer : 0 | 1 | 2;
     p5 ;
@@ -128,10 +227,18 @@ class Ball{
     }
 
     responsiveBall(newHeight: number, oldHeight: number, newWidth: number, oldWidth: number){
-        this.positionY = newHeight * (this.positionY / oldHeight)
-        this.positionX = newWidth * (this.positionX / oldWidth)
-        this.diameterBall = ((newHeight + newWidth) / 2) * 0.015;
+        const scaleFactorX = newWidth / oldWidth;
+        const scaleFactorY = newHeight / oldHeight;
 
+        this.positionX *= scaleFactorX;
+        this.positionY *= scaleFactorY;
+
+        // Adjust the ball diameter scaling
+        this.diameterBall = ((newHeight + newWidth) / 2) * 0.02;
+
+        // Adjust the speed scaling to maintain a consistent speed relative to the screen size
+        this.speedX = Math.sign(this.speedX) * newWidth / 800 * 4;
+        this.speedY = Math.sign(this.speedY) * newHeight / 600 * 4;
     }
 
     centralize(){
@@ -167,27 +274,37 @@ class Ball{
         return 0;
     }
 
-    checkPlayerCollision(player: Player){
-        const yMenor = player.positionY
-        const yMaior = player.positionY + player.heightPlayer
-        if(player.id == 1){
-            const xReferencia = player.positionX + player.widthPlayer
-            if(this.previousCollisionPlayer != 1 && this.positionX - (this.diameterBall / 2) <= xReferencia && this.positionX - (this.diameterBall / 2) > 0){
-                if(this.positionY >= yMenor && this.positionY <= yMaior){
-                    this.speedX *= -1;
-                    this.previousCollisionPlayer = 1
-                }
-            }
-        }else if(player.id == 2){
-            const xReferencia = player.positionX
-            if(this.previousCollisionPlayer != 2 && this.positionX + (this.diameterBall / 2) >= xReferencia && this.positionX  < windowWidth){
-                if(this.positionY >= yMenor && this.positionY <= yMaior){
-                    this.speedX *= -1;
-                    this.previousCollisionPlayer = 2
-                }
-            }
+    checkPlayerCollision(player: Player) {
+        const yMin = player.positionY;
+        const yMax = player.positionY + player.heightPlayer;
+
+        if (player.id === 1) {
+          const xReference = player.positionX + player.widthPlayer;
+          if (
+            this.previousCollisionPlayer !== 1 &&
+            this.positionX - this.diameterBall / 2 <= xReference &&
+            this.positionX - this.diameterBall / 2 > 0 &&
+            this.positionY >= yMin &&
+            this.positionY <= yMax
+          ) {
+            this.speedX *= -1;
+            this.previousCollisionPlayer = 1;
+          }
+        } else if (player.id === 2) {
+          const xReference = player.positionX;
+          if (
+            this.previousCollisionPlayer !== 2 &&
+            this.positionX + this.diameterBall / 2 >= xReference &&
+            this.positionX <= windowWidth &&
+            this.positionY >= yMin &&
+            this.positionY <= yMax
+          ) {
+            this.speedX *= -1;
+            this.previousCollisionPlayer = 2;
+          }
         }
-    }
+      }
+
 }
 
 const Pong: React.FC = () => {
@@ -310,7 +427,7 @@ const Pong: React.FC = () => {
         canvasParent = canvasParentRef
         ball = new Ball(p5,  ballImage)
         player1 = new Player(p5, 1)
-        player2 = new Player(p5, 2)
+        player2 = state.players == "2" ? new Player(p5, 2) : new Bot(p5, 2)
         game = new Game(ball)
         buttonStart = new ButtonStart(p5)
         score = new Score(p5)
@@ -327,6 +444,8 @@ const Pong: React.FC = () => {
             if(ball.isGoal()){
                 game.scorePlayer(ball.whoScoredGoal());
                 game.stop();
+                player1.positionY = windowHeight / 2;
+                player2.positionY = windowHeight / 2;
             }
             player1.movePlayer();
             player2.movePlayer();
