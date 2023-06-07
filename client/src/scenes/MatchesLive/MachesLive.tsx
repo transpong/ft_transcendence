@@ -26,7 +26,7 @@ export default function MachesLive(){
       </Text>
       <Box>
         {matchesList.map((match) => {
-          return <MatchCard match={match} />;
+          return <MatchCard key={match.id} match={match} />;
         })}
       </Box>
     </Box>
