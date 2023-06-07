@@ -106,7 +106,7 @@ class Ball {
     }
 }
 
-const Pong: React.FC | null = () => {
+const Pong: React.FC = () => {
     const navigate = useNavigate();
     const {state} = useLocation()
     const params = useParams();
