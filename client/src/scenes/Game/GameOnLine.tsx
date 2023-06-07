@@ -461,7 +461,7 @@ const Pong: React.FC = () => {
     };
 
     const draw = (p5: p5Types) => {
-        if(!state.fromPong) return
+        if(!state.fromPong && !state.fromInvite) return
         p5.background(background);
         if (game.isRunning) {
             isEndGame = true;
