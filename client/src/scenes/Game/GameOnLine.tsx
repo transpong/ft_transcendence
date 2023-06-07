@@ -429,6 +429,7 @@ const Pong: React.FC = () => {
     let background: any
     let ballImage: any
     let isEndGame = false
+    let parentRef: Element
 
 
     const preload = (p5: p5Types) => {
@@ -444,6 +445,7 @@ const Pong: React.FC = () => {
 
 
     const setup = (p5: p5Types, canvasParentRef: Element) => {
+        parentRef = canvasParentRef
         parentBorderWidth = (ref.current ? ref.current.clientHeight : canvasParentRef.clientHeight) - canvasParentRef.clientHeight
         windowHeight = ref.current ? ref.current.clientHeight - parentBorderWidth : canvasParentRef.clientHeight
         windowWidth = ref.current ? ref.current.clientWidth - parentBorderWidth : canvasParentRef.clientWidth
@@ -461,6 +463,10 @@ const Pong: React.FC = () => {
     };
 
     const draw = (p5: p5Types) => {
+        if(!parentRef){
+            p5.noLoop()
+            return
+        }
         p5.background(background);
         if (game.isRunning) {
             isEndGame = true;
