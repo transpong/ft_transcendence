@@ -94,7 +94,7 @@ export class UserService {
   async userHasMfa(ftId: string): Promise<boolean> {
     const userEntity: UserEntity = await this.getUserByFtId(ftId);
 
-    return userEntity.tokenMFA !== null;
+    return !!userEntity.tokenMFA;
   }
 
   async updateNickname(ftId: string, nickname: string): Promise<void> {
