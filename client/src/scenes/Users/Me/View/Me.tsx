@@ -19,10 +19,10 @@ export default function Me() {
         const myData = await userService.getMe();
         setMe(myData);
 
-        const matches = await gameService.getMatchesHistory(myData.nickname);
+        const matches = await gameService.getMatchesHistory(myData?.nickname || 'inexistent');
         setMatchesList(matches);
 
-        const ranking = await gameService.getUserRanking(myData.nickname);
+        const ranking = await gameService.getUserRanking(myData?.nickname || 'inexistent');
         setUserRanking(ranking);
     }, []);
 
@@ -50,6 +50,7 @@ export default function Me() {
     }
 
     async function handleMfaActivation() {
+      try {
         const data = await userService.activateMfa();
 
         navigate(`/home/me/mfa`, {
@@ -57,6 +58,7 @@ export default function Me() {
                 qr_code: data.qr_code_url,
             },
         });
+      } catch {}
     }
 
     async function handleMfadeactivation() {

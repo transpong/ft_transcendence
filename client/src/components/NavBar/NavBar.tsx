@@ -49,6 +49,7 @@ export default function Simple() {
     useMemo(async () => {
         const myData = await userService.getMe();
 
+        if (!myData) return;
         if (!myData?.nickname) navigate("/nickname");
         setMe(myData);
     }, [navigate]);

@@ -47,26 +47,40 @@ export class GameService {
   }
 
   async getRanking(): Promise<IApiRanking[]> {
-    const { data } = await this.api.get<IApiRanking[]>("/game/ranking");
-    return data;
+    try {
+      const { data } = await this.api.get<IApiRanking[]>("/game/ranking");
+      return data;
+    } catch {
+      return []
+    }
   }
 
-  async getUserRanking(nickname: string): Promise<IApiRanking> {
-    const { data } = await this.api.get<IApiRanking>(`/game/ranking/${nickname}`);
-    return data;
+  async getUserRanking(nickname: string): Promise<IApiRanking | undefined> {
+    try {
+      const { data } = await this.api.get<IApiRanking>(
+        `/game/ranking/${nickname}`
+      );
+      return data;
+    } catch {
+      return undefined;
+    }
   }
 
   async getMatchesHistory(nickname?: string, status?: MatchStatus): Promise<IApiMatchHistory[]> {
-    const { data } = await this.api.get<IApiMatchHistory[]>(
-      "/game/matches-history",
-      {
-        params: {
-          nickname,
-          status,
-        },
-      }
-    );
-    return data;
+    try {
+      const { data } = await this.api.get<IApiMatchHistory[]>(
+        "/game/matches-history",
+        {
+          params: {
+            nickname,
+            status,
+          },
+        }
+      );
+      return data;
+    } catch {
+      return []
+    }
   }
 }
 
