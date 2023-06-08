@@ -14,12 +14,12 @@ const APIGUESTURL = `${import.meta.env.VITE_API_URL}/auth/guest`;
 
 export default function LoginView(){
   const redirectTo42OAuth = () => {
-    localStorage.setItem("isGuest", "false");
+    sessionStorage.setItem("isGuest", "false");
     window.location.replace(API42OAUTHURL);
   };
 
   function handleTestLogin() {
-    localStorage.setItem("isGuest", "true");
+    sessionStorage.setItem("isGuest", "true");
     window.location.replace(APIGUESTURL);
   }
 
