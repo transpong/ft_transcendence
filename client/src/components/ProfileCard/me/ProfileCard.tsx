@@ -1,10 +1,10 @@
 import {Avatar, Button, Flex, Grid, GridItem, Input, Text, useBreakpointValue} from '@chakra-ui/react';
 import {useNavigate} from 'react-router-dom';
-import {avatarUrl} from '../../helpers/avatar-url.ts';
-import {IApiUserMe} from '../../services/users-service.ts';
+import {avatarUrl} from '../../../helpers/avatar-url.ts';
+import {IApiUserMe} from '../../../services/users-service.ts';
 import {FC, useRef} from 'react';
 
-interface ProfileSectionProps {
+interface IProfileSectionProps {
     isUploading: boolean;
     me: IApiUserMe | undefined;
     handlePhotoSelect: (file: File | null) => void;
@@ -12,13 +12,13 @@ interface ProfileSectionProps {
     handleMfadeactivation: () => Promise<void>;
 }
 
-const ProfileCard: FC<ProfileSectionProps> = ({
-                                                  isUploading,
-                                                  me,
-                                                  handlePhotoSelect,
-                                                  handleMfaActivation,
-                                                  handleMfadeactivation,
-                                              }: ProfileSectionProps) => {
+const ProfileCard: FC<IProfileSectionProps> = ({
+                                                   isUploading,
+                                                   me,
+                                                   handlePhotoSelect,
+                                                   handleMfaActivation,
+                                                   handleMfadeactivation,
+                                               }: IProfileSectionProps) => {
     const navigate = useNavigate();
     const buttonSize = useBreakpointValue({base: '85%', md: '90%'});
     const buttonSpacing = useBreakpointValue({base: '2', md: '4'});

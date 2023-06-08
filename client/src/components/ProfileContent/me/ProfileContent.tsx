@@ -1,8 +1,8 @@
 import {Flex, Text, Box} from "@chakra-ui/react";
-import RankingCard from "../RankingCard/RankingCard.tsx";
-import MatchCard from "../MatchCard/MatchCard.tsx";
-import {IApiMatchHistory, IApiRanking} from "../../services/game-service.ts";
-import {IApiUserMe} from "../../services/users-service.ts";
+import RankingCard from "../../RankingCard/RankingCard.tsx";
+import MatchCard from "../../MatchCard/MatchCard.tsx";
+import {IApiMatchHistory, IApiRanking} from "../../../services/game-service.ts";
+import {IApiUserMe} from "../../../services/users-service.ts";
 
 interface IProfileContentProps {
     userRanking?: IApiRanking | undefined;

@@ -3,8 +3,8 @@ import {useEffect, useMemo, useState} from "react";
 import {Outlet, useLocation, useNavigate, useOutlet} from "react-router-dom";
 import {IApiUserMe, userService} from "../../../../services/users-service";
 import {gameService, IApiMatchHistory, IApiRanking,} from "../../../../services/game-service";
-import ProfileCard from "../../../../components/ProfileCard/ProfileCard.tsx";
-import ProfileContent from "../../../../components/ProfileContent/ProfileContent.tsx";
+import ProfileCard from "../../../../components/ProfileCard/me/ProfileCard.tsx";
+import ProfileContent from "../../../../components/ProfileContent/me/ProfileContent.tsx";
 import {useBreakpointValue} from "@chakra-ui/react";
 
 export default function Me() {
@@ -91,7 +91,7 @@ export default function Me() {
                         handleMfaActivation={handleMfaActivation}
                         handleMfadeactivation={handleMfadeactivation}
                     />
-                    <ProfileContent userRanking={userRanking} me={me} matchesList={matchesList}/>
+                    <ProfileContent userRanking={userRanking} me={me} matchesList={matchesList} key={me?.id}/>
                 </Flex>
             )}
         </>
