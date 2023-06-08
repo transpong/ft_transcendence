@@ -1,11 +1,12 @@
 import axios, { AxiosInstance } from 'axios';
-import pino from 'pino';
 import { getCookie } from '../helpers/get-cookie';
 import { createStandaloneToast } from "@chakra-ui/react";
+// import pino from 'pino';
 
 class ApiService {
-  private axios: AxiosInstance;
-  private logger: pino.Logger;
+  private readonly axios: AxiosInstance;
+
+  // private logger: pino.Logger;
 
   constructor() {
     this.axios = axios.create({
@@ -15,38 +16,38 @@ class ApiService {
         Authorization: `Bearer ${getCookie("token")}`,
       },
     });
-    this.logger = pino();
-    const logger = this.logger;
+    // this.logger = pino();
+    // const logger = this.logger;
 
-    const { toast } = createStandaloneToast();
+    const {toast} = createStandaloneToast();
 
 
     this.axios.interceptors.response.use(
-      function (response) {
-        logger.info(
-          {
-            baseURL: response.config.baseURL,
-            method: response.config.method,
-            url: response.config.url,
-            response: {
-              status: response.status,
-            },
-          },
-          "RequestService > response"
-        );
+        function (response) {
+          // logger.info(
+          //   {
+          //     baseURL: response.config.baseURL,
+          //     method: response.config.method,
+          //     url: response.config.url,
+          //     response: {
+          //       status: response.status,
+          //     },
+          //   },
+          //   "RequestService > response"
+          // );
 
-        return response;
-      },
+          return response;
+        },
       function (error) {
-        logger.error(
-          {
-            code: error.code,
-            baseURL: error.config?.baseURL,
-            url: error.config?.url,
-            method: error.config?.method,
-          },
-          "RequestService > response error"
-        );
+        // logger.error(
+        //   {
+        //     code: error.code,
+        //     baseURL: error.config?.baseURL,
+        //     url: error.config?.url,
+        //     method: error.config?.method,
+        //   },
+        //   "RequestService > response error"
+        // );
 
         toast({
           title: error.response?.data?.message || error.message || 'Unhandled Error',
