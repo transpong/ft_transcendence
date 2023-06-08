@@ -133,7 +133,7 @@ export default function PageBase() {
                                   maxW="80%"
                                   color={"white"
                                   }>
-                                Bem-vindo ao nosso Trancendence + Pong! Este é um jogo clássico de arcade onde você
+                                Bem-vinda(o) ao nosso Trancendence + Pong! Este é um jogo clássico de arcade onde você
                                 precisa rebater a bola com o objetivo de ultrapassar o adversário. Use os botões
                                 para cima e para baixo para mover sua raquete e tente marcar o máximo de pontos
                                 possível.
