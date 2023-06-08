@@ -115,7 +115,7 @@ export default function PageBase() {
         <Flex className="MainBackground" h={"100vh"}>
             <NavBar></NavBar>
             <Flex h={"85%"} flexDirection={"row-reverse"}>
-                <Flex position={"fixed"} align={"end"} bottom={"0px"}>
+                <Flex position={"fixed"} align={"end"} bottom={"0px"} zIndex={"1500"}>
 
                     {!isGameRoute && (
                         <>
@@ -125,7 +125,7 @@ export default function PageBase() {
 
                     )}
                 </Flex>
-                <Flex ref={ref} className={!isGameRoute ? "MainView" : "GameView"}>
+                <Flex ref={ref} className={!isGameRoute ? "MainView" : "GameView"} zIndex={"base"}>
                     {showWelcomeText && (
                         <Center w="100%" p={4}>
                             <Text fontSize={{base: "lg", md: "xl", lg: "2xl"}}
