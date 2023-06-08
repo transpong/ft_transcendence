@@ -105,8 +105,16 @@ export class PongService {
       (this.ballX + this.diameterBall >= this.canvasWidth - this.widthPlayer &&
         this.ballY + this.diameterBall >= this.player2Y &&
         this.ballY <= this.player2Y + this.heightPlayer)
-    ) {
+        ) {
       this.ballSpeedX *= -1; // Reverse the ball's X speed
+      // Adjust the ball's position after collision
+      if (this.ballX <= this.widthPlayer) {
+        // Collided with player 1 paddle
+        this.ballX = this.widthPlayer;
+      } else {
+        // Collided with player 2 paddle
+        this.ballX = this.canvasWidth - this.widthPlayer - this.diameterBall;
+      }
     }
 
     // Check for point scoring
