@@ -1,4 +1,4 @@
-import { Button, Flex, Stack, Image, Input } from '@chakra-ui/react'
+import {Button, Flex, Stack, Image, Input, Center, Heading} from '@chakra-ui/react'
 import "./CreateNickNameLoginView.css"
 import { useNavigate } from "react-router";
 import { KeyboardEvent, useState } from 'react';
@@ -52,16 +52,23 @@ export default function CreateNickNameLoginView(){
                     marginBottom={"20px"}
                 />
                 <Stack spacing={10} direction={"column"} align={"center"}>
+                    <Center>
+                        <Heading
+                            lineHeight={1.1} fontSize={{base: '2xl', md: '1xl', lg: '2xl'}}
+                            color={"white"}>
+                            Insira o Apelido
+                        </Heading>
+                    </Center>
                     <Input
-                      className={'loginBoxInput'}
-                      onChange={handleChange}
-                      placeholder={"Apelido"}
-                      size={"md"}
-                      textColor={"white"}
-                      onKeyPress={(e: KeyboardEvent<HTMLInputElement>) => {
-                        if (e.key === "Enter") {
-                          handleNicknameUpdate();
-                        }
+                        className={'loginBoxInput'}
+                        onChange={handleChange}
+                        placeholder={"Apelido"}
+                        size={"md"}
+                        textColor={"white"}
+                        onKeyPress={(e: KeyboardEvent<HTMLInputElement>) => {
+                            if (e.key === "Enter") {
+                                handleNicknameUpdate();
+                            }
                       }}
                     />
                     <Button onClick={handleNicknameUpdate} colorScheme={"purple"} size={"lg"} isLoading={isUploading}>
