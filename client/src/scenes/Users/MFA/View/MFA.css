@@ -1,7 +1,14 @@
-.MFABackground{
+.MFABackground {
     display: flex;
     flex-direction: column;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-  }
+}
+
+.loginBoxInput, *[data-focus] {
+    box-shadow: none !important;
+    outline: none !important;
+    border-color: inherit !important;
+}
+
