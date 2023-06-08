@@ -56,7 +56,7 @@ export default function Simple() {
 
     async function handleLogoff() {
         clearCookies();
-        localStorage.clear();
+        sessionStorage.clear();
         await userService.logout();
         navigate("/");
     }
