@@ -1,5 +1,5 @@
-import { Button, Flex, Stack, Image, Input } from '@chakra-ui/react'
-import { useState } from 'react';
+import {Button, Flex, Stack, Image, Input, Heading, Center} from '@chakra-ui/react'
+import {useState} from 'react';
 import { useNavigate } from 'react-router';
 import { userService } from '../../../services/users-service';
 import ftgif from '../../../../docs/gifs/42.gif'
@@ -49,9 +49,20 @@ export default function TwoFactorAuthenticationLogin(){
                     marginBottom={"20px"}
                 />
                 <Stack spacing={10} direction={"column"} align={"center"}>
-                    <Input onChange={handleChange} placeholder={"2FA Code"} size={"md"} textColor={"white"}/>
+                    <Center>
+                        <Heading
+                            lineHeight={1.1} fontSize={{base: '2xl', md: '1xl', lg: '2xl'}}
+                            color={"white"}>
+                            Insira o Código Gerado Pelo Aplicativo de Autenticação
+                        </Heading>
+                    </Center>
+                    <Input className={'loginBoxInput'}
+                           onChange={handleChange}
+                           placeholder={"Código de Autenticação"}
+                           size={"md"}
+                           textColor={"white"}/>
                     <Button onClick={handleMfaValidation} colorScheme={"purple"} size={"lg"} isLoading={isUploading}>
-                        LOGIN
+                        Entrar
                     </Button>
                 </Stack>
             </Flex>
