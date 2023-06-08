@@ -1,7 +1,7 @@
 import {Avatar, Button, Flex, Grid, GridItem, Input, Text, useBreakpointValue} from '@chakra-ui/react';
 import {useNavigate} from 'react-router-dom';
-import {avatarUrl} from '../../../helpers/avatar-url.ts';
-import {IApiUserMe} from '../../../services/users-service.ts';
+import {avatarUrl} from '../../../helpers/avatar-url';
+import {IApiUserMe} from '../../../services/users-service';
 import {FC, useRef} from 'react';
 
 interface IProfileSectionProps {

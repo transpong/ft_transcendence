@@ -1,8 +1,8 @@
 import {Flex, Text, Box} from "@chakra-ui/react";
-import MatchCard from "../../MatchCard/MatchCard.tsx";
-import RankingCard from "../../RankingCard/RankingCard.tsx";
-import {IApiMatchHistory, IApiRanking} from "../../../services/game-service.ts";
-import {IUserProfile} from "../../../services/users-service.ts";
+import MatchCard from "../../MatchCard/MatchCard";
+import RankingCard from "../../RankingCard/RankingCard";
+import {IApiMatchHistory, IApiRanking} from "../../../services/game-service";
+import {IUserProfile} from "../../../services/users-service";
 import {FC} from "react";
 
 interface IUserContentProps {

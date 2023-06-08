@@ -3,8 +3,8 @@ import {useEffect, useMemo, useState} from "react";
 import {Outlet, useLocation, useNavigate, useOutlet} from "react-router-dom";
 import {IApiUserMe, userService} from "../../../../services/users-service";
 import {gameService, IApiMatchHistory, IApiRanking,} from "../../../../services/game-service";
-import ProfileCard from "../../../../components/ProfileCard/me/ProfileCard.tsx";
-import ProfileContent from "../../../../components/ProfileContent/me/ProfileContent.tsx";
+import ProfileCard from "../../../../components/ProfileCard/me/ProfileCard";
+import ProfileContent from "../../../../components/ProfileContent/me/ProfileContent";
 import {useBreakpointValue} from "@chakra-ui/react";
 
 export default function Me() {
