@@ -28,7 +28,7 @@ export default function Me() {
         if (inputMessage.length === 6) {
             handleMfaValidation();
         }
-    }, [handleMfaValidation, inputMessage]);
+    }, [inputMessage]);
 
     async function handleMfaValidation() {
         setIsUploading(true);
