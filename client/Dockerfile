@@ -20,7 +20,6 @@ ENV VITE_API_URL=${VITE_API_URL}
 RUN bash ./config/envit.sh
 
 RUN npm ci --silent
-RUN cat .env
 RUN npm run build && rm -rf node_modules src
 
 
