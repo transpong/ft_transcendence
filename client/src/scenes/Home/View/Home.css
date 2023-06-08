@@ -14,13 +14,12 @@
 }
 
 .GameView {
-  height: 95%;
+  height: 100%;
   width: 80vw;
   margin-top: 1vh;
-  border: 6px solid white;
+  border: 6px solid #805AD5;
   background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 20px;
-  padding: 10px;
+  padding: 1px;
   flex: auto;
   overflow: auto;
 }
