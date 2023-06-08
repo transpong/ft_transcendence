@@ -101,58 +101,92 @@ export class ChatService {
   }
 
   async sendDirectMessages(nickname: string, message: string): Promise<void> {
-    await this.api.post(`/chat/channel/direct/${nickname}/messages`, { message });
+    try {
+      await this.api.post(`/chat/channel/direct/${nickname}/messages`, { message });
+    } catch {}
   }
 
   async createChannel(chat: IChatToCreate): Promise<void> {
-    await this.api.post(`/chat`, chat);
+    try {
+      await this.api.post(`/chat`, chat);
+    } catch {}
   }
 
   async sendChannelMessages(chatId: number, message: string): Promise<void> {
-    await this.api.post(`/chat/channel/${chatId}/messages`, { message });
+    try {
+      await this.api.post(`/chat/channel/${chatId}/messages`, { message });
+    } catch {}
   }
 
   async getChannelMessages(id: number): Promise<IMessage[]> {
-    const { data } = await this.api.get<IMessage[]>(`/chat/channels/${id}/messages`);
-    return data;
+    try {
+      const { data } = await this.api.get<IMessage[]>(`/chat/channels/${id}/messages`);
+      return data;
+    } catch {
+      return []
+    }
   }
 
   async updateChannelType(chatId: number, type: ChannelAccessType): Promise<void> {
-    await this.api.patch(`/chat/channels/${chatId}/type`, { type });
+    try {
+      await this.api.patch(`/chat/channels/${chatId}/type`, { type });
+    } catch {}
   }
 
   async updateChannelPassword(chatId: number, password: string): Promise<void> {
-    await this.api.put(`/chat/channels/${chatId}/password`, { password });
+    try {
+      await this.api.put(`/chat/channels/${chatId}/password`, { password });
+    } catch {}
   }
 
   async verifyChannelPassword(chatId: number, password: string): Promise<void> {
-    await this.api.post(`/chat/channels/${chatId}/login`, { password });
+    try {
+      await this.api.post(`/chat/channels/${chatId}/login`, { password });
+    } catch {}
   }
 
   async getChannelUsers(id: number): Promise<IApiChannelUsers[]> {
-    const { data } = await this.api.get<IApiChannelUsers[]>(`/chat/channels/${id}/users`);
-    return data;
+    try {
+      const { data } = await this.api.get<IApiChannelUsers[]>(`/chat/channels/${id}/users`);
+      return data;
+    } catch {
+      return []
+    }
   }
 
   async addChannelUsers(id: number, nickname: string): Promise<IApiChannelUsers[]> {
-    const { data } = await this.api.put<IApiChannelUsers[]>(`/chat/channel/${id}/user/${nickname}`);
-    return data;
+    try {
+      const { data } = await this.api.put<IApiChannelUsers[]>(
+        `/chat/channel/${id}/user/${nickname}`
+      );
+      return data;
+    } catch {
+      return []
+    }
   }
 
   async updateUserChannelType(chatId: number, nickname: string, type: UserAccessType): Promise<void> {
-    await this.api.patch(`/chat/channels/${chatId}/users/${nickname}/type`, { type });
+    try {
+      await this.api.patch(`/chat/channels/${chatId}/users/${nickname}/type`, { type });
+    } catch {}
   }
 
   async updateUserChannelRestrictions(chatId: number, nickname: string, restriction: UserAccessRestrictions): Promise<void> {
-    await this.api.patch(`/chat/channels/${chatId}/users/${nickname}/restrictions`, { restriction });
+    try {
+      await this.api.patch(`/chat/channels/${chatId}/users/${nickname}/restrictions`, { restriction });
+    } catch {}
   }
 
   async leaveChannel(chatId: number): Promise<void> {
-    await this.api.delete(`/chat/channels/${chatId}/leave`);
+    try {
+      await this.api.delete(`/chat/channels/${chatId}/leave`);
+    } catch {}
   }
 
   async removeUserFromChannel(chatId: number, nickname: string): Promise<void> {
-    await this.api.delete(`/chat/channels/${chatId}/users/${nickname}`);
+    try {
+      await this.api.delete(`/chat/channels/${chatId}/users/${nickname}`);
+    } catch {}
   }
 }
 

@@ -17,11 +17,13 @@ const MessagesView = (props: Props) => {
 
   useMemo(async () => {
     if (props.directInfo) {
-      const messagesList = await chatService.getDirectMessages(
-        props.directInfo.nickname
-      );
-      setMessages(messagesList.messages);
-      setSender(messagesList.user);
+      try {
+        const messagesList = await chatService.getDirectMessages(
+          props.directInfo.nickname
+        );
+        setMessages(messagesList.messages);
+        setSender(messagesList.user);
+      } catch {}
     }
 
     if (props.channelInfo) {
@@ -40,7 +42,7 @@ const MessagesView = (props: Props) => {
         ).then(messagesList => {
           setMessages(messagesList.messages);
           setSender(messagesList.user);
-        })
+        }).catch()
       }
 
       if (props.channelInfo) {
@@ -58,10 +60,12 @@ const MessagesView = (props: Props) => {
     if (props.directInfo) {
       await chatService.sendDirectMessages(props.directInfo.nickname, inputMessage);
       setInputMessage("");
-      const messagesList = await chatService.getDirectMessages(
-        props.directInfo.nickname
-      );
-      setMessages(messagesList.messages);
+      try {
+        const messagesList = await chatService.getDirectMessages(
+          props.directInfo.nickname
+        );
+        setMessages(messagesList.messages);
+      } catch {}
     }
 
     if (props.channelInfo) {

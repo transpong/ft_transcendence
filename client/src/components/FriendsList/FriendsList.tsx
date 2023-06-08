@@ -22,8 +22,10 @@ const FriendsList = (props: Props) => {
   const getStatusMinimized = () => isMinimized;
 
   useMemo(async () => {
-    const chatList = await chatService.getChats()
-    setChats(chatList);
+    try {
+      const chatList = await chatService.getChats()
+      setChats(chatList);
+    } catch {}
   }, [])
 
   return (

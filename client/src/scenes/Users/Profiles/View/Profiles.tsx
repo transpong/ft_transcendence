@@ -18,10 +18,10 @@ export default function Me() {
         const userProfile = await userService.getProfile(user || '');
         setProfile(userProfile);
 
-        const matches = await gameService.getMatchesHistory(userProfile.nickname);
+        const matches = await gameService.getMatchesHistory(userProfile?.nickname || 'inexistent');
         setMatchesList(matches);
 
-        const ranking = await gameService.getUserRanking(userProfile.nickname);
+        const ranking = await gameService.getUserRanking(userProfile?.nickname || 'inexistent');
         setUserRanking(ranking);
     }, [user]);
 

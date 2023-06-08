@@ -32,9 +32,13 @@ export class UsersService {
     this.api = apiService.getAxios();
   }
 
-  async getMe(): Promise<IApiUserMe> {
-    const { data } = await this.api.get<IApiUserMe>("/user/me");
-    return data;
+  async getMe(): Promise<IApiUserMe | undefined> {
+    try {
+      const { data } = await this.api.get<IApiUserMe>("/user/me");
+      return data;
+    } catch {
+      return undefined;
+    }
   }
 
   async uploadAvatar(avatar: FormData): Promise<void> {
@@ -53,7 +57,9 @@ export class UsersService {
   }
 
   async disableMfa(): Promise<void> {
-    return this.api.patch("/user/me/mfa/invalidate");
+    try {
+      await this.api.patch("/user/me/mfa/invalidate");
+    } catch {}
   }
 
   async updateNickname(nickname: string): Promise<void> {
@@ -63,32 +69,46 @@ export class UsersService {
   }
 
   async logout(): Promise<void> {
-    return this.api.patch("auth/logout");
+    try {
+      await this.api.patch("auth/logout");
+    } catch {}
   }
 
-  async getProfile(nickname: string): Promise<IUserProfile> {
-    const { data } = await this.api.get<IUserProfile>(`/user/profiles/${nickname}`);
-    return data;
+  async getProfile(nickname: string): Promise<IUserProfile | undefined> {
+    try {
+      const { data } = await this.api.get<IUserProfile>(`/user/profiles/${nickname}`);
+      return data;
+    } catch {
+      return undefined;
+    }
   }
 
   async addFriend(nickname: string): Promise<void> {
-    const { data } = await this.api.post<void>(`/user/profiles/${nickname}/friends`);
-    return data;
+    try {
+      const { data } = await this.api.post<void>(`/user/profiles/${nickname}/friends`);
+      return data;
+    } catch {}
   }
 
   async removeFriend(nickname: string): Promise<void> {
-    const { data } = await this.api.delete<void>(`/user/profiles/${nickname}/friends`);
-    return data;
+    try {
+      const { data } = await this.api.delete<void>(`/user/profiles/${nickname}/friends`);
+      return data;
+    } catch {}
   }
 
   async blockUser(nickname: string): Promise<void> {
-    const { data } = await this.api.post<void>(`/user/profiles/${nickname}/block`);
-    return data;
+    try {
+      const { data } = await this.api.post<void>(`/user/profiles/${nickname}/block`);
+      return data;
+    } catch {}
   }
 
   async unblockUser(nickname: string): Promise<void> {
-    const { data } = await this.api.delete<void>(`/user/profiles/${nickname}/block`);
-    return data;
+    try {
+      const { data } = await this.api.delete<void>(`/user/profiles/${nickname}/block`);
+      return data;
+    } catch {}
   }
 }
 
