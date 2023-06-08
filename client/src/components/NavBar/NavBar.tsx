@@ -17,8 +17,8 @@ import {IApiUserMe, userService} from "../../services/users-service";
 import {IoExit} from "react-icons/io5";
 import {clearCookies} from "../../helpers/clear-cookies";
 
-const Links: string[] = ['Jogar', 'Lista de Jogos', 'Jogos ao vivo', 'Ranking'];
-const Redirects: string[] = ['/home/pong', '/home/matches', '/home/matches/live', '/home/ranking'];
+const Links: string[] = ['Lista de Jogos', 'Ranking', 'Jogos ao vivo', 'Jogar'];
+const Redirects: string[] = ['/home/matches', '/home/ranking', '/home/matches/live', '/home/pong'];
 
 const NavLink = ({children, route}: { children: ReactNode, route: string }) => (
     <ChakraLink
