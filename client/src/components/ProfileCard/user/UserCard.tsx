@@ -1,7 +1,7 @@
 import {Avatar, Button, Flex, Grid, GridItem, Text, useBreakpointValue, VStack} from "@chakra-ui/react";
 import {FC} from "react";
-import {IUserProfile} from "../../../services/users-service.ts";
-import {avatarUrl} from "../../../helpers/avatar-url.ts";
+import {IUserProfile} from "../../../services/users-service";
+import {avatarUrl} from "../../../helpers/avatar-url";
 
 interface IUserCardProps {
     profile?: IUserProfile;

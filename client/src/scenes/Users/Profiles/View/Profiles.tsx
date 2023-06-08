@@ -4,8 +4,8 @@ import {useMemo, useState} from "react";
 import {Outlet, useOutlet, useParams} from "react-router-dom";
 import {gameService, IApiMatchHistory, IApiRanking} from "../../../../services/game-service";
 import {IUserProfile, userService} from "../../../../services/users-service";
-import UserCard from "../../../../components/ProfileCard/user/UserCard.tsx";
-import UserContent from "../../../../components/ProfileContent/user/UserContent.tsx";
+import UserCard from "../../../../components/ProfileCard/user/UserCard";
+import UserContent from "../../../../components/ProfileContent/user/UserContent";
 
 export default function Me() {
     const {user} = useParams()
