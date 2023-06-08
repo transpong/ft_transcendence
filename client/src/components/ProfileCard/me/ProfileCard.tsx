@@ -72,15 +72,19 @@ const ProfileCard: FC<IProfileSectionProps> = ({
                                 onClick={() => navigate('/nickname')}>
                             Alterar Nickname
                         </Button>
-                        {!me?.is_mfa_enabled ? (
-                            <Button width={buttonSize} colorScheme="purple" onClick={handleMfaActivation}>
-                                Ativar MFA
-                            </Button>
-                        ) : (
-                            <Button width={buttonSize} colorScheme="purple" onClick={handleMfadeactivation}>
-                                Desativar MFA
-                            </Button>
-                        )}
+                        {
+                            localStorage.getItem("isGuest") != "true" && !me?.is_mfa_enabled ? (
+                                <Button width={buttonSize} colorScheme="purple" onClick={handleMfaActivation}>
+                                    Ativar MFA
+                                </Button>
+                            ) : (
+                                localStorage.getItem("isGuest") != "true" && me?.is_mfa_enabled && (
+                                    <Button width={buttonSize} colorScheme="purple" onClick={handleMfadeactivation}>
+                                        Desativar MFA
+                                    </Button>
+                                )
+                            )
+                        }
                     </Flex>
                 </GridItem>
             </Grid>
