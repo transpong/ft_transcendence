@@ -1,6 +1,7 @@
-export function clearCookies () {
-  const cookies = document.cookie.split(";");
-  for (let i = 0; i < cookies.length; i++) {
-    document.cookie = cookies[i] + "=; expires=" + new Date(0).toUTCString() + "; SameSite=None; secure";
-  }
+export function clearCookies() {
+  document.cookie.split(";").forEach((c) => {
+    document.cookie = c
+      .replace(/^ +/, "")
+      .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+  });
 }
