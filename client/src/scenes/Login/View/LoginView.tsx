@@ -44,18 +44,20 @@ export default function LoginView(){
           />
           <Stack spacing={10} direction="column" align="center">
             <Button
-              colorScheme="purple"
-              size="lg"
-              onClick={redirectTo42OAuth}
+                colorScheme="purple"
+                size="lg"
+                onClick={redirectTo42OAuth}
+                width={"90%"}
             >
-              LOGIN COM 42
+              Fazer login
             </Button>
             <Button
-              colorScheme="purple"
-              size="lg"
-              onClick={handleTestLogin}
+                colorScheme="purple"
+                size="lg"
+                onClick={handleTestLogin}
+                width={"90%"}
             >
-              LOGIN TESTE
+              Entrar como convidado
             </Button>
           </Stack>
         </Flex>
