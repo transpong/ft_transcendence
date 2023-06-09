@@ -106,10 +106,13 @@ export class ChatService {
     } catch {}
   }
 
-  async createChannel(chat: IChatToCreate): Promise<void> {
+  async createChannel(chat: IChatToCreate): Promise<boolean> {
     try {
       await this.api.post(`/chat`, chat);
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async sendChannelMessages(chatId: number, message: string): Promise<void> {
@@ -127,22 +130,31 @@ export class ChatService {
     }
   }
 
-  async updateChannelType(chatId: number, type: ChannelAccessType): Promise<void> {
+  async updateChannelType(chatId: number, type: ChannelAccessType): Promise<boolean> {
     try {
       await this.api.patch(`/chat/channels/${chatId}/type`, { type });
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
 
-  async updateChannelPassword(chatId: number, password: string): Promise<void> {
+  async updateChannelPassword(chatId: number, password: string): Promise<boolean> {
     try {
       await this.api.put(`/chat/channels/${chatId}/password`, { password });
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
 
-  async verifyChannelPassword(chatId: number, password: string): Promise<void> {
+  async verifyChannelPassword(chatId: number, password: string): Promise<boolean> {
     try {
       await this.api.post(`/chat/channels/${chatId}/login`, { password });
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async getChannelUsers(id: number): Promise<IApiChannelUsers[]> {
@@ -165,10 +177,13 @@ export class ChatService {
     }
   }
 
-  async updateUserChannelType(chatId: number, nickname: string, type: UserAccessType): Promise<void> {
+  async updateUserChannelType(chatId: number, nickname: string, type: UserAccessType): Promise<boolean> {
     try {
       await this.api.patch(`/chat/channels/${chatId}/users/${nickname}/type`, { type });
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async updateUserChannelRestrictions(chatId: number, nickname: string, restriction: UserAccessRestrictions): Promise<void> {
@@ -177,10 +192,13 @@ export class ChatService {
     } catch {}
   }
 
-  async leaveChannel(chatId: number): Promise<void> {
+  async leaveChannel(chatId: number): Promise<boolean> {
     try {
       await this.api.delete(`/chat/channels/${chatId}/leave`);
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async removeUserFromChannel(chatId: number, nickname: string): Promise<void> {
