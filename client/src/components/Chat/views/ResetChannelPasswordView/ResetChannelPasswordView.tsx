@@ -20,8 +20,8 @@ const ResetChannelPasswordView = ({ channelInfo }: Props) => {
     }
     const data = inputPassword.trim();
     if (channelInfo) {
-      await chatService.updateChannelPassword(channelInfo.id, data);
-      window.location.reload();
+      const isValid = await chatService.updateChannelPassword(channelInfo.id, data);
+      if(isValid) window.location.reload();
     }
   };
 

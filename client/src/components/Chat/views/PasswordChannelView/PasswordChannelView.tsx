@@ -20,8 +20,8 @@ const PasswordChannelView = ({ setScreenNavigation, channelInfo }: Props) => {
     }
     const data = inputPassword.trim();
     if (channelInfo) {
-      await chatService.verifyChannelPassword(channelInfo.id, data);
-      setScreenNavigation(1);
+      const isValid = await chatService.verifyChannelPassword(channelInfo.id, data);
+      if (isValid) setScreenNavigation(1);
     }
   };
 

@@ -15,15 +15,15 @@ const ConfigChannelView = ({ setScreenNavigation, group_type, user_access_type, 
 
   const handleChannelUpdate = async (type: ChannelAccessType) => {
     if (channelInfo) {
-      await chatService.updateChannelType(channelInfo.id, type);
-      window.location.reload();
+      const isValid = await chatService.updateChannelType(channelInfo.id, type);
+      if (isValid) window.location.reload();
     }
   };
 
   const handleLeaveChannel = async () => {
     if (channelInfo) {
-      await chatService.leaveChannel(channelInfo.id);
-      window.location.reload();
+      const isValid = await chatService.leaveChannel(channelInfo.id);
+      if (isValid) window.location.reload();
     }
   };
 

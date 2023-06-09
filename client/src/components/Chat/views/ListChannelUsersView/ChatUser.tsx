@@ -22,8 +22,8 @@ const ChatUser = ({ user , user_access_type, channelInfo, setScreenNavigation }:
 
   const handleUserType = async (nickname: string, type: UserAccessType) => {
     if (channelInfo) {
-      await chatService.updateUserChannelType(channelInfo.id, nickname, type);
-      setScreenNavigation(2);
+      const isValid = await chatService.updateUserChannelType(channelInfo.id, nickname, type);
+      if (isValid) setScreenNavigation(2);
     }
   };
 

@@ -6,12 +6,12 @@ const NewGroupInput = () => {
   const [channelName, setChannelName] = useState("");
 
   const handleCreateChannel = async () => {
-      await chatService.createChannel({
+      const isValid = await chatService.createChannel({
         name: channelName,
         type: ChannelAccessType.PRIVATE,
       });
 
-      window.location.reload()
+      if(isValid) window.location.reload()
   };
 
   return (
