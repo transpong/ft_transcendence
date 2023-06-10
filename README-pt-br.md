@@ -66,40 +66,39 @@ As dependências do cliente estão listadas no arquivo [package.json](https://gi
 
 ### Server (NestJS)
 
-The server dependencies are listed in the [package.json](https://github.com/transpong/Transpong/blob/master/server/package.json) file.
+As dependências do servidor estão listadas no arquivo [package.json](https://github.com/transpong/Transpong/blob/master/server/package.json).
 
-Here is the formatted table with the provided data:
 
-| Package                     | Description                                                      |
-|-----------------------------|------------------------------------------------------------------|
-| @nestjs/class-transformer   | Library for class transformation                                 |
-| @nestjs/class-validator     | Library for class validation                                     |
-| @nestjs/common              | Main module of the NestJS framework                              |
-| @nestjs/config              | Configuration library for NestJS                                 |
-| @nestjs/core                | Core module of the NestJS framework                              |
-| @nestjs/jwt                 | JWT authentication library for NestJS                            |
-| @nestjs/passport            | Authentication library for NestJS                                |
-| @nestjs/platform-express    | Express-based HTTP adapter for NestJS                            |
-| @nestjs/platform-socket.io  | Socket.io adapter for NestJS                                    |
-| @nestjs/typeorm             | TypeORM integration for NestJS                                   |
-| @nestjs/websockets          | Library for real-time communication                              |
-| 2fa-util                    | Utility for two-factor authentication                           |
-| bcrypt                      | Library for password hashing                                    |
-| better-sqlite3              | SQLite wrapper with performance improvements                     |
-| class-transformer           | Library for class transformation                                 |
-| class-validator             | Library for class validation                                     |
-| http-proxy-middleware       | HTTP proxy middleware                                            |
-| passport-42                 | Authentication strategy for login using 42's intra              |
-| passport-jwt                | JWT authentication strategy for Passport                         |
-| pg                          | PostgreSQL driver for Node.js                                    |
-| reflect-metadata            | Library for reflected metadata                                   |
-| rxjs                        | Library for reactive programming                                |
-| typeorm                     | ORM for relational databases                                     |
-
+| Pacote                      | Descrição                                                          |
+|-----------------------------|-------------------------------------------------------------------|
+| @nestjs/class-transformer   | Biblioteca para transformação de classes                           |
+| @nestjs/class-validator     | Biblioteca para validação de classes                               |
+| @nestjs/common              | Módulo principal do framework NestJS                               |
+| @nestjs/config              | Biblioteca de configuração para NestJS                             |
+| @nestjs/core                | Módulo central do framework NestJS                                |
+| @nestjs/jwt                 | Biblioteca de autenticação JWT para NestJS                         |
+| @nestjs/passport            | Biblioteca de autenticação para NestJS                             |
+| @nestjs/platform-express    | Adaptador HTTP baseado em Express para NestJS                      |
+| @nestjs/platform-socket.io  | Adaptador Socket.io para NestJS                                   |
+| @nestjs/typeorm             | Integração do TypeORM para NestJS                                  |
+| @nestjs/websockets          | Biblioteca para comunicação em tempo real                          |
+| 2fa-util                    | Utilitário para autenticação de dois fatores                       |
+| bcrypt                      | Biblioteca para hash de senhas                                    |
+| better-sqlite3              | Wrapper SQLite com melhorias de desempenho                         |
+| class-transformer           | Biblioteca para transformação de classes                           |
+| class-validator             | Biblioteca para validação de classes                               |
+| http-proxy-middleware       | Middleware de proxy HTTP                                           |
+| passport-42                 | Estratégia de autenticação para login usando o intra da 42         |
+| passport-jwt                | Estratégia de autenticação JWT para o Passport                    |
+| pg                          | Driver PostgreSQL para Node.js                                    |
+| reflect-metadata            | Biblioteca para metadados refletidos                              |
+| rxjs                        | Biblioteca para programação reativa                                |
+| typeorm                     | ORM para bancos de dados relacionais                               |
 
 
 
-#### Authors
+
+#### Autores
 
 <p align="center">
 <table>
