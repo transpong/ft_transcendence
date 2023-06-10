@@ -1,7 +1,7 @@
 # TransPong (ft_transcendence)
 
 Para acessar uma versão em português desse readme, clique [aqui](
-https://github.com/transpong/ft_transcendence/blob/master/README-pr-br.md)
+https://github.com/transpong/ft_transcendence/blob/master/README-pt-br.md)
 
 ## Description
 
