@@ -1,9 +1,9 @@
-# ft_transcendence
+# TransPong (ft_transcendence)
 
 ## Descrição
 
 Este projeto consiste em criar um website para o jogo Pong.
-O website permitirá que os usuários joguem Pong com outras pessoas em tempo real, além de fornecer uma interface de usuário agradável e um recurso de bate-papo
+O website permitirá que os usuários joguem Pong com outras pessoas em tempo real, além de fornecer uma interface de usuário e um recurso de bate-papo.
 
 ## Tecnologias
 
