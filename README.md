@@ -1,104 +1,88 @@
 # TransPong (ft_transcendence)
 
-## Descrição
+Para acessar uma versão em português desse readme, clique [aqui](
+https://github.com/transpong/ft_transcendence/blob/master/README-pr-br.md)
 
-Este projeto consiste em criar um website para o jogo Pong.
-O website permitirá que os usuários joguem Pong com outras pessoas em tempo real, além de fornecer uma interface de usuário e um recurso de bate-papo.
+## Description
 
-## Tecnologias
+This project aims to create a website for the game Pong. The website will allow users to play Pong with others in real-time, providing a user interface and a chat feature.
 
-* [Typescript](https://www.typescriptlang.org/) - Linguagem de programação
-* [Node.js](https://nodejs.org/en/) - Ambiente de execução Javascript
-* [React](https://pt-br.reactjs.org/) - Biblioteca Javascript
-* [NestJS](https://nestjs.com/) - Framework Javascript
-* [PostgreSQL](https://www.postgresql.org/) - Banco de dados relacional
-* [Docker](https://www.docker.com/) - Plataforma de virtualização
+## Technologies
 
-## Requisitos de sistema
+* [Typescript](https://www.typescriptlang.org/) - Programming language
+* [Node.js](https://nodejs.org/en/) - JavaScript runtime environment
+* [React](https://reactjs.org/) - JavaScript library
+* [NestJS](https://nestjs.com/) - JavaScript framework
+* [PostgreSQL](https://www.postgresql.org/) - Relational database
+* [Docker](https://www.docker.com/) - Virtualization platform
+
+## System Requirements
 
 * Docker
 * Docker-compose
 
-## Instalação
+## Installation
 
-Para executar o projeto, você deve ter o Docker instalado em sua máquina e executar o seguinte comando:
+To run the project, you must have Docker installed on your machine and execute the following command:
 
 ```bash
 docker-compose up --build
 ```
 
-## Banco de dados
+## Database
 
-O banco de dados é criado automaticamente ao executar o comando `docker-compose up --build`.
-Uma representação dos relacionamentos entre as tabelas pode ser vista abaixo:
+The database is automatically created when running the `docker-compose up --build` command.
+A representation of the table relationships can be seen below:
 
 ![postgres - public](https://github.com/transpong/ft_transcendence/assets/47704550/28bc4256-cdf5-42d6-a429-639c33511598)
 
+## Dependencies
+
+### Client (React)
+
+The client dependencies are listed in the [package.json](https://github.com/transpong/Transpong/blob/master/client/package.json) file.
+
+| Package                 | Description                                                 |
+|-------------------------|-------------------------------------------------------------|
+| @chakra-ui/icons        | Icon set for use with the Chakra UI framework               |
+| @chakra-ui/react        | User interface components for the Chakra UI framework       |
+| @emotion/react          | CSS-in-JS styling library using Emotion                     |
+| @emotion/styled         | CSS-in-JS styling library using Emotion                     |
+| @vitejs/plugin-react    | Vite plugin for React projects                              |
+| @types/socket.io-client | Socket.io client data types                                 |
+| axios                   | HTTP client for making requests                             |
+| framer-motion           | Library for animations and transitions for React components |
+| pino                    | Logging library                                             |
+| react                   | JavaScript library for building user interfaces             |
+| react-dom               | React renderer for the browser                              |
+| react-icons             | Popular icon set for use with React                         |
+| react-p5                | p5.js integration with React for creating graphics          |
+| react-router-dom        | Routing library for React applications                      |
+| socket.io-client        | Library for real-time communication with Socket.io          |
+| vite                    | Fast development build tool for web applications            |
+
+### Server (NestJS)
+
+The server dependencies are listed in the [package.json](https://github.com/transpong/Transpong/blob/master/server/package.json) file.
+
+Here is the formatted table with the provided data:
+
+| Package                    | Description                                                  |
+|----------------------------|--------------------------------------------------------------|
+| @nestjs/class-transformer  | Class transformation library                                 |
+| @nestjs/class-validator    | Class validation library                                     |
+| @nestjs/common             | Main module of the NestJS framework                          |
+| @nestjs/config             | Configuration library for NestJS                             |
+| @nestjs/core               | Core module of the NestJS framework                          |
+| @nestjs/jwt                | JWT authentication library for NestJS                        |
+| @nestjs/passport           | Authentication library for NestJS                            |
+| @nestjs/platform-express   | Express-based HTTP adapter for NestJS                        |
+| @nestjs/platform-socket.io | Socket.io adapter for NestJS                                 |
+| @nestjs/typeorm            | TypeORM integration for NestJS                               |
+| @nestjs/websockets         |
 
 
-## Dependências
-
-### Cliente (React)
-
-As dependências do cliente estão listadas no arquivo [package.json](https://github.com/transpong/Transpong/blob/master/client/package.json).
-
-| Pacote                  | Descrição                                                      |
-|-------------------------|----------------------------------------------------------------|
-| @chakra-ui/icons        | Conjunto de ícones para uso com o framework Chakra UI          |
-| @chakra-ui/react        | Componentes de interface do usuário para o framework Chakra UI |
-| @emotion/react          | Biblioteca para estilização com CSS-in-JS usando Emotion       |
-| @emotion/styled         | Biblioteca para estilização com CSS-in-JS usando Emotion       |
-| @vitejs/plugin-react    | Plugin do Vite para suporte a projetos React                   |
-| @types/socket.io-client | Tipos de dados para o cliente Socket.io                        |
-| axios                   | Cliente HTTP para fazer requisições                            |
-| framer-motion           | Biblioteca para animações e transições de componentes React    |
-| pino                    | Biblioteca de logging                                          |
-| react                   | Biblioteca JavaScript para construção de interfaces de usuário |
-| react-dom               | Renderizador do React para o navegador                         |
-| react-icons             | Conjunto de ícones populares para uso com o React              |
-| react-p5                | Integração do p5.js com o React para criação de gráficos       |
-| react-router-dom        | Biblioteca de roteamento para aplicações React                 |
-| socket.io-client        | Biblioteca para comunicação em tempo real com Socket.io        |
-| vite                    | Bundler rápido para desenvolvimento de aplicações web          |
-
-### Servidor (NestJS)
-
-As dependências do servidor estão listadas no arquivo [package.json](
-https://github.com/transpong/Transpong/blob/master/server/package.json).
-
-Aqui está a tabela formatada com os dados fornecidos:
-
-| Pacote                     | Descrição                                                      |
-|----------------------------|----------------------------------------------------------------|
-| @nestjs/class-transformer  | Biblioteca para transformação de classes                       |
-| @nestjs/class-validator    | Biblioteca para validação de classes                           |
-| @nestjs/common             | Módulo principal do framework NestJS                           |
-| @nestjs/config             | Biblioteca para configuração no NestJS                         |
-| @nestjs/core               | Núcleo do framework NestJS                                     |
-| @nestjs/jwt                | Biblioteca para autenticação JWT no NestJS                     |
-| @nestjs/passport           | Biblioteca para autenticação no NestJS                         |
-| @nestjs/platform-express   | Adaptador HTTP baseado em Express para NestJS                  |
-| @nestjs/platform-socket.io | Adaptador Socket.io para NestJS                                |
-| @nestjs/typeorm            | Integração do TypeORM com o NestJS                             |
-| @nestjs/websockets         | Biblioteca para comunicação em tempo real                      |
-| 2fa-util                   | Utilitário para autenticação de dois fatores                   |
-| bcrypt                     | Biblioteca para hashing de senhas                              |
-| better-sqlite3             | Wrapper para SQLite com melhorias de desempenho                |
-| class-transformer          | Biblioteca para transformação de classes                       |
-| class-validator            | Biblioteca para validação de classes                           |
-| http-proxy-middleware      | Middleware para proxy HTTP                                     |
-| passport-42                | Estratégia de autenticação para login utilizando a intra da 42 |
-| passport-jwt               | Estratégia de autenticação JWT para o Passport                 |
-| pg                         | Driver do PostgreSQL para Node.js                              |
-| reflect-metadata           | Biblioteca para metadados refletidos                           |
-| rxjs                       | Biblioteca para programação reativa                            |
-| typeorm                    | ORM para bancos de dados relacionais                           |
-
-
-
-
-#### Autores
-
+#### Authors
 <p align="center">
 <table>
   <tr>
