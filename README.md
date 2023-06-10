@@ -65,8 +65,6 @@ The client dependencies are listed in the [package.json](https://github.com/tran
 
 The server dependencies are listed in the [package.json](https://github.com/transpong/Transpong/blob/master/server/package.json) file.
 
-Here is the formatted table with the provided data:
-
 | Package                    | Description                                                  |
 |----------------------------|--------------------------------------------------------------|
 | @nestjs/class-transformer  | Class transformation library                                 |
