@@ -32,6 +32,8 @@ docker-compose up --build
 O banco de dados é criado automaticamente ao executar o comando `docker-compose up --build`.
 Uma representação dos relacionamentos entre as tabelas pode ser vista abaixo:
 
+![postgres - public](https://github.com/transpong/Transpong/assets/47704550/359ce99d-7627-46ed-8a21-485fa838c88d)
+
 
 
 ## Dependências
